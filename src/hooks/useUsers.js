@@ -10,7 +10,7 @@ const useUsers = () => {
         setLoading(true);
         try {
             const response = await axiosClient.get('/Customers');
-            setUsers(response);
+            setUsers(response.result);
         } catch (err) {
             setError(err.message || 'Failed to fetch users');
         } finally {
@@ -18,28 +18,28 @@ const useUsers = () => {
         }
     };
     
-    const addUser = async (newUser) => {
+    const addUser = (newUser) => {
         try {
-            const response = await axiosClient.post('/Customers', newUser);
-            setUsers([...users, { ...newUser, id: response.id }]);
+            const response = axiosClient.post('/Customers', newUser);
+            setUsers([...users, { ...newUser, id: response.result.id }]);
         } catch (err) {
             setError(err.message || 'Failed to add user');
         }
     };
 
-    const updateUser = async (username, updatedUser) => {
+    const updateUser = (id, updatedUser) => {
         try {
-            await axiosClient.put(`/Customers/${username}`, updatedUser);
-            setUsers(users.map((user) => (user.username === username ? updatedUser : user)));
+            axiosClient.put(`/Customers/${id}`, updatedUser);
+            setUsers(users.map((user) => (user.id === id ? updatedUser : user)));
         } catch (err) {
             setError(err.message || 'Failed to update user');
         }
     };
 
-    const deleteUser = async (username) => {
+    const deleteUser = (id) => {
         try {
-            await axiosClient.delete(`/Customers/${username}`);
-            setUsers(users.filter((user) => user.username !== username));
+            axiosClient.delete(`/Customers/${id}`);
+            setUsers(users.filter((user) => user.id !== id));
         } catch (err) {
             setError(err.message || 'Failed to delete user');
         }

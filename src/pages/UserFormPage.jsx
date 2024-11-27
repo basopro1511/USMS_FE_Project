@@ -5,15 +5,15 @@ import UserForm from '../components/UserForm';
 import useUsers from '../hooks/useUsers';
 
 const UserFormPage = () => {
-    const { username } = useParams();
+    const { id } = useParams();
     const { users, addUser, updateUser } = useUsers();
     const navigate = useNavigate();
 
-    const editingUser = username ? users.find((user) => user.username === username) : null;
+    const editingUser = id ? users.find((user) => user.id === id) : null;
 
     const handleSubmit = (formData) => {
         if (editingUser) {
-            updateUser(editingUser.username, formData);
+            updateUser(editingUser.id, formData);
         } else {
             addUser(formData);
         }

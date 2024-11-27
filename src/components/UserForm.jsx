@@ -3,29 +3,19 @@
 import React, { useState, useEffect } from 'react';
 
 const UserForm = ({ onSubmit, initialData = {} }) => {
-    const formatDate = (date) => {
-        if (!date) return '';
-        const formattedDate = new Date(date);
-        return formattedDate.toISOString().split('T')[0];
-    };
-
     const [formData, setFormData] = useState({
-        username: initialData?.username || '',
-        password: initialData?.password || '',
-        fullname: initialData?.fullname || '',
-        gender: initialData?.gender || '',
-        birthday: initialData?.birthday ? formatDate(initialData.birthday) : '',
+        id: initialData?.id || '',
+        name: initialData?.name || '',
+        phone: initialData?.phone || '',
         address: initialData?.address || ''
     });
 
     useEffect(() => {
         if (initialData) {
             setFormData({
-                username: initialData.username || '',
-                password: initialData.password || '',
-                fullname: initialData.fullname || '',
-                gender: initialData.gender || '',
-                birthday: initialData.birthday ? formatDate(initialData.birthday) : '',
+                id: initialData.id || '',
+                name: initialData.name || '',
+                phone: initialData.phone || '',
                 address: initialData.address || ''
             });
         }
@@ -45,9 +35,9 @@ const UserForm = ({ onSubmit, initialData = {} }) => {
         <form onSubmit={handleSubmit} className="user-form">
             <input
                 type="text"
-                name="username"
-                placeholder="Username"
-                value={formData.username}
+                name="id"
+                placeholder="ID"
+                value={formData.id}
                 onChange={handleChange}
                 required
                 readOnly={initialData ? true : false}
@@ -55,36 +45,18 @@ const UserForm = ({ onSubmit, initialData = {} }) => {
             <br />
             <input
                 type="text"
-                name="password"
-                placeholder="Password"
-                value={formData.password}
-                onChange={handleChange}
-                required
-            />
-            <br />
-            <input
-                type="text"
-                name="fullname"
+                name="name"
                 placeholder="Fullname"
-                value={formData.fullname}
+                value={formData.name}
                 onChange={handleChange}
                 required
             />
             <br />
             <input
                 type="text"
-                name="gender"
-                placeholder="Gender"
-                value={formData.gender}
-                onChange={handleChange}
-                required
-            />
-            <br />
-            <input
-                type="date"
-                name="birthday"
-                placeholder="Birthday"
-                value={formData.birthday}
+                name="phone"
+                placeholder="Phone"
+                value={formData.phone}
                 onChange={handleChange}
                 required
             />

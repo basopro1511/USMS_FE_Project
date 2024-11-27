@@ -12,12 +12,12 @@ const UserPage = () => {
         navigate('/users/new');
     };
 
-    const handleEditUser = (username) => {
-        navigate(`/users/edit/${username}`);
+    const handleEditUser = (id) => {
+        navigate(`/users/edit/${id}`);
     };
 
-    const handleDeleteUser = (username) => {
-        deleteUser(username);
+    const handleDeleteUser = (id) => {
+        deleteUser(id);
     };
 
     if (loading) return <p>Loading...</p>;

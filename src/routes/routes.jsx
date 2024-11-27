@@ -10,7 +10,7 @@ const AppRoutes = () => {
             <Routes>
                 <Route path="/" element={<UserPage />} />
                 <Route path="/users/new" element={<UserFormPage />} />
-                <Route path="/users/edit/:username" element={<UserFormPage />} />
+                <Route path="/users/edit/:id" element={<UserFormPage />} />
             </Routes>
         </Router>
     );

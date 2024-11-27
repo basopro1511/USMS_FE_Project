@@ -11,27 +11,25 @@ const UserList = ({ users, onEdit, onDelete }) => {
             <table border="1" style={{ width: '100%', textAlign: 'left', borderCollapse: 'collapse' }}>
                 <thead>
                     <tr>
-                        <th>Username</th>
+                        <th>ID</th>
                         <th>Fullname</th>
-                        <th>Birthday</th>
-                        <th>Gender</th>
+                        <th>Phone</th>
                         <th>Address</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     {users.map((user) => (
-                        <tr key={user.username}>
-                            <td>{user.username}</td>
-                            <td>{user.fullname}</td>
-                            <td>{user.birthday}</td>
-                            <td>{user.gender}</td>
+                        <tr key={user.id}>
+                            <td>{user.id}</td>
+                            <td>{user.name}</td>
+                            <td>{user.phone}</td>
                             <td>{user.address}</td>
                             <td>
-                                <button onClick={() => onEdit(user.username)} style={{ marginRight: '10px' }}>
+                                <button onClick={() => onEdit(user.id)} style={{ marginRight: '10px' }}>
                                     Edit
                                 </button>
-                                <button onClick={() => onDelete(user.username)}>
+                                <button onClick={() => onDelete(user.id)}>
                                     Delete
                                 </button>
                             </td>
