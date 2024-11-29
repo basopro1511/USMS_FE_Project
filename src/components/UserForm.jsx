@@ -1,8 +1,8 @@
-/* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
+/* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from 'react';
 
-const UserForm = ({ onSubmit, initialData = {} }) => {
+const UserForm = ({ onSubmit, initialData = {}, error }) => {
     const [formData, setFormData] = useState({
         id: initialData?.id || '',
         name: initialData?.name || '',
@@ -33,6 +33,7 @@ const UserForm = ({ onSubmit, initialData = {} }) => {
 
     return (
         <form onSubmit={handleSubmit} className="user-form">
+            {error && <p style={{ color: 'red', marginBottom: '10px' }}>{error}</p>}
             <input
                 type="text"
                 name="id"

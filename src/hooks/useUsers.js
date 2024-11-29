@@ -6,42 +6,77 @@ const useUsers = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
+    const handleAPIResponse = (response, onSuccess, onError) => {
+        if (response?.isSuccess) {
+            onSuccess(response.result);
+            return true;
+        } else {
+            const errorMessage = response?.message || 'An error occurred';
+            setError(errorMessage);
+            if (onError){
+                onError(errorMessage);
+            } 
+            return false;
+        }
+    };
+
     const fetchUsers = async () => {
         setLoading(true);
+        setError(null);
         try {
             const response = await axiosClient.get('/Customers');
-            setUsers(response.result);
+            handleAPIResponse(response, (result) => setUsers(result || []));
         } catch (err) {
             setError(err.message || 'Failed to fetch users');
         } finally {
             setLoading(false);
         }
     };
-    
-    const addUser = (newUser) => {
+
+    const addUser = async (newUser) => {
+        setError(null);
         try {
-            const response = axiosClient.post('/Customers', newUser);
-            setUsers([...users, { ...newUser, id: response.result.id }]);
+            const response = await axiosClient.post('/Customers', newUser);
+            return handleAPIResponse(
+                response,
+                (result) => setUsers((prevUsers) => [...prevUsers, { ...newUser, id: result?.id }])
+            );
         } catch (err) {
             setError(err.message || 'Failed to add user');
+            return false;
         }
     };
 
-    const updateUser = (id, updatedUser) => {
+    const updateUser = async (id, updatedUser) => {
+        setError(null);
         try {
-            axiosClient.put(`/Customers/${id}`, updatedUser);
-            setUsers(users.map((user) => (user.id === id ? updatedUser : user)));
+            const response = await axiosClient.put(`/Customers/${id}`, updatedUser);
+            return handleAPIResponse(
+                response,
+                () =>
+                    setUsers((prevUsers) =>
+                        prevUsers.map((user) => (user.id === id ? { ...user, ...updatedUser } : user))
+                    )
+            );
         } catch (err) {
             setError(err.message || 'Failed to update user');
+            return false;
         }
     };
 
-    const deleteUser = (id) => {
+    const deleteUser = async (id) => {
+        setError(null);
         try {
-            axiosClient.delete(`/Customers/${id}`);
-            setUsers(users.filter((user) => user.id !== id));
+            const response = await axiosClient.delete(`/Customers/${id}`);
+            return handleAPIResponse(
+                response,
+                () => setUsers((prevUsers) => prevUsers.filter((user) => user.id !== id)),
+                (errMessage) => setError(errMessage)
+            ) ? null : response.message;
         } catch (err) {
-            setError(err.message || 'Failed to delete user');
+            const errorMessage = err.message || 'Failed to delete user';
+            setError(errorMessage);
+            return errorMessage;
         }
     };
 

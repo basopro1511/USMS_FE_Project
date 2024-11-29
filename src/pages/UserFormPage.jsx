@@ -6,24 +6,28 @@ import useUsers from '../hooks/useUsers';
 
 const UserFormPage = () => {
     const { id } = useParams();
-    const { users, addUser, updateUser } = useUsers();
+    const { users, addUser, updateUser, error } = useUsers();
     const navigate = useNavigate();
 
     const editingUser = id ? users.find((user) => user.id === id) : null;
 
-    const handleSubmit = (formData) => {
+    const handleSubmit = async  (formData) => {
+        let isSuccess;
         if (editingUser) {
-            updateUser(editingUser.id, formData);
+            isSuccess = await updateUser(editingUser.id, formData);
         } else {
-            addUser(formData);
+            isSuccess = await addUser(formData);
         }
-        navigate('/');
+
+        if (isSuccess) {
+            navigate('/');
+        }
     };
 
     return (
         <div>
             <h1>{editingUser ? 'Edit User' : 'Add User'}</h1>
-            <UserForm onSubmit={handleSubmit} initialData={editingUser} />
+            <UserForm onSubmit={handleSubmit} initialData={editingUser} error={error} />
         </div>
     );
 };
