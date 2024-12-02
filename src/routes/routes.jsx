@@ -1,20 +1,18 @@
-/* eslint-disable no-unused-vars */
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import UserPage from '../pages/UserPage';
-import UserFormPage from '../pages/UserFormPage';
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Navigate } from "react-router-dom";
+import Login from "../pages/CommonPages/Login";
+import Home from "../pages/Schedule/Home"
 
 const AppRoutes = () => {
-    return (
-        <Router>
-            <Routes>
-                <Route path="/" element={<UserPage />} />
-                <Route path="/users/new" element={<UserFormPage />} />
-                <Route path="/users/edit/:id" element={<UserFormPage />} />
-            </Routes>
-        </Router>
-    );
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Navigate to="/Login" />} />
+        <Route path="/Login" element={<Login />} />
+        <Route path="/Home" element={<Home />} />
+      </Routes>
+    </BrowserRouter>
+  );
 };
 
 export default AppRoutes;
-
