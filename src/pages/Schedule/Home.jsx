@@ -1,6 +1,12 @@
+import Footer from "../../components/CommonComponents/Footer";
+import Header from "../../components/CommonComponents/Header";
+
 function Home() {
   return (
-    <div className="text-center my-auto h-screen w-screen">Schedule là trang chủ!</div>
+    <div className="h-screen w-screen">
+      <Header/>
+      <Footer/>
+    </div>
   )
 }
 
