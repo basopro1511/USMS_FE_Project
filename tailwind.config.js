@@ -4,10 +4,13 @@ export default {
   theme: {
     extend: {
       colors: {
-        WhiteGrey: "#E0E5E9",
-        Grey: "#EBEBEB",
-        Dark: "#000000",
-        Success: "#2F903F",
+        whiteGrey: "#E0E5E9",
+        grey: "#EBEBEB",
+        dark: "#000000",
+        success: "#2F903F",
+        quaternarty:"#78cae2",
+        whitegray:"#e0e5e9",
+        primary: "#3c6470"
       },
     },
   },
