@@ -4,16 +4,12 @@ import HeaderManage from '../components/management/HeaderFooter/HeaderManage';
 
 function LayoutManage({ children }) {
     return (
-        <div style={{display:'flex'}}>
-             <div className='w-screen ' style={{display: 'flex', backgroundColor:"#e0e5e9", maxWidth: false}}>
-                <div style={{marginLeft:"auto"}}>
+      <div className="flex bg-secondaryGray max-w-false" >
                  <SidebarManage/>
-                </div>
-                    <div style={{paddingTop:15, marginRight:"auto", }}>
+                    <div>
                         <HeaderManage></HeaderManage>
                         <main>{children}</main>
                     </div>
-            </div>
         </div>
     );
 }

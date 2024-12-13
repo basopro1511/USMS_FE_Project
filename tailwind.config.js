@@ -4,13 +4,28 @@ export default {
   theme: {
     extend: {
       colors: {
-        whiteGrey: "#E0E5E9",
-        grey: "#EBEBEB",
         dark: "#000000",
         success: "#2F903F",
-        quaternarty:"#78cae2",
-        whitegray:"#e0e5e9",
-        primary: "#3c6470"
+
+        //green
+        primaryGreen:"#046808",
+        secondaryGreen:"#2f903f",
+        tritenaryGreen: "#55b359",
+        quaternartyGreen:"#669fa0",
+
+        //blue
+        primaryBlue:"#3c6470",
+        secondaryBlue:"#64a8bc",
+        quaternartyBlue:"#78cae2",
+        whiteBlue:"#e6f7ff",
+        boldBlue:"#1706ff",
+        btnBlue:"#2196f3",
+
+        //gray
+        primaryGray: "#e0e5e9",
+        secondaryGray:"#ebebeb",
+
+        //other color
       },
     },
   },

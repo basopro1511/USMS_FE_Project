@@ -1,22 +1,22 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Login from "../pages/CommonPages/Login";
-import Home from "../pages/user/Schedule/Home"
 import ManageLayout from '../layouts/LayoutManagement';
 import LayoutDefault from '../layouts/LayoutDefault';
 import ManageSchedule from '../pages/manage/schedule/schedule';
 import ManageClass from '../pages/manage/class/class';
+import LayoutUser from '../layouts/LayoutUser';
+import StudentSchedule from '../pages/user/Schedule/StudentSchedule';
 
 const AppRoutes = () => {
   const routes = [
     //Login Zone //
     { path: "/", component: Login, layout: LayoutDefault },
 
-    //User Zone //
-    { path: "/home", component: Home, layout: ManageLayout },
+    //User Zone (Teacher, Student )//
+    { path: "/studentSchedule", component: StudentSchedule, layout: LayoutUser },
 
     //Manange Zone //
     { path: "/manageClass", component: ManageClass, layout: ManageLayout },
-
     { path: "/manageSchedule", component: ManageSchedule, layout: ManageLayout },
 
     
