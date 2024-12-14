@@ -6,21 +6,24 @@ import ManageSchedule from '../pages/manage/schedule/schedule';
 import ManageClass from '../pages/manage/class/class';
 import LayoutUser from '../layouts/LayoutUser';
 import StudentSchedule from '../pages/user/Schedule/StudentSchedule';
+import UserHome from '../pages/user/Home/UserHome';
+import StudentDetail from '../pages/user/Schedule/StudentDetail';
 
 const AppRoutes = () => {
   const routes = [
     //Login Zone //
     { path: "/", component: Login, layout: LayoutDefault },
 
-    //User Zone (Teacher, Student )//
+    //User Zone (Teacher, Student )
+    { path: "/home", component: UserHome, layout: LayoutUser },
     { path: "/studentSchedule", component: StudentSchedule, layout: LayoutUser },
+    { path: "/studentDetail", component: StudentDetail, layout: LayoutUser },
+
+    
 
     //Manange Zone //
     { path: "/manageClass", component: ManageClass, layout: ManageLayout },
     { path: "/manageSchedule", component: ManageSchedule, layout: ManageLayout },
-
-    
-
 
 
 ];
