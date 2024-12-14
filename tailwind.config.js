@@ -1,4 +1,5 @@
 /** @type {import('tailwindcss').Config} */
+
 export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
@@ -27,6 +28,11 @@ export default {
 
         //other color
       },
+      backgroundImage: {
+        'bgHome1': "url('/src/assets/Imgs/bgHome1.jpg')",
+        'bgHome2': "url('/src/assets/Imgs/bgHome2.jpg')",
+        'bgHome3': "url('/src/assets/Imgs/bgHome3.jpg')",
+      },         
     },
   },
   plugins: [],
