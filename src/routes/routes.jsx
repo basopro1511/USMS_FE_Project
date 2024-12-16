@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Login from "../pages/CommonPages/Login";
+import Login from "../pages/Login/Login";
 import ManageLayout from '../layouts/LayoutManagement';
 import LayoutDefault from '../layouts/LayoutDefault';
 import ManageSchedule from '../pages/manage/schedule/schedule';
@@ -8,6 +8,7 @@ import LayoutUser from '../layouts/LayoutUser';
 import StudentSchedule from '../pages/user/Schedule/StudentSchedule';
 import UserHome from '../pages/user/Home/UserHome';
 import StudentDetail from '../pages/user/Schedule/StudentDetail';
+import StudentInClass from '../pages/manage/class/studentInClass';
 
 const AppRoutes = () => {
   const routes = [
@@ -23,6 +24,7 @@ const AppRoutes = () => {
 
     //Manange Zone //
     { path: "/manageClass", component: ManageClass, layout: ManageLayout },
+    { path: "/studentInClass", component: StudentInClass, layout: ManageLayout },
     { path: "/manageSchedule", component: ManageSchedule, layout: ManageLayout },
 
 

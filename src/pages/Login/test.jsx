@@ -33,11 +33,11 @@ function Login() {
 
   return (
     <div className="flex flex-col items-center justify-center h-screen">
-      <div className="text-center mb-4">
+      <div className="text-center mb-2">
         <img
           src="/src/assets/images/Logo-FPT.svg"
           alt="FPT Logo"
-          className="mx-auto mb-12"
+          className="mb-5"
         />
       </div>
       <div className="w-1/4 min-w-max max-w-96 bg-white p-8 rounded-lg shadow-lg border border-solid border-black">
@@ -94,7 +94,7 @@ function Login() {
           )}
           <button
             type="submit"
-            className="w-full font-semibold transition ease-in-out hover:scale-110 hover:font-bold duration-300 bg-Success text-white py-2 px-4 rounded-lg"
+            className="w-full font-semibold transition ease-in-out hover:scale-110 hover:font-bold duration-300 bg-success text-white py-2 px-4 rounded-lg"
           >
             Đăng nhập
           </button>

@@ -1,94 +1,75 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
 
-function ManageClass() {
-  const [data] = useState([
-    { id: "1",  classId: "SE1702", subjectId: "PRM392", semesterId: "FA24", major: "Information Technology", term: "9", status: "1" },
-    { id: "2",  classId: "SE1702", subjectId: "PRN231", semesterId: "FA24", major: "Information Technology", term: "9", status: "0" },
-    { id: "3",  classId: "SE1703", subjectId: "PRM101", semesterId: "FA24", major: "Computer Science", term: "8", status: "2" },
-    { id: "4",  classId: "SE1704", subjectId: "PRM102", semesterId: "FA24", major: "Information Technology", term: "9", status: "1" },
-    { id: "5",  classId: "SE1705", subjectId: "PRN202", semesterId: "FA24", major: "Computer Science", term: "8", status: "2" },
-    { id: "6",  classId: "SE1706", subjectId: "PRM232", semesterId: "FA24", major: "Mathematics", term: "2", status: "0" },
-    { id: "7",  classId: "SE1707", subjectId: "PRM303", semesterId: "FA24", major: "Physics", term: "8", status: "1" },
-    { id: "8",  classId: "SE1708", subjectId: "PRM404", semesterId: "FA24", major: "Engineering", term: "9", status: "2" },
-    { id: "9",  classId: "SE1709", subjectId: "PRN101", semesterId: "FA25", major: "Information Technology", term: "9", status: "0" },
-    { id: "10", classId: "SE1710", subjectId: "PRN102", semesterId: "FA24", major: "Computer Science", term: "8", status: "1" },
-    { id: "11", classId: "SE1711", subjectId: "PRM303", semesterId: "FA24", major: "Physics", term: "8", status: "2" },
-    { id: "12", classId: "SE1712", subjectId: "PRM404", semesterId: "FA24", major: "Engineering", term: "9", status: "0" },
-    { id: "13", classId: "SE1713", subjectId: "PRM503", semesterId: "FA25", major: "Mathematics", term: "9", status: "1" },
-    { id: "14", classId: "SE1714", subjectId: "PRN211", semesterId: "FA24", major: "Engineering", term: "9", status: "2" },
-    { id: "15", classId: "SE1715", subjectId: "PRM512", semesterId: "FA24", major: "Physics", term: "8", status: "1" },
-    { id: "16", classId: "SE1716", subjectId: "PRM400", semesterId: "FA24", major: "Computer Science", term: "9", status: "0" },
-    { id: "17", classId: "SE1717", subjectId: "PRM301", semesterId: "FA24", major: "Information Technology", term: "8", status: "2" },
-    { id: "18", classId: "SE1718", subjectId: "PRM201", semesterId: "FA25", major: "Mathematics", term: "9", status: "0" },
-    { id: "19", classId: "SE1719", subjectId: "PRM302", semesterId: "FA25", major: "Engineering", term: "9", status: "1" },
-    { id: "20", classId: "SE1720", subjectId: "PRM303", semesterId: "FA24", major: "Computer Science", term: "8", status: "2" },
-    { id: "21", classId: "SE1721", subjectId: "PRM202", semesterId: "FA24", major: "Physics", term: "9", status: "1" },
-    { id: "22", classId: "SE1722", subjectId: "PRM301", semesterId: "FA25", major: "Mathematics", term: "9", status: "2" },
-    { id: "23", classId: "SE1723", subjectId: "PRM404", semesterId: "FA24", major: "Engineering", term: "9", status: "0" },
-    { id: "24", classId: "SE1724", subjectId: "PRM503", semesterId: "FA25", major: "Computer Science", term: "9", status: "1" },
-    { id: "25", classId: "SE1725", subjectId: "PRM601", semesterId: "FA24", major: "Information Technology", term: "8", status: "2" },
-    { id: "26", classId: "SE1726", subjectId: "PRM404", semesterId: "FA24", major: "Mathematics", term: "8", status: "1" },
-    { id: "27", classId: "SE1727", subjectId: "PRN101", semesterId: "FA24", major: "Computer Science", term: "9", status: "0" },
-    { id: "28", classId: "SE1728", subjectId: "PRN202", semesterId: "FA25", major: "Physics", term: "9", status: "1" },
-    { id: "29", classId: "SE1729", subjectId: "PRM202", semesterId: "FA24", major: "Engineering", term: "8", status: "0" },
-    { id: "30", classId: "SE1730", subjectId: "PRM303", semesterId: "FA24", major: "Information Technology", term: "9", status: "1" }
+function StudentInClass() {
+    
+// Region: State Initialization
+const [data] = useState([
+   
   ]);
-  
   const [filters, setFilters] = useState({
     major: "",
     classId: "",
     subjectId: "",
     semesterId: "",
   });
-
   const [availableClasses, setAvailableClasses] = useState([]);
   const [availableSubjects, setAvailableSubjects] = useState([]);
   const [availableSemesters, setAvailableSemesters] = useState([]);
-
   // Get all unique values for major, classId, subjectId, and semesterId
-  const majors = Array.from(new Set(data.map(item => item.major)));
-
+  const majors = Array.from(new Set(data.map((item) => item.major)));
   useEffect(() => {
     // Bước 1: Lọc theo major (nếu có filter major)
-    let filteredSubjects = data.filter(item => filters.major ? item.major === filters.major : true);
-  
+    let filteredSubjects = data.filter((item) =>
+      filters.major ? item.major === filters.major : true
+    );
     // Bước 2: Lọc subjectId duy nhất từ filteredSubjects
-    filteredSubjects = Array.from(new Set(filteredSubjects.map(item => item.subjectId)))
-      .map(subjectId => filteredSubjects.find(item => item.subjectId === subjectId));
+    filteredSubjects = Array.from(
+      new Set(filteredSubjects.map((item) => item.subjectId))
+    ).map((subjectId) =>
+      filteredSubjects.find((item) => item.subjectId === subjectId)
+    );
     setAvailableSubjects(filteredSubjects);
-  
+
     // Bước 3: Lọc các lớp (classes) theo subjectId nếu có filter subjectId
     let filteredClasses = filteredSubjects;
     if (filters.subjectId) {
-      filteredClasses = filteredSubjects.filter(item => item.subjectId === filters.subjectId);
+      filteredClasses = filteredSubjects.filter(
+        (item) => item.subjectId === filters.subjectId
+      );
     }
-    
+
     // Bước 4: Lọc classId duy nhất từ filteredClasses
-    filteredClasses = Array.from(new Set(filteredClasses.map(item => item.classId)))
-      .map(classId => filteredClasses.find(item => item.classId === classId));
+    filteredClasses = Array.from(
+      new Set(filteredClasses.map((item) => item.classId))
+    ).map((classId) =>
+      filteredClasses.find((item) => item.classId === classId)
+    );
     setAvailableClasses(filteredClasses);
-  
+
     // Bước 5: Lọc semesterId duy nhất từ filteredClasses (theo classId hoặc subjectId nếu có filter)
     let filteredSemesters = filteredClasses;
     if (filters.subjectId) {
-      filteredSemesters = filteredClasses.filter(item => item.subjectId === filters.subjectId);
+      filteredSemesters = filteredClasses.filter(
+        (item) => item.subjectId === filters.subjectId
+      );
     }
     if (filters.classId) {
-      filteredSemesters = filteredSemesters.filter(item => item.classId === filters.classId);
+      filteredSemesters = filteredSemesters.filter(
+        (item) => item.classId === filters.classId
+      );
     }
-    setAvailableSemesters(Array.from(new Set(filteredSemesters.map(item => item.semesterId))));
-  
+    setAvailableSemesters(
+      Array.from(new Set(filteredSemesters.map((item) => item.semesterId)))
+    );
   }, [filters, data]);
-  
+
   // Handle filter changes
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
     setFilters((prev) => ({ ...prev, [name]: value }));
   };
-
   // Filter data based on selected filters
-  const filteredData = data.filter(item => {
+  const filteredData = data.filter((item) => {
     return (
       (!filters.major || item.major === filters.major) &&
       (!filters.classId || item.classId === filters.classId) &&
@@ -96,43 +77,38 @@ function ManageClass() {
       (!filters.semesterId || item.semesterId === filters.semesterId)
     );
   });
-
   const [sortConfig, setSortConfig] = useState({
-      key: "classId",
-      direction: "asc",
-    }); // Sort state
-    const [currentPage, setCurrentPage] = useState(1); // Track current page
-    const pageSize = 9; // Items per page
-  
-    // Handle sorting logic
-    const handleSort = (key) => {
-      const direction =
-        sortConfig.key === key && sortConfig.direction === "asc" ? "desc" : "asc";
-      setSortConfig({ key, direction });
-    };
-  
-    // Sort data based on current sort config
-    const sortedData = [...filteredData].sort((a, b) => {
-      if (a[sortConfig.key] < b[sortConfig.key]) {
-        return sortConfig.direction === "asc" ? -1 : 1;
-      }
-      if (a[sortConfig.key] > b[sortConfig.key]) {
-        return sortConfig.direction === "asc" ? 1 : -1;
-      }
-      return 0;
-    });
-  
-    // Calculate which items to show based on current page
-    const indexOfLastItem = currentPage * pageSize;
-    const indexOfFirstItem = indexOfLastItem - pageSize;
-    const currentData = sortedData.slice(indexOfFirstItem, indexOfLastItem);
-  
-    const handlePageChange = (newPage) => {
-      if (newPage >= 1 && newPage <= Math.ceil(sortedData.length / pageSize)) {
-        setCurrentPage(newPage);
-      }
-    };
-  
+    key: "classId",
+    direction: "asc",
+  }); // Sort state
+  const [currentPage, setCurrentPage] = useState(1); // Track current page
+  const pageSize = 9; // Items per page
+  // Handle sorting logic
+  const handleSort = (key) => {
+    const direction =
+      sortConfig.key === key && sortConfig.direction === "asc" ? "desc" : "asc";
+    setSortConfig({ key, direction });
+  };
+  // Sort data based on current sort config
+  const sortedData = [...filteredData].sort((a, b) => {
+    if (a[sortConfig.key] < b[sortConfig.key]) {
+      return sortConfig.direction === "asc" ? -1 : 1;
+    }
+    if (a[sortConfig.key] > b[sortConfig.key]) {
+      return sortConfig.direction === "asc" ? 1 : -1;
+    }
+    return 0;
+  });
+  // Calculate which items to show based on current page
+  const indexOfLastItem = currentPage * pageSize;
+  const indexOfFirstItem = indexOfLastItem - pageSize;
+  const currentData = sortedData.slice(indexOfFirstItem, indexOfLastItem);
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= Math.ceil(sortedData.length / pageSize)) {
+      setCurrentPage(newPage);
+    }
+  };
+// EndRegion
 
   return (
     <div className="border mt-4 h-auto pb-7 w-[1600px] bg-white rounded-2xl">
@@ -215,9 +191,8 @@ function ManageClass() {
         </div>
       </div>
 
-     
       {/* table - Start */}
-      <div className="w-[1565px] ml-3 relative flex flex-col w-full mt-4 bg-white shadow-md rounded-2xl border border-gray overflow-hidden">
+      <div className="w-[1566px] ml-3 relative flex flex-col w-full mt-4 bg-white shadow-md rounded-2xl border border-gray overflow-hidden">
         <table className="w-full text-left table-auto bg-white">
           <thead className="bg-gray-100">
             <tr>
@@ -226,7 +201,9 @@ function ManageClass() {
                 onClick={() => handleSort("classId")}
               >
                 <div className="flex items-center justify-between">
-                  <p className="m-auto transition-all hover:scale-105">Mã lớp</p>
+                  <p className="m-auto transition-all hover:scale-105">
+                    Mã lớp
+                  </p>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
@@ -387,22 +364,21 @@ function ManageClass() {
                     ? "Đã kết thúc"
                     : "Không xác định"}
                 </td>
-                <td className="p-4 text-center align-middle">
+                <td className="flex p-4 text-center align-middle">
                   <button className="w-8 h-8 ml-auto mr-2 bg-primaryBlue text-white rounded-xl shadow-md hover:bg-blue-700 transition-all hover:scale-125">
-                  <i className="fa-solid fa-pen-fancy"></i>
+                    <i className="fa-solid fa-pen-fancy"></i>
                   </button>
                   {/* Button 2 */}
-                  <Link to={"/studentInClass"}>
                   <button className="w-8 h-8 mr-auto bg-green-600 text-white rounded-xl shadow-md hover:bg-green-700 transition-all  hover:scale-125">
-                  <i className="fa-regular fa-address-card"></i>
+                    <i className="fa-regular fa-address-card"></i>
                   </button>
-                  </Link>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+
       {/* table - End */}
 
       {/* Phân trang - start */}
@@ -435,4 +411,4 @@ function ManageClass() {
   );
 }
 
-export default ManageClass;
+export default StudentInClass;
