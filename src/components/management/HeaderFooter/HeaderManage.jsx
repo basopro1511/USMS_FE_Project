@@ -13,8 +13,16 @@ function HeaderManage() {
       <div className="flex items-center space-x-2">
         {isActive("/manageSchedule") && (
           <>
-            <i className="fas fa-calendar w-4 h-4"></i>
+            <i className="fas fa-calendar-days w-4 h-4"></i>
             <p className="text-lg italic">Quản lý lịch học</p>
+          </>
+        )}
+        {isActive("/manageClass") && (
+          <>
+            <i
+              className="fa-solid fa-table-list w-4 h-4"
+            ></i>
+            <p className="text-lg italic">Quản lý lớp học</p>
           </>
         )}
       </div>

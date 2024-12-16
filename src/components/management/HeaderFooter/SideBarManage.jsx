@@ -19,13 +19,13 @@ function SidebarManage() {
         <div className="mt-3">
           <h1 className="text-lg font-bold ml-2">Bảng điều khiển</h1>
           <ul>
-            <Link to="/manageSchedule">
+            <Link to="/manageClass">
               <li
                 className={`flex items-center cursor-pointer w-56 mb-2 ml-2 rounded-lg p-2 transition-all duration-300 ${
                   isActive("/manageClass") ? "bg-quaternartyBlue pl-6" : "hover:bg-quaternartyBlue hover:pl-6"
                 }`}
               >
-                <i className="fas fa-th-large mr-2"></i>
+                <i className="fa-solid fa-table-list mr-2"></i>
                 <span>Quản lý lớp</span>
               </li>
             </Link>
@@ -39,7 +39,7 @@ function SidebarManage() {
 
             <Link to="/">
               <li className="flex items-center cursor-pointer w-56 mb-2 ml-2 rounded-lg p-2 hover:bg-quaternartyBlue hover:pl-6 transition-all duration-300">
-                <i className="fas fa-calendar-alt mr-2"></i>
+                <i className="fas fa-calendar-week mr-2"></i>
                 <span>Quản lý kì học</span>
               </li>
             </Link>
@@ -57,7 +57,7 @@ function SidebarManage() {
                   isActive("/manageSchedule") ? "bg-quaternartyBlue pl-6" : "hover:bg-quaternartyBlue hover:pl-6"
                 }`}
               >
-                <i className="fas fa-calendar mr-2"></i>
+                <i className="fas fa-calendar-alt mr-2"></i>
                 <span>Quản lý lịch học</span>
               </li>
             </Link>
