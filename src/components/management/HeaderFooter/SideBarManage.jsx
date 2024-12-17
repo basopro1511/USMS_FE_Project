@@ -22,7 +22,9 @@ function SidebarManage() {
             <Link to="/manageClass">
               <li
                 className={`flex items-center cursor-pointer w-56 mb-2 ml-2 rounded-lg p-2 transition-all duration-300 ${
-                  isActive("/manageClass") ? "bg-quaternartyBlue pl-6" : "hover:bg-quaternartyBlue hover:pl-6"
+                  isActive("/manageClass")
+                    ? "bg-quaternartyBlue pl-6"
+                    : "hover:bg-quaternartyBlue hover:pl-6"
                 }`}
               >
                 <i className="fa-solid fa-table-list mr-2"></i>
@@ -30,22 +32,42 @@ function SidebarManage() {
               </li>
             </Link>
 
-            <Link to="/">
-              <li className="flex items-center cursor-pointer w-56 mb-2 ml-2 rounded-lg p-2 hover:bg-quaternartyBlue hover:pl-6 transition-all duration-300">
+            <Link to="/manageSubject">
+              <li
+                className={`flex items-center cursor-pointer w-56 mb-2 ml-2 rounded-lg p-2 transition-all duration-300 ${
+                  isActive("/manageSubject")
+                    ? "bg-quaternartyBlue pl-6"
+                    : "hover:bg-quaternartyBlue hover:pl-6"
+                }`}
+              >
+                {" "}
                 <i className="fas fa-book mr-2"></i>
                 <span>Quản lý môn</span>
               </li>
             </Link>
 
             <Link to="/">
-              <li className="flex items-center cursor-pointer w-56 mb-2 ml-2 rounded-lg p-2 hover:bg-quaternartyBlue hover:pl-6 transition-all duration-300">
+              <li
+                className={`flex items-center cursor-pointer w-56 mb-2 ml-2 rounded-lg p-2 transition-all duration-300 ${
+                  isActive("/manageSemester")
+                    ? "bg-quaternartyBlue pl-6"
+                    : "hover:bg-quaternartyBlue hover:pl-6"
+                }`}
+              >
                 <i className="fas fa-calendar-week mr-2"></i>
                 <span>Quản lý kì học</span>
               </li>
             </Link>
 
-            <Link to="/">
-              <li className="flex items-center cursor-pointer w-56 mb-2 ml-2 rounded-lg p-2 hover:bg-quaternartyBlue hover:pl-6 transition-all duration-300">
+            <Link to="/manageRoom">
+              <li
+                className={`flex items-center cursor-pointer w-56 mb-2 ml-2 rounded-lg p-2 transition-all duration-300 ${
+                  isActive("/manageRoom")
+                    ? "bg-quaternartyBlue pl-6"
+                    : "hover:bg-quaternartyBlue hover:pl-6"
+                }`}
+              >
+                {" "}
                 <i className="fas fa-door-open mr-2"></i>
                 <span>Quản lý phòng học</span>
               </li>
@@ -54,7 +76,9 @@ function SidebarManage() {
             <Link to="/manageSchedule">
               <li
                 className={`flex items-center cursor-pointer w-56 mb-2 ml-2 rounded-lg p-2 transition-all duration-300 ${
-                  isActive("/manageSchedule") ? "bg-quaternartyBlue pl-6" : "hover:bg-quaternartyBlue hover:pl-6"
+                  isActive("/manageSchedule")
+                    ? "bg-quaternartyBlue pl-6"
+                    : "hover:bg-quaternartyBlue hover:pl-6"
                 }`}
               >
                 <i className="fas fa-calendar-alt mr-2"></i>

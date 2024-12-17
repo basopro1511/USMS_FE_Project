@@ -25,6 +25,14 @@ function HeaderManage() {
             <p className="text-lg italic">Quản lý lớp học</p>
           </>
         )}
+              {isActive("/manageRoom") && (
+          <>
+            <i
+              className="fas fa-door-open w-4 h-4"
+            ></i>
+            <p className="text-lg italic">Quản lý phòng học</p>
+          </>
+        )}
       </div>
 
       {/* Right section with the avatar and logout */}
