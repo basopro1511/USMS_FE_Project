@@ -10,11 +10,14 @@ import UserHome from '../pages/user/Home/UserHome';
 import StudentDetail from '../pages/user/Schedule/StudentDetail';
 import StudentInClass from '../pages/manage/class/studentInClass';
 import StudentActivityDetail from '../pages/user/Schedule/StudentActivityDetail';
+import ManageRoom from '../pages/manage/room/room';
+import FormAddRoom from '../components/management/Room/FormAddRoom';
 
 const AppRoutes = () => {
   const routes = [
     //Login Zone //
     { path: "/", component: Login, layout: LayoutDefault },
+    { path: "/Form", component: FormAddRoom, layout: LayoutDefault },
 
     //User Zone (Teacher, Student )
     { path: "/home", component: UserHome, layout: LayoutUser },
@@ -23,11 +26,11 @@ const AppRoutes = () => {
     { path: "/studentActivityDetail", component: StudentActivityDetail, layout: LayoutUser},
 
     
-
     //Manange Zone //
     { path: "/manageClass", component: ManageClass, layout: ManageLayout },
     { path: "/studentInClass", component: StudentInClass, layout: ManageLayout },
     { path: "/manageSchedule", component: ManageSchedule, layout: ManageLayout },
+    { path: "/manageRoom", component: ManageRoom, layout: ManageLayout },
 
 
 ];

@@ -217,7 +217,7 @@ function ManageClass() {
 
      
       {/* table - Start */}
-      <div className="w-[1565px] ml-3 relative flex flex-col w-full mt-4 bg-white shadow-md rounded-2xl border border-gray overflow-hidden">
+      <div className="w-[1565px] ml-3 relative flex flex-col mt-4 bg-white shadow-md rounded-2xl border border-gray overflow-hidden">
         <table className="w-full text-left table-auto bg-white">
           <thead className="bg-gray-100">
             <tr>
