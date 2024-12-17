@@ -1,45 +1,52 @@
-import { useState } from "react";
-import { AddRoom } from "../../../services/roomService";
+import { useEffect, useState } from "react";
+import { UpdateRoom } from "../../../services/roomService";
 
 // eslint-disable-next-line react/prop-types
-function FormAddRoom({onRoomAdded}) {
+function FormUpdateRoom({ roomToUpdate, onRoomUpdated }) {
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [showAlert, setShowAlert] = useState(false); // Alert để thông báo thành công hay thất bại
-  const [newRoom, setNewRoom] = useState({
-    // tạo 1 model đễ lấy dữ liệu từ api
-    roomId: "",
-    location: "",
-    isOnline: false,
-    onlineURL: null,
-    status: 0,
-    createAt: new Date().toISOString(),
-    updateAt: new Date().toISOString(),
-  });
 
   const [isFormVisible, setIsFormVisible] = useState(true); // State để điều khiển việc hiển thị form
   const handleCancel = () => {
     setIsFormVisible(false); // Ẩn form khi nhấn nút hủy
   };
+  const [roomData, setRoomData] = useState(
+    roomToUpdate || {
+      roomId: "",
+      location: "",
+      isOnline: false,
+      onlineURL: null,
+      status: 0,
+      createAt: new Date().toISOString(),
+      updateAt: new Date().toISOString(),
+    }
+  );
 
-  // Xử lý form AddRoom
-  const handleAddRoom = async (e) => {
+  useEffect(() => {
+    if (roomToUpdate) {
+      setRoomData(roomToUpdate);
+    }
+  }, [roomToUpdate]);
+
+  // Xử lý form Update
+  const handleUpdateRoom = async (e) => {
     e.preventDefault(); 
     try {
-      const response = await AddRoom(newRoom); 
+      const response = await UpdateRoom(roomData); 
       if (response.isSuccess) {
         setShowAlert("success");
         setSuccessMessage(response.message);
-        onRoomAdded(response.room);
-        setTimeout(() => setShowAlert(false), 3000); 
+        onRoomUpdated(response.room); // Trả về data mới nhất cho trang ManageRoom để update lên bảng
+        setTimeout(() => setShowAlert(false), 3000); // Ẩn bảng thông báo sau 3 giây
         setIsFormVisible(false); 
       } else {
         setShowAlert("error");
         setErrorMessage(response.message);
-        setTimeout(() => setShowAlert(false), 3000);
+        setTimeout(() => setShowAlert(false), 3000); 
       }
     } catch (error) {
-      console.error("Error adding room:", error);
+      console.error("Error updating room:", error);
     }
   };
 
@@ -86,29 +93,32 @@ function FormAddRoom({onRoomAdded}) {
           <div className="bg-white border w-full max-w-[700px] h-auto rounded-2xl items-center text-center shadow-xl">
             <div>
               <p className="font-bold text-3xl sm:text-4xl md:text-5xl mt-8 text-secondaryBlue">
-                Thêm phòng học
+                Cập nhật phòng học
               </p>
-              <form onSubmit={handleAddRoom}>
+              <form onSubmit={handleUpdateRoom}>
                 <p className="text-left ml-[100px] text-xl mt-8">
                   Mã phòng học:{" "}
                 </p>
                 <input
+                  readOnly
                   type="text"
                   required
-                  placeholder="Mã số phòng học"
                   className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl px-4"
+                  value={roomData.roomId}
                   onChange={(e) =>
-                    setNewRoom({ ...newRoom, roomId: e.target.value })
+                    setRoomData({ ...roomData, roomId: e.target.value })
                   }
-                />{" "}
+                />
                 <p className="text-left ml-[100px] text-xl mt-3">Vị trí : </p>
+
                 <input
                   type="text"
                   required
                   placeholder="Vị trí"
-                  className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl  mb-6 px-4"
+                  className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl mb-6 px-4"
+                  value={roomData.location}
                   onChange={(e) =>
-                    setNewRoom({ ...newRoom, location: e.target.value })
+                    setRoomData({ ...roomData, location: e.target.value })
                   }
                 />
                 <div className="flex flex-wrap justify-center gap-4">
@@ -135,4 +145,4 @@ function FormAddRoom({onRoomAdded}) {
   );
 }
 
-export default FormAddRoom;
+export default FormUpdateRoom;
