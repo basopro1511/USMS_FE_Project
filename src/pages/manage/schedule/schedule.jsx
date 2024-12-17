@@ -20,6 +20,8 @@ function ManageSchedule() {
       <div className="flex">
         <p className="m-auto text-3xl font-bold mt-8">Thời Khóa Biểu</p>
       </div>
+
+
       {/* Filter - Start */}
       <div className="flex w-auto h-12 mt-5">
         <div className="flex">
@@ -68,6 +70,7 @@ function ManageSchedule() {
             </button>
           </div>
         </div>
+
         <div className="flex rounded-full transition-all duration-300 hover:scale-95 ml-auto mr-4">
           <button
             type="button"
@@ -76,6 +79,7 @@ function ManageSchedule() {
             Thêm TKB
           </button>
         </div>
+        
       </div>
       {/* Filter - End */}
 

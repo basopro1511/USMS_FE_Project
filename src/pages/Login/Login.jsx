@@ -44,7 +44,7 @@ function Login() {
 
   return (
     <>
-      {/* Thông báo */}
+      {/* Thông báo Start */}
       {showAlert && (
         <div
           className={`fixed top-5 right-0 z-50 ${
@@ -75,7 +75,9 @@ function Login() {
             </div>
           </div>
         </div>
-      )}
+      )}     
+       {/* Thông báo  End*/}
+
 
       {/* Giao diện chính */}
       <div className="w-full mt-[100px] mx-auto max-w-screen-lg">
