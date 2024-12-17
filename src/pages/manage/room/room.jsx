@@ -1,32 +1,75 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import FormAddRoom from "../../../components/management/Room/FormAddRoom";
 import { getRooms } from "../../../services/roomService";
+import FormUpdateRoom from "../../../components/management/Room/FormUpdateRoom";
+import FormDetailRoom from "../../../components/management/Room/FormDetailRoom";
 
 function ManageRoom() {
   // Fetch Data Room - Start
   const [roomData, setRoomData] = useState([]);
   useEffect(() => {
-    const fetchRoomData = async ()=> {
-      const data = await getRooms();
-      setRoomData(data.result)
+    const fetchRoomData = async () => {
+      const data = await getRooms(); //Lấy ra list room rtong database
+      setRoomData(data.result);
     };
     fetchRoomData();
   }, []);
-    // Hàm này sẽ được truyền vào FormAddRoom để thêm phòng vào roomData
-    const handleAddRoom = (newRoom) => {
-      setRoomData((prevRoomData) => [...prevRoomData, newRoom]);
-    };
   //Fetch Data Room - End
 
+  //Update bảng mà không cần reload
+  const handleRoomReload = async () => {
+    const data = await getRooms(); // Gọi API để lấy lại tất cả các phòng
+    setRoomData(data.result); // Cập nhật lại dữ liệu phòng
+  };
+  //Update bảng mà không cần reload
+
   // Show form Add New Room - Start
-  const [showAddForm, setAddForm] = useState(false);
-  const toggleShowForm = () =>{
+  const [showAddForm, setAddForm] = useState(false); // Dùng để hiển thị form
+  const toggleShowForm = () => {
     setAddForm(!showAddForm);
   };
   // Show form Add New Room - End
+
+  //Lấy Data gắn qua form Update
+  const [roomToUpdate, setRoomToUpdate] = useState(null);
+  const handleUpdateClick = (room) => {
+    setRoomToUpdate(room);
+    toggleShowUpdateForm(); // Show form update
+  };
+
+  // Show form Update Room - Start
+  const [showUpdateForm, setUpdateForm] = useState(false);
+  const toggleShowUpdateForm = () => {
+    setUpdateForm(!showUpdateForm);
+  };
+  // Show form Update Room - End
+
+  //Lấy Data gắn qua form Update
+  const [roomDetail, setRoomDetail] = useState(null);
+  const handleDetailClick = (room) => {
+    setRoomDetail(room);
+    toggleShowDetailForm(); // Show the update form
+  };
+
+  // Show form Detail Room - Start
+  const [showDetailForm, setDetailForm] = useState(false);
+  const toggleShowDetailForm = () => {
+    setDetailForm(!showDetailForm);
+  };
+  // Show form Detail Room - End
+
+   
+  //Tìm kiếm - start
+  const [searchQuery, setSearchQuery] = useState('');
+  const handleSearchChange = (event) => {
+    setSearchQuery(event.target.value);
+  };
+  const filteredRooms = roomData.filter((room) =>
+    room.roomId.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+  //Tìm kiếm - End
   
-  // Sort, Filter Paging - Start
+  // Sort, Lọc, Phân trang- Start
   const [sortConfig, setSortConfig] = useState({
     key: "roomId",
     direction: "asc",
@@ -40,7 +83,7 @@ function ManageRoom() {
     setSortConfig({ key, direction });
   };
   // Sort data based on current sort config
-  const sortedData = [...roomData].sort((a, b) => {
+  const sortedData = [...filteredRooms].sort((a, b) => {
     if (a[sortConfig.key] < b[sortConfig.key]) {
       return sortConfig.direction === "asc" ? -1 : 1;
     }
@@ -65,26 +108,18 @@ function ManageRoom() {
       <div className="flex justify-center">
         <p className="mt-8 text-3xl font-bold">Quản lý phòng học</p>
       </div>
-
+      <p className="fixed ml-4">Tìm kiếm: </p>
       {/* Filter Section */}
-      <div className="flex w-auto h-12 mt-5 ">
+      <div className="flex  w-auto h-12 mt-5 ">
         <div className="flex">
           {/* Select Chuyên ngành */}
           <input
-            name="major"
-            placeholder=" Mã phòng học"
-            className="max-w-sm mx-auto ml-3 h-12 w-[300px] border border-black rounded-xl"
-          >
-          </input>
-          <div className="flex ml-2 rounded-full transition-all duration-300 hover:scale-95">
-            <button
-              type="button"
-              className="border border-black rounded-xl w-[130px] bg-primaryBlue text-white font-600"
-            >
-              <i className="fa fa-search mr-2" aria-hidden="true"></i>
-              Tìm kiếm
-            </button>
-          </div>
+            name="roomId"
+            placeholder="Mã phòng học"
+            className="max-w-sm mx-auto ml-3 h-12 w-[300px] border border-black rounded-xl px-2"
+            value={searchQuery}
+            onChange={handleSearchChange}
+          ></input>
         </div>
         <div className="flex ml-auto mr-4 rounded-full transition-all duration-300 hover:scale-95">
           <button
@@ -176,7 +211,7 @@ function ManageRoom() {
               </th>
               <th
                 className="p-4 font-semibold cursor-pointer hover:bg-primaryBlue text-white text-center align-middle bg-secondaryBlue "
-                onClick={() => handleSort("createAt")}
+                onClick={() => handleSort("createAtFormatted")}
               >
                 <div className="flex items-center justify-between">
                   <p className="m-auto">Thời gian tạo </p>
@@ -199,7 +234,7 @@ function ManageRoom() {
               </th>
               <th
                 className="p-4 font-semibold cursor-pointer hover:bg-primaryBlue text-white text-center align-middle bg-secondaryBlue "
-                onClick={() => handleSort("updateAt")}
+                onClick={() => handleSort("updateAtFormatted")}
               >
                 <div className="flex items-center justify-between">
                   <p className="m-auto">Thời gian cập nhật</p>
@@ -220,7 +255,7 @@ function ManageRoom() {
                   </svg>
                 </div>
               </th>
-              
+
               <th className="p-4 font-semibold cursor-pointer hover:bg-primaryBlue text-white text-center align-middle bg-secondaryBlue ">
                 <div className="flex items-center justify-between">
                   <p className="m-auto">Thao tác</p>
@@ -237,26 +272,35 @@ function ManageRoom() {
                 </td>
                 <td className="p-4 text-center align-middle">
                   {item.status === 0
-                    ? "vô hiệu hóa"
+                    ? "Vô hiệu hóa"
                     : item.status === 1
                     ? "Đang khả dụng"
                     : item.status === 2
                     ? "Đang bảo trì"
                     : "Không xác định"}
                 </td>
-                <td className="p-4 text-center align-middle">{item.createAt}</td>
-                <td className="p-4 text-center align-middle">{item.updateAt}</td>
+                <td className="p-4 text-center align-middle">
+                  {item.createAtFormatted}
+                </td>
+                <td className="p-4 text-center align-middle">
+                  {item.updateAtFormatted}
+                </td>
 
                 <td className="p-4 text-center align-middle">
-                  <button className="w-8 h-8 ml-auto mr-2 bg-primaryBlue text-white rounded-xl shadow-md hover:bg-blue-700 transition-all hover:scale-125">
+                  {/* Update Button */}
+                  <button
+                    className="w-8 h-8 ml-auto mr-2 bg-primaryBlue text-white rounded-xl shadow-md hover:bg-blue-700 transition-all hover:scale-125"
+                    onClick={() => handleUpdateClick(item)}
+                  >
                     <i className="fa-solid fa-pen-fancy"></i>
                   </button>
-                  {/* Button 2 */}
-                  <Link to={"/studentInClass"}>
-                    <button className="w-8 h-8 mr-auto bg-green-600 text-white rounded-xl shadow-md hover:bg-green-700 transition-all  hover:scale-125">
-                      <i className="fa-regular fa-address-card"></i>
-                    </button>
-                  </Link>
+                  {/* Detail button */}
+                  <button
+                    className="w-8 h-8 mr-auto bg-green-600 text-white rounded-xl shadow-md hover:bg-green-700 transition-all  hover:scale-125"
+                    onClick={() => handleDetailClick(item)}
+                  >
+                    <i className="fa-regular fa-address-card"></i>
+                  </button>
                 </td>
               </tr>
             ))}
@@ -291,12 +335,25 @@ function ManageRoom() {
         </button>
       </div>
       {/* Phân trang - end */}
-      {
-        showAddForm && (
-          <>
-          <FormAddRoom onAddRoom={handleAddRoom}></FormAddRoom>
-          </>
-        )}
+
+      {/* Show Form Add New Room - Start */}
+      {showAddForm && <FormAddRoom onRoomAdded={handleRoomReload} />}
+      {/* Show Form Add New Room - End */}
+      {/* Show Form Update Room - Start */}
+      {showUpdateForm && (
+        <>
+          <FormUpdateRoom roomToUpdate={roomToUpdate}  onRoomUpdated={handleRoomReload}/>
+        </>
+      )}
+
+      {/* Show Form Update Room - End */}
+      {/* Show Form Detail Room - Start */}
+      {showDetailForm && (
+        <>
+          <FormDetailRoom roomDetail={roomDetail} onRoomDetailUpdated={handleRoomReload}></FormDetailRoom>
+        </>
+      )}
+      {/* Show Form Detail Room - End */}
     </div>
   );
 }
