@@ -3,14 +3,14 @@ function StudentActivityDetail() {
       <div className="w-full mt-8 mx-auto">
         {/* Tiêu đề */}
         <div className="text-center mb-8">
-          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800">
+          <h1 className="text-xl sm:text-2xl md:text-4xl font-bold text-gray-800">
             Xem chi tiết hoạt động
           </h1>
         </div>
         
         {/* Bảng chi tiết hoạt động */}
         <div className="overflow-x-auto mx-4 sm:mx-8 mb-8">
-          <table className="min-w-full border border-gray-300">
+          <table className="min-w-full">
             <tbody>
               <tr className="border-b flex flex-col sm:table-row">
                 <td className="p-2 font-semibold text-gray-700 block sm:table-cell">Ngày:</td>
