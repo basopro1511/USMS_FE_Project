@@ -1,4 +1,5 @@
 import  { useState, useEffect } from "react";
+import { Link } from "react-router-dom"; 
 
 const StudentSchedule = () => {
   const [scheduleData, setScheduleData] = useState([]);
@@ -183,9 +184,16 @@ const StudentSchedule = () => {
                     <td key={idx} className="border border-black p-5">
                       {row[day] ? (
                         <div className="bg-whiteBlue border border-black p-2 rounded-2xl h-[auto] text-left pl-5">
-                          <p className="text-[14px] sm:text-[16px] md:text-[18px] ">
-                            Môn: <span className="text-blue-600 font-bold">{row[day].subject}</span>
-                          </p>
+                          <p className="text-[14px] sm:text-[16px] md:text-[18px]">
+                              Môn:{" "}
+                              <Link
+                                to="/studentActivityDetail"
+                                className="text-blue-600 font-bold hover:text-blue-900 cursor-pointer hover:underline"
+                              >
+                                {row[day].subject}
+                              </Link>
+                            </p>
+
                           <p className="text-[12px] sm:text-[14px] md:text-[15px] ">
                             Thời gian: <span className="text-quaternartyGreen font-bold">({row[day].time})</span>
                           </p>

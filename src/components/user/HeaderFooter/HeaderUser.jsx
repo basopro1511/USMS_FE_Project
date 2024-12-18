@@ -7,7 +7,7 @@ function HeaderUser() {
   const isStudentDetailPage = location.pathname === "/studentDetail";
   const isDetailActivityPage = location.pathname === "/detail";
   const isHome = location.pathname === "/home";
-  const isStudentActivityDetailPage = location.pathname === "/studentActivityDetail"
+  const isStudentActivityDetailPage = location.pathname === "/studentActivityDetail";
   return (
     <div className="w-screen h-auto">
       {/* Header start */}
