@@ -7,6 +7,7 @@ function HeaderUser() {
   const isStudentDetailPage = location.pathname === "/studentDetail";
   const isDetailActivityPage = location.pathname === "/detail";
   const isHome = location.pathname === "/home";
+  const isStudentActivityDetailPage = location.pathname === "/studentActivityDetail";
   return (
     <div className="w-screen h-auto">
       {/* Header start */}
@@ -48,6 +49,11 @@ function HeaderUser() {
                     / Thông tin cá nhân
                   </span>
                 )}
+                  {isStudentActivityDetailPage &&(
+                    <span className="ml-2 text-[12px] sm:text-[16px] md:text-[24px] font-roboto">
+                    / Chi tiết hoạt động
+                    </span>
+                  )}
               </p>
             </div>
             <div className="flex justify-center items-center h-auto md:h-[39px] w-full md:w-auto ml-auto md:mr-[8rem]">

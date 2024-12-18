@@ -9,6 +9,7 @@ import StudentSchedule from '../pages/user/Schedule/StudentSchedule';
 import UserHome from '../pages/user/Home/UserHome';
 import StudentDetail from '../pages/user/Schedule/StudentDetail';
 import StudentInClass from '../pages/manage/class/studentInClass';
+import StudentActivityDetail from '../pages/user/Schedule/StudentActivityDetail';
 import ManageRoom from '../pages/manage/room/room';
 import FormAddRoom from '../components/management/Room/FormAddRoom';
 
@@ -22,6 +23,7 @@ const AppRoutes = () => {
     { path: "/home", component: UserHome, layout: LayoutUser },
     { path: "/studentSchedule", component: StudentSchedule, layout: LayoutUser },
     { path: "/studentDetail", component: StudentDetail, layout: LayoutUser },
+    { path: "/studentActivityDetail", component: StudentActivityDetail, layout: LayoutUser},
 
     
     //Manange Zone //
