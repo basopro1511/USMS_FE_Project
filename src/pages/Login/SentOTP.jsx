@@ -1,144 +1,67 @@
+import React from 'react';
 
-// import { doRequest } from "../../utils/Common";
+function SentOTP() {
+    return (
+        <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 px-4">
+            {/* Logo */}
+            <div className="h-[100px] sm:h-[120px] flex justify-center items-center mb-6">
+                <img
+                    src="/src/assets/images/Logo-FPT.svg"
+                    alt="Logo"
+                    className="w-[120px] sm:w-[180px] md:w-[250px] h-auto"
+                />
+            </div>
 
-// function forgotPassword() {
+            {/* Verification Form */}
+            <div className="border border-gray-300 rounded-3xl w-full max-w-[350px] sm:max-w-[450px] md:max-w-[500px] bg-white p-6 sm:p-8 mx-auto shadow-lg">
+                <div className="text-center mb-6">
+                    <h1 className="text-lg sm:text-2xl md:text-4xl font-semibold mt-4 mb-4">
+                        Check your email
+                    </h1>
+                </div>
+                <div className="text-justify w-full pb-6">
+                    <p className="text-gray-600 text-sm sm:text-base md:text-lg">
+                        We sent a reset link to <span className="font-bold">email@email.com</span>.
+                        Enter the 6-digit code mentioned in the email.
+                    </p>
+                </div>
 
+                {/* Input fields for the 6-digit code */}
+                <form>
+                    <div className="flex justify-center flex-wrap gap-2 sm:gap-3 mb-6">
+                        {Array(6)
+                            .fill(0)
+                            .map((_, i) => (
+                                <input
+                                    key={i}
+                                    type="text"
+                                    maxLength="1"
+                                    className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 border border-gray-300 rounded text-center text-lg sm:text-xl md:text-2xl focus:ring-2 focus:ring-green-500 focus:outline-none"
+                                />
+                            ))}
+                    </div>
 
-//   const handleSubmit = async (event) => {
-//     event.preventDefault();
+                    {/* Submit button */}
+                    <button
+                        type="submit"
+                        className="w-full bg-green-600 text-white py-2 sm:py-3 rounded font-semibold hover:bg-green-700 transition duration-200 mt-4 text-sm sm:text-base md:text-lg"
+                    >
+                        Verify Code
+                    </button>
+                </form>
 
-//     const res = await doRequest("post", "/login", { data: values });
+                {/* Resend email */}
+                <div className="text-center mt-4">
+                    <p className="text-gray-600 text-xs sm:text-sm md:text-base">
+                        Haven’t got the email yet?{' '}
+                        <a href="#" className="text-blue-600 font-semibold hover:underline">
+                            Resend email
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    );
+}
 
-//     if (res.isError) {
-//       if (res.error.response?.status === 400) {
-//         setErrorMessage("Invalid email or password.");
-//       } else {
-//         setErrorMessage("Something went wrong. Please try again later.");
-//       }
-//       setShowAlert("error");
-//       setTimeout(() => setShowAlert(false), 3000); // Ẩn sau 3 giây
-//     } else {
-//       setSuccessMessage("Login successful!");
-//       setShowAlert("success");
-//       localStorage.setItem("access_token", res.data.token);
-
-//       // Chờ 2 giây trước khi chuyển trang
-//       setTimeout(() => {
-//         setShowAlert(false);
-//         navigate("/Home");
-//       }, 2000);
-//     }
-//   };
-
-//   return (
-//     <>
-//       {/* Thông báo */}
-//       {showAlert && (
-//         <div
-//           className={`fixed top-5 right-0 z-50 ${
-//             showAlert === "error" ? "animate-slide-in text-red-800 bg-red-50 border-red-300 mr-4" : "animate-slide-in text-green-800 bg-green-50 border-green-300 mr-4"
-//           } border rounded-lg p-4`}
-//         >
-//           <div className="flex items-center">
-//             <svg
-//               className="flex-shrink-0 inline w-4 h-4 me-3"
-//               aria-hidden="true"
-//               xmlns="http://www.w3.org/2000/svg"
-//               fill="currentColor"
-//               viewBox="0 0 20 20"
-//             >
-//               <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 1 1 1 1v4h1a1 1 0 0 1 0 2Z" />
-//             </svg>
-//             <span className="sr-only">Info</span>
-//             <div>
-//               {showAlert === "error" ? (
-//                 <span>
-//                   <strong>Error:</strong> {errorMessage}
-//                 </span>
-//               ) : (
-//                 <span>
-//                   <strong>Success:</strong> {successMessage}
-//                 </span>
-//               )}
-//             </div>
-//           </div>
-//         </div>
-//       )}
-
-//       {/* Giao diện chính */}
-//       <div className="w-full mt-[100px] mx-auto max-w-screen-lg">
-//         {/* Logo */}
-//         <div className="h-[120px] flex justify-center items-center mb-8">
-//           <img
-//             src="/src/assets/images/Logo-FPT.svg"
-//             alt="Logo"
-//             className="w-[200px] md:w-[313px] h-auto"
-//           />
-//         </div>
-
-//         {/* Form Container */}
-//         <div className="border-2 border-black rounded-3xl w-full max-w-[580px] mx-auto flex flex-col p-4">
-//           <div className="text-center">
-//             <h1 className="text-2xl md:text-4xl font-semibold mt-4 mb-4">
-//               Academic Portal
-//             </h1>
-//             <p className="text-lg font-semibold md:text-2xl">Đăng nhập</p>
-//           </div>
-
-//           {/* Form */}
-//           <form onSubmit={handleSubmit} className="mt-6 text-center">
-//             {/* Email Input */}
-//             <div className="w-full max-w-[450px] mx-auto mb-4 text-left">
-//               <label className="text-gray-500 text-sm font-medium">Email</label>
-//               <input
-//                 type="email"
-//                 placeholder="Nhập vào email của bạn"
-//                 required
-//                 className="w-full border rounded-md px-4 py-3 mt-1 focus:outline-none focus:ring-2 focus:ring-green-500"
-//                 onChange={(e) =>
-//                   setValues({ ...values, email: e.target.value })
-//                 }
-//               />
-//             </div>
-
-//             {/* Password Input */}
-//             <div className="w-full max-w-[450px] mx-auto mb-4 text-left">
-//               <label className="text-gray-500 text-sm font-medium">
-//                 Password
-//               </label>
-//               <input
-//                 type="password"
-//                 placeholder="Nhập vào mật khẩu của bạn"
-//                 required
-//                 className="w-full border rounded-md px-4 py-3 mt-1 focus:outline-none focus:ring-2 focus:ring-green-500"
-//                 onChange={(e) =>
-//                   setValues({ ...values, password: e.target.value })
-//                 }
-//               />
-//             </div>
-
-//             {/* quên mật khẩu */}
-//             <div className="flex items-center justify-start mb-6 w-full max-w-[450px] mx-auto">
-//               <a
-//                 href="/forgotPassword"
-//                 className="text-gray-500 text-sm font-medium ml-auto hover:text-boldBlue hover:underline"
-//               >
-//                 Quên mật khẩu?
-//               </a>
-//             </div>
-
-//             {/* Submit Button */}
-//             <button
-//               type="submit"
-//               className="w-full max-w-[460px] bg-green-500 text-white font-bold text-lg rounded-md py-4 transition-transform transform hover:bg-green-700 hover:scale-105 mb-6"
-//             >
-//               Login
-//             </button>
-//           </form>
-//         </div>
-//       </div>
-//     </>
-//   );
-// }
-
-// export default forgotPassword;
+export default SentOTP;
