@@ -46,7 +46,7 @@ function SidebarManage() {
               </li>
             </Link>
 
-            <Link to="/">
+            <Link to="/manageSemester">
               <li
                 className={`flex items-center cursor-pointer w-56 mb-2 ml-2 rounded-lg p-2 transition-all duration-300 ${
                   isActive("/manageSemester")
