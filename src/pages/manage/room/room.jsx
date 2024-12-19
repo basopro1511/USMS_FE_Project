@@ -58,7 +58,7 @@ function ManageRoom() {
   };
   // Show form Detail Room - End
 
-   
+
   //Tìm kiếm - start
   const [searchQuery, setSearchQuery] = useState('');
   const handleSearchChange = (event) => {
@@ -68,7 +68,7 @@ function ManageRoom() {
     room.roomId.toLowerCase().includes(searchQuery.toLowerCase())
   );
   //Tìm kiếm - End
-  
+
   // Sort, Lọc, Phân trang- Start
   const [sortConfig, setSortConfig] = useState({
     key: "roomId",
@@ -108,9 +108,9 @@ function ManageRoom() {
       <div className="flex justify-center">
         <p className="mt-8 text-3xl font-bold">Quản lý phòng học</p>
       </div>
-      <p className="fixed ml-4">Tìm kiếm: </p>
+      <p className="ml-4 mt-5">Tìm kiếm: </p>
       {/* Filter Section */}
-      <div className="flex  w-auto h-12 mt-5 ">
+      <div className="flex w-auto h-12">
         <div className="flex">
           {/* Select Chuyên ngành */}
           <input
@@ -274,10 +274,10 @@ function ManageRoom() {
                   {item.status === 0
                     ? "Vô hiệu hóa"
                     : item.status === 1
-                    ? "Đang khả dụng"
-                    : item.status === 2
-                    ? "Đang bảo trì"
-                    : "Không xác định"}
+                      ? "Đang khả dụng"
+                      : item.status === 2
+                        ? "Đang bảo trì"
+                        : "Không xác định"}
                 </td>
                 <td className="p-4 text-center align-middle">
                   {item.createAtFormatted}
@@ -342,7 +342,7 @@ function ManageRoom() {
       {/* Show Form Update Room - Start */}
       {showUpdateForm && (
         <>
-          <FormUpdateRoom roomToUpdate={roomToUpdate}  onRoomUpdated={handleRoomReload}/>
+          <FormUpdateRoom roomToUpdate={roomToUpdate} onRoomUpdated={handleRoomReload} />
         </>
       )}
 
