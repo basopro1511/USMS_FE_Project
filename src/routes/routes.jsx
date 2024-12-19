@@ -15,6 +15,8 @@ import FormDetailRoom from '../components/management/Room/FormDetailRoom';
 import ForgotPassword from '../pages/Login/ForgotPassword';
 import SentOTP from '../pages/Login/SentOTP';
 import ResetPassword from '../pages/Login/ResetPassword';
+import ManageSemester from '../pages/manage/semester/semester';
+
 
 const AppRoutes = () => {
   const routes = [
@@ -37,6 +39,7 @@ const AppRoutes = () => {
     { path: "/studentInClass", component: StudentInClass, layout: ManageLayout },
     { path: "/manageSchedule", component: ManageSchedule, layout: ManageLayout },
     { path: "/manageRoom", component: ManageRoom, layout: ManageLayout },
+    { path: "/manageSemester", component: ManageSemester, layout: ManageLayout },
 
 ];
   return (
