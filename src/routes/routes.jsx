@@ -12,7 +12,7 @@ import StudentInClass from '../pages/manage/class/studentInClass';
 import StudentActivityDetail from '../pages/user/Schedule/StudentActivityDetail';
 import ManageRoom from '../pages/manage/room/room';
 import FormDetailRoom from '../components/management/Room/FormDetailRoom';
-import Semester from '../pages/manage/semester/semester';
+import ManageSemester from '../pages/manage/semester/semester';
 
 const AppRoutes = () => {
   const routes = [
@@ -32,7 +32,7 @@ const AppRoutes = () => {
     { path: "/studentInClass", component: StudentInClass, layout: ManageLayout },
     { path: "/manageSchedule", component: ManageSchedule, layout: ManageLayout },
     { path: "/manageRoom", component: ManageRoom, layout: ManageLayout },
-    { path: "/manageSemester", component: Semester, layout: ManageLayout },
+    { path: "/manageSemester", component: ManageSemester, layout: ManageLayout },
 
 ];
   return (

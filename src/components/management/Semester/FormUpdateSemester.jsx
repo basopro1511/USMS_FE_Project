@@ -103,9 +103,9 @@ function FormUpdateSemester({ semesterToUpdate, onSemesterUpdated }) {
                                     type="text"
                                     required
                                     className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl px-4"
-                                    value={semesterData.semesterCode}
+                                    value={semesterData.semesterId}
                                     onChange={(e) =>
-                                        setSemesterData({ ...semesterData, semesterCode: e.target.value })
+                                        setSemesterData({ ...semesterData, semesterId: e.target.value })
                                     }
                                 />
                                 <p className="text-left ml-[100px] text-xl ">Tên kỳ học: </p>

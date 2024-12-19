@@ -111,7 +111,7 @@ function FormDetailSemester({ semesterDetail, onSemesterDetailUpdated }) {
                                 type="text"
                                 required
                                 className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl px-4 text-xl"
-                                value={semesterData.semesterCode}
+                                value={semesterData.semesterId}
                             />
                             <p className="text-left ml-[100px] text-xl mt-3">Tên kỳ học:</p>
 
@@ -159,21 +159,32 @@ function FormDetailSemester({ semesterDetail, onSemesterDetailUpdated }) {
                                 
                             />
 
-                            <div className="flex flex-wrap justify-center gap-4 mt-3">
-                                <button
-                                    type="submit"
-                                    className="w-full max-w-[200px] h-[50px] sm:h-[64px] border rounded-3xl bg-secondaryBlue text-white font-bold text-lg sm:text-2xl transition-all hover:scale-105 hover:bg-primaryBlue"
-                                >
-                                    Cập nhật
-                                </button>
-                                <button
-                                    type="button" // Sử dụng type="button" để ngừng việc submit form
-                                    className="w-full max-w-[200px] h-[50px] sm:h-[64px] border rounded-3xl bg-red-500 text-white font-bold text-lg sm:text-2xl transition-all hover:scale-105 hover:bg-red-700 mb-8"
-                                    onClick={handleCancel} // Ẩn form khi nhấn nút hủy
-                                >
-                                    Hủy
-                                </button>
-                            </div>
+<p className="text-left ml-[100px] text-xl mt-3">
+                Thay đổi trạng thái :{" "}
+              </p>
+              <div className="flex m-auto w-full max-w-[500px] h-[80px] flex-wrap justify-center border border-black rounded-2xl mb-16 gap-4">
+                <button
+                  type="button"
+                  className=" w-full max-w-[150px] h-[50px] sm:h-[45px] border rounded-2xl bg-gray-500 text-white font-bold text-lg sm:text-xl transition-all hover:scale-105 hover:bg-primaryBlue mt-auto mb-auto"
+                  onClick={() => handleChangeRoomStatus(roomData.roomId, 0)}
+                >
+                  Chưa bắt đầu
+                </button>
+                <button
+                  type="button"
+                  className=" w-full max-w-[150px] h-[50px] sm:h-[45px] border rounded-2xl bg-yellow-500 text-white font-bold text-lg sm:text-xl transition-all hover:scale-105 hover:bg-yellow-600 mt-auto mb-auto"
+                  onClick={() => handleChangeRoomStatus(roomData.roomId, 1)}
+                >
+                  Đang diễn ra
+                </button>
+                <button
+                  type="button"
+                  className=" w-full max-w-[150px] h-[50px] sm:h-[45px] border rounded-2xl bg-red-500 text-white font-bold text-lg sm:text-xl transition-all hover:scale-105 hover:bg-red-600 mt-auto mb-auto"
+                  onClick={() => handleChangeRoomStatus(roomData.roomId, 2)}
+                >
+                  Đã kết thúc
+                </button>
+              </div>
                         </form>
                     </div>
                 </div>
