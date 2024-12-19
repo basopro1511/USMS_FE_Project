@@ -2,33 +2,34 @@ import React from 'react';
 
 function SentOTP() {
     return (
-        <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 px-4">
+        <div className="w-full mt-[100px] mx-auto max-w-screen-lg">
             {/* Logo */}
-            <div className="h-[100px] sm:h-[120px] flex justify-center items-center mb-6">
+            <div className="h-[120px] flex justify-center items-center mb-8">
                 <img
                     src="/src/assets/images/Logo-FPT.svg"
                     alt="Logo"
-                    className="w-[120px] sm:w-[180px] md:w-[250px] h-auto"
+                    className="w-[200px] md:w-[313px] h-auto"
                 />
             </div>
 
-            {/* Verification Form */}
-            <div className="border border-gray-300 rounded-3xl w-full max-w-[350px] sm:max-w-[450px] md:max-w-[500px] bg-white p-6 sm:p-8 mx-auto shadow-lg">
-                <div className="text-center mb-6">
-                    <h1 className="text-lg sm:text-2xl md:text-4xl font-semibold mt-4 mb-4">
-                        Check your email
+            {/* Form OTP */}
+            <div className="border-2 border-black rounded-3xl w-full max-w-[580px] mx-auto flex flex-col p-4">
+                {/* Heading */}
+                <div className="text-center">
+                    <h1 className="text-2xl md:text-4xl font-semibold mt-4 mb-4">
+                        Kiểm tra email của bạn
                     </h1>
-                </div>
-                <div className="text-justify w-full pb-6">
-                    <p className="text-gray-600 text-sm sm:text-base md:text-lg">
-                        We sent a reset link to <span className="font-bold">email@email.com</span>.
-                        Enter the 6-digit code mentioned in the email.
+                    <p className="text-lg md:text-2xl text-gray-700">
+                        Chúng tôi đã gửi liên kết tới <span className="font-bold">email@email.com</span>.
+                    </p>
+                    <p className="text-lg md:text-2xl text-gray-700 mt-2">
+                        Nhập mã gồm 6 chữ số được đề cập trong email.
                     </p>
                 </div>
 
-                {/* Input fields for the 6-digit code */}
-                <form>
-                    <div className="flex justify-center flex-wrap gap-2 sm:gap-3 mb-6">
+                {/* OTP Input */}
+                <form className="mt-6 text-center">
+                    <div className="flex justify-center gap-2 md:gap-3 mb-6">
                         {Array(6)
                             .fill(0)
                             .map((_, i) => (
@@ -36,26 +37,26 @@ function SentOTP() {
                                     key={i}
                                     type="text"
                                     maxLength="1"
-                                    className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 border border-gray-300 rounded text-center text-lg sm:text-xl md:text-2xl focus:ring-2 focus:ring-green-500 focus:outline-none"
+                                    className="w-12 h-12 md:w-14 md:h-14 border border-gray-300 rounded-md text-center text-xl focus:ring-2 focus:ring-green-500 focus:outline-none"
                                 />
                             ))}
                     </div>
 
-                    {/* Submit button */}
+                    {/* Verify Button */}
                     <button
                         type="submit"
-                        className="w-full bg-green-600 text-white py-2 sm:py-3 rounded font-semibold hover:bg-green-700 transition duration-200 mt-4 text-sm sm:text-base md:text-lg"
+                        className="w-full max-w-[460px] bg-green-500 text-white font-bold text-lg rounded-md py-4 transition-transform transform hover:bg-green-700 hover:scale-105 mb-6"
                     >
-                        Verify Code
+                        Kiểm tra mã
                     </button>
                 </form>
 
-                {/* Resend email */}
-                <div className="text-center mt-4">
-                    <p className="text-gray-600 text-xs sm:text-sm md:text-base">
-                        Haven’t got the email yet?{' '}
+                {/* Resend Email */}
+                <div className="text-center">
+                    <p className="text-gray-600 text-sm md:text-base">
+                        Bạn vẫn chưa nhận được email?{' '}
                         <a href="#" className="text-blue-600 font-semibold hover:underline">
-                            Resend email
+                            Gửi lại email
                         </a>
                     </p>
                 </div>
