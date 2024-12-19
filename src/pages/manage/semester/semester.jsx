@@ -1,20 +1,76 @@
 import React, { useState, useEffect } from "react";
-
+import FormUpdateSemester from "../../../components/management/Semester/FormUpdateSemester";
+import FormAddSemester from "../../../components/management/Semester/FormAddSemester";
+import FormDetailSemester from "../../../components/management/Semester/FormDetailSemester";
 function Semester() {
     const [semesterData] = useState([
-        { id: "1", semesterCode: "FA24", semesterName: "Fall2024", startDate: "01/02/2024", endDate: "29/04/2025", status: "2" },
-        { id: "2", semesterCode: "SU23", semesterName: "Summer23", startDate: "05/05/2023", endDate: "05/08/2023", status: "2" },
-        { id: "3", semesterCode: "SU24", semesterName: "Summer24", startDate: "05/06/2024", endDate: "05/09/2024", status: "2" },
-        { id: "4", semesterCode: "SP24", semesterName: "Spring24", startDate: "01/02/2024", endDate: "01/05/2024", status: "2" },
-        { id: "5", semesterCode: "SP25", semesterName: "Spring25", startDate: "01/04/2025", endDate: "01/07/2025", status: "1" },
-        { id: "6", semesterCode: "SU24", semesterName: "Summer24", startDate: "01/06/2024", endDate: "01/09/2024", status: "1" },
-        { id: "7", semesterCode: "FA23", semesterName: "Fall23", startDate: "01/03/2023", endDate: "01/06/2023", status: "1" },
-        { id: "8", semesterCode: "FA21", semesterName: "Fall21", startDate: "01/02/2021", endDate: "01/05/2021", status: "1" },
-        { id: "9", semesterCode: "SU21", semesterName: "Summer21", startDate: "01/06/2021", endDate: "01/09/2021", status: "1" },
-        { id: "10", semesterCode: "SP22", semesterName: "Spring22", startDate: "01/04/2022", endDate: "01/07/2022", status: "1" },
-        { id: "11", semesterCode: "SU25", semesterName: "Summer25", startDate: "01/07/2025", endDate: "01/10/2025", status: "1" },
-        { id: "12", semesterCode: "SU2020", semesterName: "Summer2020", startDate: "01/08/2020", endDate: "01/11/2020", status: "1" }
-    ]);
+        { id: "1", semesterCode: "FA24", semesterName: "Fall2024", startDate: "2024-01-02", endDate: "2025-04-29", status: "2" },
+        { id: "2", semesterCode: "SU23", semesterName: "Summer23", startDate: "2023-05-05", endDate: "2023-08-05", status: "2" },
+        { id: "3", semesterCode: "SU24", semesterName: "Summer24", startDate: "2024-06-05", endDate: "2024-09-05", status: "2" },
+        { id: "4", semesterCode: "SP24", semesterName: "Spring24", startDate: "2024-02-01", endDate: "2024-05-01", status: "2" },
+        { id: "5", semesterCode: "SP25", semesterName: "Spring25", startDate: "2025-04-01", endDate: "2025-07-01", status: "1" },
+        { id: "6", semesterCode: "SU24", semesterName: "Summer24", startDate: "2024-06-01", endDate: "2024-09-01", status: "1" },
+        { id: "7", semesterCode: "FA23", semesterName: "Fall23", startDate: "2023-03-01", endDate: "2023-06-01", status: "1" },
+        { id: "8", semesterCode: "FA21", semesterName: "Fall21", startDate: "2021-02-01", endDate: "2021-05-01", status: "1" },
+        { id: "9", semesterCode: "SU21", semesterName: "Summer21", startDate: "2021-06-01", endDate: "2021-09-01", status: "1" },
+        { id: "10", semesterCode: "SP22", semesterName: "Spring22", startDate: "2022-04-01", endDate: "2022-07-01", status: "1" },
+        { id: "11", semesterCode: "SU25", semesterName: "Summer25", startDate: "2025-07-01", endDate: "2025-10-01", status: "1" },
+        { id: "12", semesterCode: "SU2020", semesterName: "Summer2020", startDate: "2020-08-01", endDate: "2020-11-01", status: "1" }
+      ]
+      );
+
+    // // Fetch Data Semester - Start
+    //   const [semesterData1, setSemesterData] = useState([]);
+    //   useEffect(() => {
+    //     const fetchSemesterData = async () => {
+    //       const data = await SemesterData(); //Lấy ra list semester rtong database
+    //       setRoomData(data.result);
+    //     };
+    //     fetchSemesterData();
+    //   }, []);
+    //   //Fetch Data Semester - End
+
+    //Update bảng mà không cần reload
+    const handleSemesterReload = async () => {
+        const data = await getSemesters(); // Gọi API để lấy lại tất cả các kìkì
+        setSemesterData(data.result); // Cập nhật lại dữ liệu kìkì
+    };
+    //Update bảng mà không cần reload
+
+    // Show form Add New semester - Start
+    const [showAddForm, setAddForm] = useState(false); // Dùng để hiển thị form
+    const toggleShowForm = () => {
+        setAddForm(!showAddForm);
+    };
+    // Show form Add New semester - End
+
+    //Lấy Data gắn qua form Update
+    const [semesterToUpdate, setSemesterToUpdate] = useState(null);
+    const handleUpdateClick = (semester) => {
+        setSemesterToUpdate(semester);
+        toggleShowUpdateForm(); // Show form update
+    };
+
+    // Show form Update semester - Start
+    const [showUpdateForm, setUpdateForm] = useState(false);
+    const toggleShowUpdateForm = () => {
+        setUpdateForm(!showUpdateForm);
+    };
+    // Show form Update semester - End
+
+    //Lấy Data gắn qua form Update
+    const [semesterDetail, setSemesterDetail] = useState(null);
+    const handleDetailClick = (semester) => {
+        setSemesterDetail(semester);
+        toggleShowDetailForm(); // Show the update form
+    };
+
+    // Show form Detail semester - Start
+    const [showDetailForm, setDetailForm] = useState(false);
+    const toggleShowDetailForm = () => {
+        setDetailForm(!showDetailForm);
+    };
+    // Show form Detail semester - End
 
     const [filters, setFilters] = useState({
         semesterCode: "",
@@ -133,6 +189,7 @@ function Semester() {
                     <button
                         type="button"
                         className="border border-white rounded-xl w-full md:w-[130px] bg-secondaryGreen hover:bg-primaryGreen text-white font-semibold"
+                        onClick={toggleShowForm}
                     >
                         <i className="fa fa-plus mr-2" aria-hidden="true"></i>
                         Thêm kì học
@@ -190,10 +247,17 @@ function Semester() {
                                 <td className="p-4 text-center align-middle">
                                     {/* Edit and Detail Buttons */}
                                     <div className="flex justify-center space-x-2">
-                                        <button className="w-8 h-8 bg-primaryBlue text-white rounded-xl shadow-md hover:bg-blue-700 transition-all hover:scale-125">
+                                        <button
+                                            className="w-8 h-8 bg-primaryBlue text-white rounded-xl shadow-md hover:bg-blue-700 transition-all hover:scale-125"
+                                            onClick={() => handleUpdateClick(item)}
+                                        >
                                             <i className="fa-solid fa-pen-fancy"></i>
+
                                         </button>
-                                        <button className="w-8 h-8 bg-green-600 text-white rounded-xl shadow-md hover:bg-green-700 transition-all hover:scale-125">
+                                        <button
+                                            className="w-8 h-8 bg-green-600 text-white rounded-xl shadow-md hover:bg-green-700 transition-all hover:scale-125"
+                                            onClick={() => handleDetailClick(item)}
+                                        >
                                             <i className="fa-regular fa-address-card"></i>
                                         </button>
                                     </div>
@@ -231,6 +295,25 @@ function Semester() {
                 </button>
             </div>
             {/* Phân trang - end */}
+
+            {/* Show Form Add New Semester - Start */}
+            {showAddForm && <FormAddSemester onSemesterAdded={handleSemesterReload} />}
+            {/* Show Form Add New Semester - End */}
+            {/* Show Form Update Semester - Start */}
+            {showUpdateForm && (
+                <>
+                    <FormUpdateSemester semesterToUpdate={semesterToUpdate} onSemesterUpdated={handleSemesterReload} />
+                </>
+            )}
+
+            {/* Show Form Update Semester - End */}
+            {/* Show Form Detail Semester - Start */}
+            {showDetailForm && (
+                <>
+                    <FormDetailSemester semesterDetail={semesterDetail} onSemesterDetailUpdated={handleSemesterReload}></FormDetailSemester>
+                </>
+            )}
+            {/* Show Form Detail Semester - End */}
         </div>
     );
 }
