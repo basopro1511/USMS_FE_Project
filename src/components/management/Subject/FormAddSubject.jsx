@@ -44,8 +44,8 @@ function FormAddSubject({ onSubjectAdded }) {
             {showAlert && (
                 <div
                     className={`fixed top-5 right-0 z-50 ${showAlert === "error"
-                            ? "animate-slide-in text-red-800 bg-red-50 border-red-300 mr-4"
-                            : "animate-slide-in text-green-800 bg-green-50 border-green-300 mr-4"
+                        ? "animate-slide-in text-red-800 bg-red-50 border-red-300 mr-4"
+                        : "animate-slide-in text-green-800 bg-green-50 border-green-300 mr-4"
                         } border rounded-lg p-4`}
                 >
                     <div className="flex items-center">
@@ -76,87 +76,87 @@ function FormAddSubject({ onSubjectAdded }) {
 
             {isFormVisible && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
-                    <div className="p-4 rounded-md shadow-md bg-white max-w-md mx-auto">
-                        <h2 className="text-xl font-semibold text-center text-secondaryBlue mb-4">Thêm môn học</h2>
+                    <div className="bg-white border w-full max-w-[700px] h-auto rounded-2xl items-center text-center shadow-xl">
+                        <h2 className="font-bold text-3xl sm:text-4xl md:text-5xl mt-8 text-secondaryBlue">Thêm môn học</h2>
                         <form onSubmit={handleAddSubject}>
-                            <div className="mb-4">
-                                <label htmlFor="subjectId" className="block font-medium mb-1">Mã số môn học</label>
-                                <input
-                                    type="text"
-                                    id="subjectId"
-                                    name="subjectId"
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring focus:ring-secondaryBlue"
-                                    required
-                                    onChange={(e) =>
-                                        setNewSubject({ ...newSubject, subjectId: e.target.value })
-                                    }
-                                />
-                            </div>
-                            <div className="mb-4">
-                                <label htmlFor="subjectName" className="block font-medium mb-1">Tên môn học</label>
-                                <input
-                                    type="text"
-                                    id="subjectName"
-                                    name="subjectName"
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring focus:ring-secondaryBlue"
-                                    required
-                                    onChange={(e) =>
-                                        setNewSubject({ ...newSubject, subjectName: e.target.value })
-                                    }
-                                />
-                            </div>
-                            <div className="mb-4">
-                                <label htmlFor="numberOfSlot" className="block font-medium mb-1">Số buổi học</label>
-                                <input
-                                    type="number"
-                                    id="numberOfSlot"
-                                    name="numberOfSlot"
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring focus:ring-secondaryBlue"
-                                    required
-                                    onChange={(e) =>
-                                        setNewSubject({ ...newSubject, numberOfSlot: e.target.value })
-                                    }
-                                />
-                            </div>
-                            <div className="mb-4">
-                                <label htmlFor="majorId" className="block font-medium mb-1">Chuyên ngành</label>
-                                <select
-                                    id="majorId"
-                                    name="majorId"
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring focus:ring-secondaryBlue"
-                                    required
-                                    onChange={(e) =>
-                                        setNewSubject({ ...newSubject, majorId: e.target.value })
-                                    }
-                                >
-                                    <option value="">Chọn chuyên ngành</option>
-                                    <option value="major1">Chuyên ngành 1</option>
-                                    <option value="major2">Chuyên ngành 2</option>
-                                </select>
-                            </div>
-                            <div className="mb-4">
-                                <label htmlFor="description" className="block font-medium mb-1">Mô tả</label>
-                                <textarea
-                                    id="description"
-                                    name="description"
-                                    rows="4"
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring focus:ring-secondaryBlue"
-                                    onChange={(e) =>
-                                        setNewSubject({ ...newSubject, description: e.target.value })
-                                    }
-                                ></textarea>
-                            </div>
-                            <div className="flex justify-between">
+                            <p htmlFor="subjectId" className="text-left ml-[100px] text-xl mt-5">Mã số môn học:</p>
+                            <input
+                                type="text"
+                                id="subjectId"
+                                name="subjectId"
+                                placeholder="Nhập mã môn học"
+                                className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl mb-3 px-4"
+                                required
+                                onChange={(e) =>
+                                    setNewSubject({ ...newSubject, subjectId: e.target.value })
+                                }
+                            />
+                            <p htmlFor="subjectName" className="text-left ml-[100px] text-xl">Tên môn học:</p>
+                            <input
+                                type="text"
+                                id="subjectName"
+                                name="subjectName"
+                                placeholder="Nhập tên môn học"
+                                className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl mb-3 px-4"
+                                required
+                                onChange={(e) =>
+                                    setNewSubject({ ...newSubject, subjectName: e.target.value })
+                                }
+                            />
+
+                            <p htmlFor="numberOfSlot" className="text-left ml-[100px] text-xl">Số buổi học:</p>
+                            <input
+                                type="number"
+                                id="numberOfSlot"
+                                name="numberOfSlot"
+                                placeholder="Nhập số buổi học"
+                                className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl mb-3 px-4"
+                                required
+                                onChange={(e) =>
+                                    setNewSubject({ ...newSubject, numberOfSlot: e.target.value })
+                                }
+                            />
+
+                            <p htmlFor="majorId" className="text-left ml-[100px] text-xl">Chuyên ngành:</p>
+                            <select
+                                id="majorId"
+                                name="majorId"
+                                placeholder="Nhập chuyên ngành"
+                                className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl mb-3 px-4"
+                                required
+                                onChange={(e) =>
+                                    setNewSubject({ ...newSubject, majorId: e.target.value })
+                                }
+                            >
+                                <option value="">Chọn chuyên ngành</option>
+                                <option value="major1">Kỹ thuật phần mềm</option>
+                                <option value="major2">Ngôn ngữ Anh</option>
+                                <option value="major3">Quản trị kinh doanh</option>
+                            </select>
+
+                            <p htmlFor="description" className="text-left ml-[100px] text-xl">Mô tả:</p>
+                            <textarea
+                                id="description"
+                                name="description"
+                                placeholder="Nhập mô tả"
+                                rows="4"
+                                className="w-full max-w-[500px] h-[100px] text-black border border-black rounded-xl mb-3 px-4 py-1"
+                                onChange={(e) =>
+                                    setNewSubject({ ...newSubject, description: e.target.value })
+                                }
+                            ></textarea>
+
+                            <div className="flex flex-wrap justify-center gap-4">
                                 <button
                                     type="submit"
-                                    className="px-6 py-2 bg-secondaryBlue text-white font-medium rounded-md hover:bg-secondaryBlue-dark"
+                                    className="w-full max-w-[200px] h-[50px] sm:h-[64px] border rounded-3xl bg-secondaryBlue text-white font-bold text-lg sm:text-2xl transition-all hover:scale-105 hover:bg-primaryBlue"
                                 >
                                     Thêm
                                 </button>
                                 <button
-                                    type="button"
-                                    onClick={handleCancel}
-                                    className="px-6 py-2 bg-red-500 text-white font-medium rounded-md hover:bg-red-600"
+                                    type="button" // Use type="button" to prevent form submission
+                                    className="w-full max-w-[200px] h-[50px] sm:h-[64px] border rounded-3xl bg-red-500 text-white font-bold text-lg sm:text-2xl transition-all hover:scale-105 hover:bg-red-700 mb-8"
+                                    onClick={handleCancel} // Hide form when cancel is clicked
                                 >
                                     Hủy
                                 </button>

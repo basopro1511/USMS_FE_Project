@@ -1,23 +1,25 @@
 import { useEffect, useState } from "react";
 import FormAddSubject from "../../../components/management/Subject/FormAddSubject";
+import FormUpdateSubject from "../../../components/management/Subject/FormUpdateSubject";
+import FormDetailSubject from "../../../components/management/Subject/FormDetailSubject";
 
 function ManageSubject() {
     const [subjectData] = useState([
-        { subjectId: "PRF192", subjectName: "Program", majorId: "Kỹ thuật phần mềm", numberOfSlot: "30", status: "1" },
-        { subjectId: "SSE203", subjectName: "Intertional", majorId: "Quản trị kinh doanh", numberOfSlot: "30", status: "2" },
-        { subjectId: "MLN122", subjectName: "Langue", majorId: "Ngôn Ngữ Anh", numberOfSlot: "30", status: "0" },
-        { subjectId: "PRF192", subjectName: "Program", majorId: "Kỹ thuật phần mềm", numberOfSlot: "30", status: "2" },
-        { subjectId: "PRF192", subjectName: "Program", majorId: "Kỹ thuật phần mềm", numberOfSlot: "30", status: "1" },
-        { subjectId: "PRF192", subjectName: "Program", majorId: "Kỹ thuật phần mềm", numberOfSlot: "30", status: "1" },
-        { subjectId: "PRF192", subjectName: "Program", majorId: "Kỹ thuật phần mềm", numberOfSlot: "30", status: "1" },
-        { subjectId: "PRF192", subjectName: "Program", majorId: "Kỹ thuật phần mềm", numberOfSlot: "30", status: "1" },
-        { subjectId: "PRF192", subjectName: "Program", majorId: "Kỹ thuật phần mềm", numberOfSlot: "30", status: "1" },
-        { subjectId: "PRF192", subjectName: "Program", majorId: "Kỹ thuật phần mềm", numberOfSlot: "30", status: "1" },
-        { subjectId: "PRF192", subjectName: "Program", majorId: "Kỹ thuật phần mềm", numberOfSlot: "30", status: "1" },
-        { subjectId: "PRF192", subjectName: "Program", majorId: "Kỹ thuật phần mềm", numberOfSlot: "30", status: "1" },
-        { subjectId: "PRF192", subjectName: "Program", majorId: "Kỹ thuật phần mềm", numberOfSlot: "30", status: "1" },
-        { subjectId: "PRF192", subjectName: "Program", majorId: "Kỹ thuật phần mềm", numberOfSlot: "30", status: "1" },
-        { subjectId: "PRF192", subjectName: "Program", majorId: "Kỹ thuật phần mềm", numberOfSlot: "30", status: "1" },
+        { subjectId: "PRF192", subjectName: "Program", majorId: "0", numberOfSlot: "30", status: "1" },
+        { subjectId: "SSE203", subjectName: "Intertional", majorId: "2", numberOfSlot: "29", status: "2" },
+        { subjectId: "MLN122", subjectName: "Langue", majorId: "1", numberOfSlot: "30", status: "0" },
+        { subjectId: "PRF192", subjectName: "Program", majorId: "0", numberOfSlot: "30", status: "2" },
+        { subjectId: "PRF192", subjectName: "Program", majorId: "0", numberOfSlot: "30", status: "1" },
+        { subjectId: "PRF192", subjectName: "Program", majorId: "0", numberOfSlot: "27", status: "1" },
+        { subjectId: "PRF192", subjectName: "Program", majorId: "0", numberOfSlot: "16", status: "1" },
+        { subjectId: "PRF192", subjectName: "Program", majorId: "0", numberOfSlot: "15", status: "1" },
+        { subjectId: "PRF192", subjectName: "Program", majorId: "0", numberOfSlot: "30", status: "1" },
+        { subjectId: "PRF192", subjectName: "Program", majorId: "0", numberOfSlot: "30", status: "1" },
+        { subjectId: "PRF192", subjectName: "Program", majorId: "0", numberOfSlot: "30", status: "1" },
+        { subjectId: "PRF192", subjectName: "Program", majorId: "0", numberOfSlot: "30", status: "1" },
+        { subjectId: "PRF192", subjectName: "Program", majorId: "0", numberOfSlot: "30", status: "1" },
+        { subjectId: "SSE203", subjectName: "Intertional", majorId: "2", numberOfSlot: "29", status: "2" },
+        { subjectId: "SSE203", subjectName: "Intertional", majorId: "1", numberOfSlot: "11", status: "1" },
 
     ]);
     //Update bảng mà không cần reload
@@ -30,12 +32,47 @@ function ManageSubject() {
     const toggleShowForm = () => {
         setAddForm(!showAddForm);
     };
-
+    // Quản lý trạng thái form Edit
+    const [subjectToUpdate, setSubjectToUpdate] = useState(null);
+    // Hàm xử lý khi bấm nút sửa
+    const handleUpdateClick = (subject) => {
+        setSubjectToUpdate(subject);
+        toggleShowUpdateForm();
+    };
+    const [showUpdateForm, setUpdateForm] = useState(false);
+    const toggleShowUpdateForm = () => {
+        setUpdateForm(!showUpdateForm);
+    };
+    // Hàm xử lí nút edit tới đây hết
+    // Dưới đây là hàm xử lí khi nhấn vào nút detail
+    const [subjectDetail, setSubjectDetail] = useState(null);
+    //Hàm này xử lí khi người dùng ấn vào nút detail
+    const handleDetailClick = (subject) => {
+        setSubjectDetail(subject);
+        //Hiển thị cái trang detail ra
+        toggleShowDetailForm();
+    };
+    const [showDetailForm, setDetailForm] = useState(false);
+    const toggleShowDetailForm = () => {
+        setDetailForm(!showDetailForm);
+    };
+    // Hết hàm xử lí khi nhắn nút detail 
+    //Hàm xử lí filter
     const [filteredSubjects, setFilteredSubjects] = useState(subjectData);
     const [filter, setFilters] = useState({
         subjectId: "",
         status: "",
     });
+    const majors = [
+        { id: "0", name: "Kỹ thuật phần mềm" },
+        { id: "1", name: "Ngôn ngữ Anh" },
+        { id: "2", name: "Quản trị kinh doanh" },
+    ];
+    // Function to get the major name by majorId
+    const getMajorName = (majorId) => {
+        const major = majors.find((m) => m.id === majorId);
+        return major ? major.name : "Unknown";
+    };
     const [availableSubjects, setAvailableSubjects] = useState([]);
     const [availableStatuses] = useState([
         { id: "1", label: "Đang diễn ra" },
@@ -181,7 +218,7 @@ function ManageSubject() {
                             <tr key={index} className="hover:bg-gray-50 even:bg-gray-50">
                                 <td className="p-4 text-center">{item.subjectId}</td>
                                 <td className="p-4 text-center">{item.subjectName}</td>
-                                <td className="p-4 text-center">{item.majorId}</td>
+                                <td className="p-4 text-center">{getMajorName(item.majorId)}</td>
                                 <td className="p-4 text-center">{item.numberOfSlot}</td>
                                 <td className="p-4 text-center">
                                     {item.status === "1" ? "Đang diễn ra" : item.status === "2" ? "Đã kết thúc" : "Chưa bắt đầu"}
@@ -237,9 +274,21 @@ function ManageSubject() {
                 </button>
             </div>
             {/* Phân trang - end */}
-            {/* Show Form Add New Semester - Start */}
+            {/* Đường dẫn tới formAddSubject - Start */}
             {showAddForm && <FormAddSubject onSubjectAdded={handleSubjectReload} />}
-            {/* Show Form Add New Semester - End */}
+            {/* Đường dẫn tới formAddSubject - End */}
+            {/* Đường dẫn tới form edit - Start */}
+            {showUpdateForm && (
+                <FormUpdateSubject subjectToUpdate={subjectToUpdate} onSubjectUpdated={handleSubjectReload} />
+            )}
+            {/* Đường dẫn tới form edit - End */}
+            {/*Đường dẫn tới trang form detail - Star */}
+            {showDetailForm && (
+                <>
+                <FormDetailSubject subjectDetail={subjectDetail} onSubjectDetailUpdated={handleSubjectReload}></FormDetailSubject>
+                </>
+            )}
+            {/*Đường dẫn tới trang form detail - End*/}
         </div>
     );
 }
