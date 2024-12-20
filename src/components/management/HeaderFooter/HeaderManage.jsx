@@ -43,6 +43,11 @@ function HeaderManage() {
           <>
             <i className="fas fa-calendar-days w-4 h-4"></i>
             <p className="text-lg italic">Quản lý giáo viên</p>
+
+        {isActive("/manageSubject") && (
+          <>
+            <i className="fas fa-calendar-days w-4 h-4"></i>
+            <p className="text-lg italic">Quản lý môn học</p>
           </>
         )}
       </div>

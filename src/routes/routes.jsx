@@ -17,6 +17,7 @@ import SentOTP from '../pages/Login/SentOTP';
 import ResetPassword from '../pages/Login/ResetPassword';
 import ManageSemester from '../pages/manage/semester/semester';
 import ManageTeacher from '../pages/manage/teacher/teacher';
+import ManageSubject from '../pages/manage/subject/subject';
 
 
 const AppRoutes = () => {
@@ -42,7 +43,7 @@ const AppRoutes = () => {
     { path: "/manageRoom", component: ManageRoom, layout: ManageLayout },
     { path: "/manageSemester", component: ManageSemester, layout: ManageLayout },
     { path: "/manageTeacher", component: ManageTeacher, layout: ManageLayout },
-
+    { path: "/manageSubject", component: ManageSubject, layout: ManageLayout },
 
 ];
   return (
