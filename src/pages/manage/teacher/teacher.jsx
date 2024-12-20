@@ -5,9 +5,9 @@ import FormDetailTeacher from "../../../components/management/Teacher/FormDetail
 
 function ManageTeacher() {
     const [teacherData, setTeacherData] = useState([
-        { teacherId: "HieuNT", lastName: "Nguyễn", middleName: "Trung", firstName: "Hiếu", phoneNumber: "0123123123", email: "HieuNT239@gmail.com", major: "Kỹ thuật phần mềm", dateOfBirth: "1999-04-01", createAt: "2023-01-01", updateAt: "2023-01-01" },
-        { teacherId: "TuanV", lastName: "Vũ", middleName: "Tuấn", firstName: "Anh", phoneNumber: "0123123124", email: "TuanV@gmail.com", major: "Công nghệ thông tin", dateOfBirth: "1999-04-01", createAt: "2023-01-01", updateAt: "2023-01-01" },
-        { teacherId: "MinhT", lastName: "Trần", middleName: "Minh", firstName: "Tuấn", phoneNumber: "0123123125", email: "MinhT@gmail.com", major: "Hệ thống thông tin", dateOfBirth: "1999-04-01", createAt: "2023-01-01", updateAt: "2023-01-01" },
+        { teacherId: "HieuNT", lastName: "Nguyễn", middleName: "Trung", firstName: "Hiếu", phoneNumber: "0123123123", email: "HieuNT239@gmail.com", major: "Kỹ thuật phần mềm", dateOfBirth: "1999-04-01", createdAt: "2023-01-01", updatedAt: "2023-01-01" },
+        { teacherId: "TuanV", lastName: "Vũ", middleName: "Tuấn", firstName: "Anh", phoneNumber: "0123123124", email: "TuanV@gmail.com", major: "Công nghệ thông tin", dateOfBirth: "1999-04-01", createdAt: "2023-01-01", updatedAt: "2023-01-01" },
+        { teacherId: "MinhT", lastName: "Trần", middleName: "Minh", firstName: "Tuấn", phoneNumber: "0123123125", email: "MinhT@gmail.com", major: "Hệ thống thông tin", dateOfBirth: "1999-04-01", createdAt: "2023-01-01", updatedAt: "2023-01-01" },
         // Add more teachers as needed
     ]);
 
