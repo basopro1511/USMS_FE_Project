@@ -1,59 +1,81 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 
 function FormUpdateStudent({ studentToUpdate, onStudentUpdated }) {
     const [errorMessage, setErrorMessage] = useState("");
     const [successMessage, setSuccessMessage] = useState("");
     const [showAlert, setShowAlert] = useState(false);
-    const [updatedStudent, setUpdatedStudent] = useState({ ...studentToUpdate });
     const [isFormVisible, setIsFormVisible] = useState(true);
-    const [avatar, setAvatar] = useState(onStudentUpdated.avatar || null);
+    const [selectedImage, setSelectedImage] = useState(null); // Quản lý ảnh đã chọn
+    const fileInputRef = useRef(null);
+
+    const [studentData, setStudentData] = useState(
+        studentToUpdate || {
+            studentId: "",
+            firstName: "",
+            middleName: "",
+            lastName: "",
+            majorId: 0,
+            email: "",
+            phone: "",
+            dateOfBirth: "",
+            startYear: "",
+            userAvatar: "", // Giá trị mặc định cho avatar
+        }
+    );
+
+    useEffect(() => {
+        if (studentToUpdate) {
+            setStudentData(studentToUpdate);
+        }
+    }, [studentToUpdate]);
 
     const handleCancel = () => {
         setIsFormVisible(false);
+    };
+
+    const handleUpdateStudent = async (e) => {
+        e.preventDefault();
+        try {
+            const response = await fakeUpdateStudentAPI(studentData);
+            if (response.isSuccess) {
+                setSuccessMessage(response.message);
+                setShowAlert("success");
+                if (onStudentUpdated) {
+                    onStudentUpdated(response.student);
+                }
+                setTimeout(() => {
+                    setShowAlert(false);
+                    setIsFormVisible(false);
+                }, 3000);
+            } else {
+                setErrorMessage(response.message);
+                setShowAlert("error");
+                setTimeout(() => setShowAlert(false), 3000);
+            }
+        } catch (error) {
+            setErrorMessage("Đã xảy ra lỗi trong quá trình cập nhật.");
+            setShowAlert("error");
+            setTimeout(() => setShowAlert(false), 3000);
+        }
+    };
+
+    const handleInputChange = (field, value) => {
+        setStudentData((prev) => ({ ...prev, [field]: value }));
+    };
+
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const previewUrl = URL.createObjectURL(file);
+            setSelectedImage(previewUrl);
+            setStudentData((prev) => ({ ...prev, userAvatar: previewUrl }));
+        }
     };
 
     const majorMapping = {
         "0": "Khoa học máy tính",
         "1": "Công nghệ phần mềm",
         "2": "Kỹ thuật mạng",
-    };
-
-    const handleUpdateStudent = async (e) => {
-        e.preventDefault();
-        try {
-            // Mô phỏng gọi API
-            const response = await fakeUpdateSubjectAPI(updatedStudent);
-            if (response.isSuccess) {
-                setShowAlert("success");
-                setSuccessMessage(response.message);
-                if (onStudentUpdated) {
-                    onStudentUpdated(response.student); // Cập nhật dữ liệu cha
-                }
-                // Đóng form sau 3 giây hoặc ngay lập tức
-                setTimeout(() => {
-                    setShowAlert(false);
-                    setIsFormVisible(false); // Đóng form
-                }, 3000);
-            } else {
-                setShowAlert("error");
-                setErrorMessage(response.message);
-                setTimeout(() => setShowAlert(false), 3000);
-            }
-        } catch (error) {
-            console.error("Error updating student:", error);
-            setShowAlert("error");
-            setErrorMessage("Có lỗi xảy ra khi cập nhật.");
-            setTimeout(() => setShowAlert(false), 3000);
-        }
-    };
-
-    const handleAvatarChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = () => setAvatar(reader.result);
-            reader.readAsDataURL(file);
-        }
     };
 
     return (
@@ -91,30 +113,31 @@ function FormUpdateStudent({ studentToUpdate, onStudentUpdated }) {
                             <form onSubmit={handleUpdateStudent}>
                                 <div className="flex items-start gap-8 my-6">
                                     {/* Avatar Section */}
-                                    <div className="relative">
+                                    <div className="mb-4">
                                         <img
-                                            src={avatar || "https://via.placeholder.com/150"}
-                                            alt="Avatar"
-                                            className="w-180 h-220 object-cover border"
+                                            src={selectedImage || studentData.userAvatar || "/default-avatar.png"}
+                                            alt="Upload Preview"
+                                            className="w-[180px] h-[220px] object-cover rounded-md"
                                         />
-                                        <label
-                                            htmlFor="avatar"
-                                            className="block mt-2 text-center text-blue-500 cursor-pointer"
-                                        >
-                                            Upload
-                                        </label>
                                         <input
                                             type="file"
                                             accept="image/*"
-                                            id="avatar"
+                                            onChange={handleImageChange}
                                             className="hidden"
-                                            onChange={handleAvatarChange}
+                                            ref={fileInputRef}
                                         />
+                                        <button
+                                            type="button"
+                                            onClick={() => fileInputRef.current.click()}
+                                            className="w-full bg-[#2B559B] text-white font-bold text-sm rounded-md mt-2 py-2"
+                                        >
+                                            Upload
+                                        </button>
                                     </div>
 
                                     {/* Input Section */}
                                     <div className="flex-1 grid gap-4">
-                                        {/* First Row: Student ID and Major */}
+                                        {/* Student ID and Major */}
                                         <div className="grid grid-cols-2 gap-4">
                                             <div>
                                                 <label className="block text-sm font-medium mb-1">
@@ -122,16 +145,10 @@ function FormUpdateStudent({ studentToUpdate, onStudentUpdated }) {
                                                 </label>
                                                 <input
                                                     type="text"
-                                                    required
-                                                    value={updatedStudent.studentId}
+                                                    value={studentData.studentId}
                                                     className="w-full border rounded-md px-3 py-2"
                                                     placeholder="Nhập mã số sinh viên"
-                                                    onChange={(e) =>
-                                                        setUpdatedStudent({
-                                                            ...updatedStudent,
-                                                            studentId: e.target.value,
-                                                        })
-                                                    }
+                                                    onChange={(e) => handleInputChange("studentId", e.target.value)}
                                                 />
                                             </div>
                                             <div>
@@ -139,15 +156,9 @@ function FormUpdateStudent({ studentToUpdate, onStudentUpdated }) {
                                                     Chuyên ngành:
                                                 </label>
                                                 <select
-                                                    required
-                                                    value={updatedStudent.majorId || ""}
+                                                    value={studentData.majorId}
                                                     className="w-full border rounded-md px-3 py-2"
-                                                    onChange={(e) =>
-                                                        setUpdatedStudent({
-                                                            ...updatedStudent,
-                                                            majorId: e.target.value,
-                                                        })
-                                                    }
+                                                    onChange={(e) => handleInputChange("majorId", e.target.value)}
                                                 >
                                                     {Object.entries(majorMapping).map(([key, value]) => (
                                                         <option key={key} value={key}>
@@ -158,140 +169,84 @@ function FormUpdateStudent({ studentToUpdate, onStudentUpdated }) {
                                             </div>
                                         </div>
 
-                                        {/* Second Row: Name Fields */}
+                                        {/* Name Fields */}
                                         <div className="grid grid-cols-3 gap-4">
                                             <div>
-                                                <label className="block text-sm font-medium mb-1">
-                                                    Họ:
-                                                </label>
+                                                <label className="block text-sm font-medium mb-1">Họ:</label>
                                                 <input
                                                     type="text"
-                                                    required
-                                                    value={updatedStudent.lastName}
+                                                    value={studentData.lastName}
                                                     className="w-full border rounded-md px-3 py-2"
                                                     placeholder="Nhập họ"
-                                                    onChange={(e) =>
-                                                        setUpdatedStudent({
-                                                            ...updatedStudent,
-                                                            lastName: e.target.value,
-                                                        })
-                                                    }
+                                                    onChange={(e) => handleInputChange("lastName", e.target.value)}
                                                 />
                                             </div>
                                             <div>
-                                                <label className="block text-sm font-medium mb-1">
-                                                    Tên đệm:
-                                                </label>
+                                                <label className="block text-sm font-medium mb-1">Tên đệm:</label>
                                                 <input
                                                     type="text"
-                                                    required
-                                                    value={updatedStudent.middleName}
+                                                    value={studentData.middleName}
                                                     className="w-full border rounded-md px-3 py-2"
                                                     placeholder="Nhập tên đệm"
-                                                    onChange={(e) =>
-                                                        setUpdatedStudent({
-                                                            ...updatedStudent,
-                                                            middleName: e.target.value,
-                                                        })
-                                                    }
+                                                    onChange={(e) => handleInputChange("middleName", e.target.value)}
                                                 />
                                             </div>
                                             <div>
-                                                <label className="block text-sm font-medium mb-1">
-                                                    Tên:
-                                                </label>
+                                                <label className="block text-sm font-medium mb-1">Tên:</label>
                                                 <input
                                                     type="text"
-                                                    required
-                                                    value={updatedStudent.firstName}
+                                                    value={studentData.firstName}
                                                     className="w-full border rounded-md px-3 py-2"
                                                     placeholder="Nhập tên"
-                                                    onChange={(e) =>
-                                                        setUpdatedStudent({
-                                                            ...updatedStudent,
-                                                            firstName: e.target.value,
-                                                        })
-                                                    }
+                                                    onChange={(e) => handleInputChange("firstName", e.target.value)}
                                                 />
                                             </div>
                                         </div>
 
-                                        {/* Third Row: Email */}
+                                        {/* Email */}
                                         <div>
-                                            <label className="block text-sm font-medium mb-1">
-                                                Gmail:
-                                            </label>
+                                            <label className="block text-sm font-medium mb-1">Gmail:</label>
                                             <input
                                                 type="email"
-                                                required
-                                                value={updatedStudent.email}
+                                                value={studentData.email}
                                                 className="w-full border rounded-md px-3 py-2"
                                                 placeholder="Nhập email"
-                                                onChange={(e) =>
-                                                    setUpdatedStudent({
-                                                        ...updatedStudent,
-                                                        email: e.target.value,
-                                                    })
-                                                }
+                                                onChange={(e) => handleInputChange("email", e.target.value)}
                                             />
                                         </div>
 
-                                        {/* Fourth Row: Phone Number */}
+                                        {/* Phone */}
                                         <div>
-                                            <label className="block text-sm font-medium mb-1">
-                                                Số điện thoại:
-                                            </label>
+                                            <label className="block text-sm font-medium mb-1">Số điện thoại:</label>
                                             <input
                                                 type="text"
-                                                required
-                                                value={updatedStudent.phone}
+                                                value={studentData.phone}
                                                 className="w-full border rounded-md px-3 py-2"
                                                 placeholder="Nhập số điện thoại"
-                                                onChange={(e) =>
-                                                    setUpdatedStudent({
-                                                        ...updatedStudent,
-                                                        phone: e.target.value,
-                                                    })
-                                                }
+                                                onChange={(e) => handleInputChange("phone", e.target.value)}
                                             />
                                         </div>
 
-                                        {/* Fifth Row: Date of Birth */}
+                                        {/* Date of Birth */}
                                         <div>
-                                            <label className="block text-sm font-medium mb-1">
-                                                Ngày sinh:
-                                            </label>
+                                            <label className="block text-sm font-medium mb-1">Ngày sinh:</label>
                                             <input
                                                 type="date"
-                                                required
-                                                value={updatedStudent.dateOfBirth}
+                                                value={studentData.dateOfBirth}
                                                 className="w-full border rounded-md px-3 py-2"
-                                                onChange={(e) =>
-                                                    setUpdatedStudent({
-                                                        ...updatedStudent,
-                                                        dateOfBirth: e.target.value,
-                                                    })
-                                                }
+                                                onChange={(e) => handleInputChange("dateOfBirth", e.target.value)}
                                             />
                                         </div>
 
-                                        {/* Sixth Row: Semester */}
+                                        {/* Start Year */}
                                         <div>
-                                            <label className="block text-sm font-medium mb-1">
-                                                Kì học:
-                                            </label>
+                                            <label className="block text-sm font-medium mb-1">Kì học:</label>
                                             <input
                                                 type="text"
-                                                required
-                                                value={updatedStudent.startYear || ""}
+                                                value={studentData.startYear}
                                                 className="w-full border rounded-md px-3 py-2"
                                                 placeholder="Nhập kì học"
-                                                onChange={(e) =>
-                                                    setUpdatedStudent({
-                                                        ...updatedStudent,
-                                                        startYear: e.target.value,
-                                                    })
-                                                }
+                                                onChange={(e) => handleInputChange("startYear", e.target.value)}
                                             />
                                         </div>
                                     </div>
