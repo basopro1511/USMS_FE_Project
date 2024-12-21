@@ -1,18 +1,19 @@
 import { useEffect, useState } from "react";
 import FormAddStudent from "../../../components/management/Student/FormAddStudent";
+import FormUpdateStudent from "../../../components/management/Student/FormUpdateStudent";
 
 function ManageStudent() {
     const [studentData] = useState([
-        { studentId: "CE160815", firstName: "Nguyen", middleName: "Toan", lastName: "Thang", majorId: "0", age: 22, startYear: 2016, email: "ThangNTCE160815@example.com", phone: "0123456789" },
-        { studentId: "CE160461", firstName: "Nguyen", middleName: "Tuan", lastName: "Thinh", majorId: "1", age: 22, startYear: 2016, email: "lethib@example.com", phone: "0987654321" },
-        { studentId: "CE170288", firstName: "Nguyen", middleName: "Quoc", lastName: "Hoang", majorId: "2", age: 21, startYear: 2017, email: "HoangNQCE170288@fpt.edu.vn", phone: "0112233445" },
-        { studentId: "CE170724", firstName: "Phan", middleName: "Le Thai", lastName: "Nam", majorId: "0", age: 21, startYear: 2017, email: "NamPLTCE170724@fpt.edu.vn", phone: "0223344556" },
-        { studentId: "CE170717", firstName: "Le", middleName: "Duc", lastName: "An", majorId: "0", age: 21, startYear: 2017, email: "anldce170717@fpt.edu.vn", phone: "0223244556" },
-        { studentId: "CE160815", firstName: "Nguyen", middleName: "Toan", lastName: "Thang", majorId: "0", age: 22, startYear: 2016, email: "ThangNTCE160815@example.com", phone: "0123456789" },
-        { studentId: "CE160461", firstName: "Nguyen", middleName: "Tuan", lastName: "Thinh", majorId: "1", age: 22, startYear: 2016, email: "lethib@example.com", phone: "0987654321" },
-        { studentId: "CE170288", firstName: "Nguyen", middleName: "Quoc", lastName: "Hoang", majorId: "2", age: 21, startYear: 2017, email: "HoangNQCE170288@fpt.edu.vn", phone: "0112233445" },
-        { studentId: "CE170724", firstName: "Phan", middleName: "Le Thai", lastName: "Nam", majorId: "0", age: 21, startYear: 2017, email: "NamPLTCE170724@fpt.edu.vn", phone: "0223344556" },
-        { studentId: "CE170717", firstName: "Le", middleName: "Duc", lastName: "An", majorId: "0", age: 21, startYear: 2017, email: "anldce170717@fpt.edu.vn", phone: "0223244556" },
+        { studentId: "CE160815", firstName: "Nguyen", middleName: "Toan", lastName: "Thang", majorId: "0", age: 22, startYear: 2016, email: "ThangNTCE160815@example.com", phone: "0123456789", dateOfBirth:"20-02-2002" },
+        { studentId: "CE160461", firstName: "Nguyen", middleName: "Tuan", lastName: "Thinh", majorId: "1", age: 22, startYear: 2016, email: "lethib@example.com", phone: "0987654321", dateOfBirth:"20-02-2002" },
+        { studentId: "CE170288", firstName: "Nguyen", middleName: "Quoc", lastName: "Hoang", majorId: "2", age: 21, startYear: 2017, email: "HoangNQCE170288@fpt.edu.vn", phone: "0112233445", dateOfBirth:"20-02-2002" },
+        { studentId: "CE170724", firstName: "Phan", middleName: "Le Thai", lastName: "Nam", majorId: "0", age: 21, startYear: 2017, email: "NamPLTCE170724@fpt.edu.vn", phone: "0223344556", dateOfBirth:"20-02-2002" },
+        { studentId: "CE170717", firstName: "Le", middleName: "Duc", lastName: "An", majorId: "0", age: 21, startYear: 2017, email: "anldce170717@fpt.edu.vn", phone: "0223244556", dateOfBirth:"20-02-2002" },
+        { studentId: "CE160815", firstName: "Nguyen", middleName: "Toan", lastName: "Thang", majorId: "0", age: 22, startYear: 2016, email: "ThangNTCE160815@example.com", phone: "0123456789", dateOfBirth:"20-02-2002" },
+        { studentId: "CE160461", firstName: "Nguyen", middleName: "Tuan", lastName: "Thinh", majorId: "1", age: 22, startYear: 2016, email: "lethib@example.com", phone: "0987654321", dateOfBirth:"20-02-2002" },
+        { studentId: "CE170288", firstName: "Nguyen", middleName: "Quoc", lastName: "Hoang", majorId: "2", age: 21, startYear: 2017, email: "HoangNQCE170288@fpt.edu.vn", phone: "0112233445", dateOfBirth:"20-02-2002" },
+        { studentId: "CE170724", firstName: "Phan", middleName: "Le Thai", lastName: "Nam", majorId: "0", age: 21, startYear: 2017, email: "NamPLTCE170724@fpt.edu.vn", phone: "0223344556", dateOfBirth:"20-02-2002" },
+        { studentId: "CE170717", firstName: "Le", middleName: "Duc", lastName: "An", majorId: "0", age: 21, startYear: 2017, email: "anldce170717@fpt.edu.vn", phone: "0223244556", dateOfBirth:"20-02-2002" },
     ]);
 
     const majorMapping = {
@@ -25,11 +26,26 @@ function ManageStudent() {
         const data = await getStudents(); // Gọi API để lấy lại tất cả các kìkì
         studentData(data.result); // Cập nhật lại dữ liệu kìkì
     };
-    // Show form Add New semester - Start
+    // Show form Add New Student - Start
     const [showStudentForm, setAddForm] = useState(false); // Dùng để hiển thị form
     const toggleShowForm = () => {
         setAddForm(!showStudentForm);
     };
+    // Show form Add New Room - End
+
+    //Lấy Data gắn qua form Update
+    const [studentToUpdate, setStudentToUpdate] = useState(null);
+    const handleUpdateClick = (student) => {
+        setStudentToUpdate(student);
+        toggleShowUpdateForm(); // Show form update
+    };
+
+    // Show form Update Student - Start
+    const [showUpdateForm, setUpdateForm] = useState(false);
+    const toggleShowUpdateForm = () => {
+        setUpdateForm(!showUpdateForm);
+    };
+    // Show form Update Room - End
 
     const [filteredStudents, setFilteredStudents] = useState(studentData);
     const [filter, setFilters] = useState({
@@ -227,6 +243,12 @@ function ManageStudent() {
                 {/* Đường dẫn tới formAddSubject - Start */}
                 {showStudentForm && <FormAddStudent onStudentAdded={handleStudentReload} />}
                 {/* Đường dẫn tới formAddSubject - End */}
+                {/* Show Form Update Room - Start */}
+                {showUpdateForm && (
+                    <>
+                        <FormUpdateStudent studentToUpdate={studentToUpdate} onStudentUpdated={handleStudentReload} />
+                    </>
+                )}
             </div>
         </div>
     );
