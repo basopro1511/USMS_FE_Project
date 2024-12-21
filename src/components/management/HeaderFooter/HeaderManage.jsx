@@ -45,6 +45,12 @@ function HeaderManage() {
             <p className="text-lg italic">Quản lý môn học</p>
           </>
         )}
+        {isActive("/manageStudent") && (
+          <>
+            <i className="fas fa-calendar-days w-4 h-4"></i>
+            <p className="text-lg italic">Quản lý sinh viên</p>
+          </>
+        )}
       </div>
 
       {/* Right section with the avatar and logout */}
