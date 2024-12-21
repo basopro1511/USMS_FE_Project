@@ -1,19 +1,20 @@
 import { useEffect, useState } from "react";
 import FormAddStudent from "../../../components/management/Student/FormAddStudent";
 import FormUpdateStudent from "../../../components/management/Student/FormUpdateStudent";
+import FormDetailStudent from "../../../components/management/Student/FormDetailStudent";
 
 function ManageStudent() {
     const [studentData] = useState([
-        { studentId: "CE160815", firstName: "Nguyen", middleName: "Toan", lastName: "Thang", majorId: "0", age: 22, startYear: 2016, email: "ThangNTCE160815@example.com", phone: "0123456789", dateOfBirth:"2002-02-20",userAvatar:"https://binhminhdigital.com/StoreData/PageData/3429/Tim-hieu-ve-ban-quyen-hinh-anh%20(3).jpg" },
-        { studentId: "CE160461", firstName: "Nguyen", middleName: "Tuan", lastName: "Thinh", majorId: "1", age: 22, startYear: 2016, email: "lethib@example.com", phone: "0987654321", dateOfBirth:"2002-02-20",userAvatar:"https://binhminhdigital.com/StoreData/PageData/3429/Tim-hieu-ve-ban-quyen-hinh-anh%20(3).jpg" },
-        { studentId: "CE170288", firstName: "Nguyen", middleName: "Quoc", lastName: "Hoang", majorId: "2", age: 21, startYear: 2017, email: "HoangNQCE170288@fpt.edu.vn", phone: "0112233445", dateOfBirth:"2002-02-20",userAvatar:"https://binhminhdigital.com/StoreData/PageData/3429/Tim-hieu-ve-ban-quyen-hinh-anh%20(3).jpg" },
-        { studentId: "CE170724", firstName: "Phan", middleName: "Le Thai", lastName: "Nam", majorId: "0", age: 21, startYear: 2017, email: "NamPLTCE170724@fpt.edu.vn", phone: "0223344556", dateOfBirth:"2002-02-20",userAvatar:"https://binhminhdigital.com/StoreData/PageData/3429/Tim-hieu-ve-ban-quyen-hinh-anh%20(3).jpg" },
-        { studentId: "CE170717", firstName: "Le", middleName: "Duc", lastName: "An", majorId: "0", age: 21, startYear: 2017, email: "anldce170717@fpt.edu.vn", phone: "0223244556", dateOfBirth:"2002-02-20",userAvatar:"https://binhminhdigital.com/StoreData/PageData/3429/Tim-hieu-ve-ban-quyen-hinh-anh%20(3).jpg" },
-        { studentId: "CE160815", firstName: "Nguyen", middleName: "Toan", lastName: "Thang", majorId: "0", age: 22, startYear: 2016, email: "ThangNTCE160815@example.com", phone: "0123456789", dateOfBirth:"2002-02-20",userAvatar:"https://binhminhdigital.com/StoreData/PageData/3429/Tim-hieu-ve-ban-quyen-hinh-anh%20(3).jpg" },
-        { studentId: "CE160461", firstName: "Nguyen", middleName: "Tuan", lastName: "Thinh", majorId: "1", age: 22, startYear: 2016, email: "lethib@example.com", phone: "0987654321", dateOfBirth:"2002-02-20",userAvatar:"https://binhminhdigital.com/StoreData/PageData/3429/Tim-hieu-ve-ban-quyen-hinh-anh%20(3).jpg" },
-        { studentId: "CE170288", firstName: "Nguyen", middleName: "Quoc", lastName: "Hoang", majorId: "2", age: 21, startYear: 2017, email: "HoangNQCE170288@fpt.edu.vn", phone: "0112233445", dateOfBirth:"2002-02-20",userAvatar:"https://binhminhdigital.com/StoreData/PageData/3429/Tim-hieu-ve-ban-quyen-hinh-anh%20(3).jpg" },
-        { studentId: "CE170724", firstName: "Phan", middleName: "Le Thai", lastName: "Nam", majorId: "0", age: 21, startYear: 2017, email: "NamPLTCE170724@fpt.edu.vn", phone: "0223344556", dateOfBirth:"2002-02-20",userAvatar:"https://binhminhdigital.com/StoreData/PageData/3429/Tim-hieu-ve-ban-quyen-hinh-anh%20(3).jpg" },
-        { studentId: "CE170717", firstName: "Le", middleName: "Duc", lastName: "An", majorId: "0", age: 21, startYear: 2017, email: "anldce170717@fpt.edu.vn", phone: "0223244556", dateOfBirth:"2002-02-20", userAvatar:"https://binhminhdigital.com/StoreData/PageData/3429/Tim-hieu-ve-ban-quyen-hinh-anh%20(3).jpg" },
+        { studentId: "CE160815", firstName: "Nguyen", middleName: "Toan", lastName: "Thang", majorId: "0", age: 22, startYear: 2016, email: "ThangNTCE160815@example.com", phone: "0123456789", dateOfBirth: "2002-02-20", userAvatar: "https://binhminhdigital.com/StoreData/PageData/3429/Tim-hieu-ve-ban-quyen-hinh-anh%20(3).jpg" },
+        { studentId: "CE160461", firstName: "Nguyen", middleName: "Tuan", lastName: "Thinh", majorId: "1", age: 22, startYear: 2016, email: "lethib@example.com", phone: "0987654321", dateOfBirth: "2002-02-20", userAvatar: "https://binhminhdigital.com/StoreData/PageData/3429/Tim-hieu-ve-ban-quyen-hinh-anh%20(3).jpg" },
+        { studentId: "CE170288", firstName: "Nguyen", middleName: "Quoc", lastName: "Hoang", majorId: "2", age: 21, startYear: 2017, email: "HoangNQCE170288@fpt.edu.vn", phone: "0112233445", dateOfBirth: "2002-02-20", userAvatar: "https://binhminhdigital.com/StoreData/PageData/3429/Tim-hieu-ve-ban-quyen-hinh-anh%20(3).jpg" },
+        { studentId: "CE170724", firstName: "Phan", middleName: "Le Thai", lastName: "Nam", majorId: "0", age: 21, startYear: 2017, email: "NamPLTCE170724@fpt.edu.vn", phone: "0223344556", dateOfBirth: "2002-02-20", userAvatar: "https://binhminhdigital.com/StoreData/PageData/3429/Tim-hieu-ve-ban-quyen-hinh-anh%20(3).jpg" },
+        { studentId: "CE170717", firstName: "Le", middleName: "Duc", lastName: "An", majorId: "0", age: 21, startYear: 2017, email: "anldce170717@fpt.edu.vn", phone: "0223244556", dateOfBirth: "2002-02-20", userAvatar: "https://binhminhdigital.com/StoreData/PageData/3429/Tim-hieu-ve-ban-quyen-hinh-anh%20(3).jpg" },
+        { studentId: "CE160815", firstName: "Nguyen", middleName: "Toan", lastName: "Thang", majorId: "0", age: 22, startYear: 2016, email: "ThangNTCE160815@example.com", phone: "0123456789", dateOfBirth: "2002-02-20", userAvatar: "https://binhminhdigital.com/StoreData/PageData/3429/Tim-hieu-ve-ban-quyen-hinh-anh%20(3).jpg" },
+        { studentId: "CE160461", firstName: "Nguyen", middleName: "Tuan", lastName: "Thinh", majorId: "1", age: 22, startYear: 2016, email: "lethib@example.com", phone: "0987654321", dateOfBirth: "2002-02-20", userAvatar: "https://binhminhdigital.com/StoreData/PageData/3429/Tim-hieu-ve-ban-quyen-hinh-anh%20(3).jpg" },
+        { studentId: "CE170288", firstName: "Nguyen", middleName: "Quoc", lastName: "Hoang", majorId: "2", age: 21, startYear: 2017, email: "HoangNQCE170288@fpt.edu.vn", phone: "0112233445", dateOfBirth: "2002-02-20", userAvatar: "https://binhminhdigital.com/StoreData/PageData/3429/Tim-hieu-ve-ban-quyen-hinh-anh%20(3).jpg" },
+        { studentId: "CE170724", firstName: "Phan", middleName: "Le Thai", lastName: "Nam", majorId: "0", age: 21, startYear: 2017, email: "NamPLTCE170724@fpt.edu.vn", phone: "0223344556", dateOfBirth: "2002-02-20", userAvatar: "https://binhminhdigital.com/StoreData/PageData/3429/Tim-hieu-ve-ban-quyen-hinh-anh%20(3).jpg" },
+        { studentId: "CE170717", firstName: "Le", middleName: "Duc", lastName: "An", majorId: "0", age: 21, startYear: 2017, email: "anldce170717@fpt.edu.vn", phone: "0223244556", dateOfBirth: "2002-02-20", userAvatar: "https://binhminhdigital.com/StoreData/PageData/3429/Tim-hieu-ve-ban-quyen-hinh-anh%20(3).jpg" },
     ]);
 
     const majorMapping = {
@@ -46,6 +47,20 @@ function ManageStudent() {
         setUpdateForm(!showUpdateForm);
     };
     // Show form Update Room - End
+
+    //Lấy Data gắn qua form Update
+    const [studentDetail, setStudentDetail] = useState(null);
+    const handleDetailClick = (student) => {
+        setStudentDetail(student);
+        toggleShowDetailForm(); // Show the update form
+    };
+
+    // Show form Detail Room - Start
+    const [showDetailForm, setDetailForm] = useState(false);
+    const toggleShowDetailForm = () => {
+        setDetailForm(!showDetailForm);
+    };
+    // Show form Detail Room - End
 
     const [filteredStudents, setFilteredStudents] = useState(studentData);
     const [filter, setFilters] = useState({
@@ -249,6 +264,12 @@ function ManageStudent() {
                         <FormUpdateStudent studentToUpdate={studentToUpdate} onStudentUpdated={handleStudentReload} />
                     </>
                 )}
+                {showDetailForm && (
+                    <>
+                        <FormDetailStudent studentDetail={studentDetail} onStudentDetailUpdated={handleStudentReload}></FormDetailStudent>
+                    </>
+                )}
+                {/* Show Form Detail Room - End */}
             </div>
         </div>
     );

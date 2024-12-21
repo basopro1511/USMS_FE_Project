@@ -1,0 +1,200 @@
+import { useEffect, useState, useRef } from "react";
+
+function FormDetailStudent({ studentDetail, onStudentDetailUpdated }) {
+    const [isFormVisible, setIsFormVisible] = useState(true);
+    const [studentData, setStudentData] = useState({
+        studentId: "",
+        firstName: "",
+        middleName: "",
+        lastName: "",
+        majorId: 0,
+        email: "",
+        phone: "",
+        dateOfBirth: "",
+        startYear: "",
+        userAvatar: "",
+    });
+    const [selectedImage, setSelectedImage] = useState(null);
+    const fileInputRef = useRef(null);
+
+    useEffect(() => {
+        if (studentDetail) {
+            setStudentData(studentDetail);
+        }
+    }, [studentDetail]);
+
+    const handleCancel = () => {
+        setIsFormVisible(false);
+    };
+
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const previewUrl = URL.createObjectURL(file);
+            setSelectedImage(previewUrl);
+        }
+    };
+
+    const majorMapping = {
+        "0": "Khoa học máy tính",
+        "1": "Công nghệ phần mềm",
+        "2": "Kỹ thuật mạng",
+    };
+
+    return (
+        <>
+            {isFormVisible && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+                    <div className="bg-white border w-full max-w-[750px] h-auto rounded-2xl items-center shadow-xl p-6">
+                        <div className="flex">
+                            <button
+                                type="button"
+                                className="w-full max-w-[80px] h-[30px] sm:h-[40px] border rounded-xl bg-red-500 text-white font-bold text-lg sm:text-2xl transition-all hover:scale-105 hover:bg-red-700 ml-auto mr-3 mt-3"
+                                onClick={handleCancel}
+                            >
+                                X
+                            </button>
+                        </div>
+                        <p className="font-bold text-3xl sm:text-4xl md:text-5xl text-secondaryBlue text-center">
+                            Chi tiết sinh viên
+                        </p>
+                        <form>
+                            <div className="flex items-start gap-8 my-6">
+                                {/* Avatar Section */}
+                                <div className="mb-4">
+                                    <img
+                                        src={selectedImage || studentData.userAvatar || "/default-avatar.png"}
+                                        alt="Avatar Preview"
+                                        className="w-[180px] h-[220px] object-cover rounded-md"
+                                    />
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={handleImageChange}
+                                        className="hidden"
+                                        ref={fileInputRef}
+                                    />
+                                </div>
+
+                                {/* Input Section */}
+                                <div className="flex-1 grid gap-4">
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label className="block text-sm font-medium mb-1">
+                                                Mã số sinh viên:
+                                            </label>
+                                            <input
+                                                readOnly
+                                                type="text"
+                                                value={studentData.studentId}
+                                                className="w-full border rounded-md px-3 py-2"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium mb-1">
+                                                Chuyên ngành:
+                                            </label>
+                                            <select
+                                                readOnly
+                                                value={studentData.majorId}
+                                                className="w-full border rounded-md px-3 py-2"
+                                            >
+                                                {Object.entries(majorMapping).map(([key, value]) => (
+                                                    <option key={key} value={key}>
+                                                        {value}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-3 gap-4">
+                                        <div>
+                                            <label className="block text-sm font-medium mb-1">Họ:</label>
+                                            <input
+                                                readOnly
+                                                type="text"
+                                                value={studentData.lastName}
+                                                className="w-full border rounded-md px-3 py-2"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium mb-1">Tên đệm:</label>
+                                            <input
+                                                readOnly
+                                                type="text"
+                                                value={studentData.middleName}
+                                                className="w-full border rounded-md px-3 py-2"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium mb-1">Tên:</label>
+                                            <input
+                                                readOnly
+                                                type="text"
+                                                value={studentData.firstName}
+                                                className="w-full border rounded-md px-3 py-2"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium mb-1">Gmail:</label>
+                                        <input
+                                            readOnly
+                                            type="email"
+                                            value={studentData.email}
+                                            className="w-full border rounded-md px-3 py-2"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium mb-1">Số điện thoại:</label>
+                                        <input
+                                            readOnly
+                                            type="text"
+                                            value={studentData.phone}
+                                            className="w-full border rounded-md px-3 py-2"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium mb-1">Ngày sinh:</label>
+                                        <input
+                                            readOnly
+                                            type="date"
+                                            value={studentData.dateOfBirth}
+                                            className="w-full border rounded-md px-3 py-2"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium mb-1">Kì học:</label>
+                                        <input
+                                            readOnly
+                                            type="text"
+                                            value={studentData.startYear}
+                                            className="w-full border rounded-md px-3 py-2"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="flex justify-center mt-4">
+                                <button
+                                    type="button"
+                                    className="w-full max-w-[200px] h-[50px] sm:h-[64px] border rounded-3xl bg-red-500 text-white font-bold text-lg sm:text-2xl transition-all hover:scale-105 hover:bg-red-700"
+                                    onClick={handleCancel}
+                                >
+                                    Đóng
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+        </>
+    );
+}
+
+export default FormDetailStudent;
