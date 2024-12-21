@@ -1,14 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 function FormUpdateTeacher({ teacherToUpdate, onTeacherUpdated }) {
     const [errorMessage, setErrorMessage] = useState("");
     const [successMessage, setSuccessMessage] = useState("");
     const [showAlert, setShowAlert] = useState(false);
-
     const [isFormVisible, setIsFormVisible] = useState(true);
-    const handleCancel = () => {
-        setIsFormVisible(false);
-    };
+    const [selectedImage, setSelectedImage] = useState(null);
+    const fileInputRef = useRef(null); // Sử dụng useRef để tham chiếu đến input file
 
     const [teacherData, setTeacherData] = useState({
         teacherId: "",
@@ -21,6 +19,8 @@ function FormUpdateTeacher({ teacherToUpdate, onTeacherUpdated }) {
         dateOfBirth: "",
         createdAt: "",
         updatedAt: "",
+        personalEmail:"",
+        userAvatar:"",
     });
 
     useEffect(() => {
@@ -29,24 +29,35 @@ function FormUpdateTeacher({ teacherToUpdate, onTeacherUpdated }) {
         }
     }, [teacherToUpdate]);
 
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setSelectedImage(URL.createObjectURL(file)); // Hiển thị ảnh xem trước
+        }
+    };
+
     const handleUpdateTeacher = async (e) => {
         e.preventDefault();
         try {
-            const response = await updateTeacher(teacherData); // Call update API
+            const response = await updateTeacher(teacherData); // Giả sử đây là API gọi để cập nhật thông tin giáo viên
             if (response.isSuccess) {
                 setShowAlert("success");
                 setSuccessMessage(response.message);
-                onTeacherUpdated(response.teacher); 
-                setTimeout(() => setShowAlert(false), 3000); 
+                onTeacherUpdated(response.teacher);
+                setTimeout(() => setShowAlert(false), 3000);
                 setIsFormVisible(false);
             } else {
                 setShowAlert("error");
                 setErrorMessage(response.message);
-                setTimeout(() => setShowAlert(false), 3000); 
+                setTimeout(() => setShowAlert(false), 3000);
             }
         } catch (error) {
             console.error("Error updating teacher:", error);
         }
+    };
+
+    const handleCancel = () => {
+        setIsFormVisible(false);
     };
 
     return (
@@ -59,7 +70,6 @@ function FormUpdateTeacher({ teacherToUpdate, onTeacherUpdated }) {
                         } border rounded-lg p-4`}
                 >
                     <div className="flex items-center">
-                    <span className="sr-only">Info</span>
                         <div>
                             {showAlert === "error" ? (
                                 <span>
@@ -86,12 +96,20 @@ function FormUpdateTeacher({ teacherToUpdate, onTeacherUpdated }) {
                                     <div>
                                         <div className="mb-4">
                                             <img
-                                                src="https://via.placeholder.com/150"
+                                               src={selectedImage || teacherData.userAvatar}
                                                 alt="Upload Preview"
                                                 className="w-[180px] h-[220px] object-cover rounded-md"
                                             />
+                                            <input
+                                                type="file"
+                                                accept="image/*"
+                                                onChange={handleImageChange}
+                                                className="hidden"
+                                                ref={fileInputRef} // Sử dụng ref thay vì getElementById
+                                            />
                                             <button
                                                 type="button"
+                                                onClick={() => fileInputRef.current.click()}
                                                 className="w-full bg-[#2B559B] text-white font-bold text-sm rounded-md mt-2 py-2"
                                             >
                                                 Upload
@@ -163,7 +181,7 @@ function FormUpdateTeacher({ teacherToUpdate, onTeacherUpdated }) {
                                             </div>
                                         </div>
                                         <div>
-                                            <p className="text-left">Gmail:</p>
+                                            <p className="text-left">Email:</p>
                                             <input
                                                 type="email"
                                                 required
@@ -171,6 +189,18 @@ function FormUpdateTeacher({ teacherToUpdate, onTeacherUpdated }) {
                                                 value={teacherData.email}
                                                 onChange={(e) =>
                                                     setTeacherData({ ...teacherData, email: e.target.value })
+                                                }
+                                            />
+                                        </div>
+                                        <div>
+                                            <p className="text-left">Email cá nhân:</p>
+                                            <input
+                                                type="email"
+                                                required
+                                                className="w-full h-[40px] border border-gray-300 rounded-md px-3"
+                                                value={teacherData.personalEmail}
+                                                onChange={(e) =>
+                                                    setTeacherData({ ...teacherData, personalEmail: e.target.value })
                                                 }
                                             />
                                         </div>

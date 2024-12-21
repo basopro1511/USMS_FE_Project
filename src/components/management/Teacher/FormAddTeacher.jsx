@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 
 function FormAddTeacher({ onTeacherAdded }) {
     const [newTeacher, setNewTeacher] = useState({
@@ -10,11 +10,24 @@ function FormAddTeacher({ onTeacherAdded }) {
         email: "",
         phoneNumber: "",
         dateOfBirth: "",
+        personalEmail: "",
+        userAvatar: "",
     });
 
+    const [selectedImage, setSelectedImage] = useState(""); // Thêm state cho selectedImage
+    const fileInputRef = useRef(null); // Sử dụng useRef để khởi tạo fileInputRef
+
     const [isFormVisible, setIsFormVisible] = useState(true);
+
     const handleCancel = () => {
         setIsFormVisible(false);
+    };
+
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setSelectedImage(URL.createObjectURL(file)); // Hiển thị ảnh xem trước
+        }
     };
 
     const handleAddTeacher = (e) => {
@@ -38,17 +51,25 @@ function FormAddTeacher({ onTeacherAdded }) {
                                     <div>
                                         <div className="mb-4">
                                             <img
-                                                src="https://via.placeholder.com/150"
-                                                alt="Upload Preview"
+                                               src={selectedImage || "https://via.placeholder.com/150"}
+                                               alt="Upload Preview"
                                                 className="w-[180px] h-[220px] object-cover rounded-md"
+                                            />
+                                            <input
+                                                type="file"
+                                                accept="image/*"
+                                                onChange={handleImageChange}
+                                                className="hidden"
+                                                ref={fileInputRef} // Sử dụng ref để lấy input file
                                             />
                                             <button
                                                 type="button"
+                                                onClick={() => fileInputRef.current.click()}
                                                 className="w-full bg-[#2B559B] text-white font-bold text-sm rounded-md mt-2 py-2"
                                             >
                                                 Upload
                                             </button>
-                                        </div>  
+                                        </div>
                                     </div>
                                     <div className="flex flex-col gap-4">
                                         <div className="flex gap-4">
@@ -110,13 +131,24 @@ function FormAddTeacher({ onTeacherAdded }) {
                                             </div>
                                         </div>
                                         <div>
-                                            <p className="text-left">Gmail:</p>
+                                            <p className="text-left">Email:</p>
                                             <input
                                                 type="email"
                                                 required
                                                 className="w-full h-[40px] border border-gray-300 rounded-md px-3"
                                                 onChange={(e) =>
                                                     setNewTeacher({ ...newTeacher, email: e.target.value })
+                                                }
+                                            />
+                                        </div>
+                                        <div>
+                                            <p className="text-left">Email cá nhân:</p>
+                                            <input
+                                                type="email"
+                                                required
+                                                className="w-full h-[40px] border border-gray-300 rounded-md px-3"
+                                                onChange={(e) =>
+                                                    setNewTeacher({ ...newTeacher, personalEmail: e.target.value })
                                                 }
                                             />
                                         </div>

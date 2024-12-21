@@ -5,9 +5,9 @@ import FormDetailTeacher from "../../../components/management/Teacher/FormDetail
 
 function ManageTeacher() {
     const [teacherData, setTeacherData] = useState([
-        { teacherId: "HieuNT", lastName: "Nguyễn", middleName: "Trung", firstName: "Hiếu", phoneNumber: "0123123123", email: "HieuNT239@gmail.com", major: "Kỹ thuật phần mềm", dateOfBirth: "1999-04-01", createdAt: "2023-01-01", updatedAt: "2023-01-01" },
-        { teacherId: "TuanV", lastName: "Vũ", middleName: "Tuấn", firstName: "Anh", phoneNumber: "0123123124", email: "TuanV@gmail.com", major: "Công nghệ thông tin", dateOfBirth: "1999-04-01", createdAt: "2023-01-01", updatedAt: "2023-01-01" },
-        { teacherId: "MinhT", lastName: "Trần", middleName: "Minh", firstName: "Tuấn", phoneNumber: "0123123125", email: "MinhT@gmail.com", major: "Hệ thống thông tin", dateOfBirth: "1999-04-01", createdAt: "2023-01-01", updatedAt: "2023-01-01" },
+        { teacherId: "HieuNT", lastName: "Nguyễn", middleName: "Trung", firstName: "Hiếu", phoneNumber: "0123123123", email: "HieuNT239@gmail.com", major: "Kỹ thuật phần mềm", dateOfBirth: "1999-04-01", createdAt: "2023-01-01", updatedAt: "2023-01-01",personalEmail:"Ex@email.com", userAvatar:"https://i.pinimg.com/736x/c2/b1/36/c2b1367627ae11fc45f6e1d51d9efd13.jpg" },
+        { teacherId: "TuanV", lastName: "Vũ", middleName: "Tuấn", firstName: "Anh", phoneNumber: "0123123124", email: "TuanV@gmail.com", major: "Công nghệ thông tin", dateOfBirth: "1999-04-01", createdAt: "2023-01-01", updatedAt: "2023-01-01",personalEmail:"Ex@email.com", userAvatar:"https://i.pinimg.com/736x/c2/b1/36/c2b1367627ae11fc45f6e1d51d9efd13.jpg" },
+        { teacherId: "MinhT", lastName: "Trần", middleName: "Minh", firstName: "Tuấn", phoneNumber: "0123123125", email: "MinhT@gmail.com", major: "Hệ thống thông tin", dateOfBirth: "1999-04-01", createdAt: "2023-01-01", updatedAt: "2023-01-01" ,personalEmail:"Ex@email.com", userAvatar:"https://i.pinimg.com/736x/c2/b1/36/c2b1367627ae11fc45f6e1d51d9efd13.jpg"},
         // Add more teachers as needed
     ]);
 
@@ -133,7 +133,7 @@ function ManageTeacher() {
                         name="teacherId"
                         value={filters.teacherId}
                         onChange={handleFilterChange}
-                        className="max-w-sm mx-auto ml-3 h-12 w-full md:w-[230px] border border-black rounded-xl"
+                        className="max-w-sm mx-auto ml-3 h-12 px-3 w-full md:w-[230px] border border-black rounded-xl"
                         placeholder="Mã giáo viên"
                     />
                     {/* Select Teacher Name */}
@@ -142,7 +142,7 @@ function ManageTeacher() {
                         name="teacherName"
                         value={filters.teacherName}
                         onChange={handleFilterChange}
-                        className="max-w-sm mx-auto ml-3 h-12 w-full md:w-[230px] border border-black rounded-xl"
+                        className="max-w-sm mx-auto ml-3 h-12 px-3 w-full md:w-[230px] border border-black rounded-xl"
                         placeholder="Họ và tên"
                     />
 

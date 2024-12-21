@@ -12,6 +12,8 @@ function FormDetailTeacher({ teacherDetail }) {
         dateOfBirth: "",
         createdAt: "",
         updatedAt: "",
+        personalEmail:"",
+        userAvatar:"",
     });
 
     // Cập nhật dữ liệu khi teacherDetail thay đổi
@@ -30,6 +32,8 @@ function FormDetailTeacher({ teacherDetail }) {
                 dateOfBirth: teacherDetail.dateOfBirth || "",
                 createdAt: teacherDetail.createdAt || "",
                 updatedAt: teacherDetail.updatedAt || "",
+                personalEmail: teacherDetail.personalEmail || "",
+                userAvatar: teacherDetail.userAvatar || "",
             });
         }
     }, [teacherDetail]);
@@ -53,8 +57,8 @@ function FormDetailTeacher({ teacherDetail }) {
                                     <div>
                                         <div className="mb-4">
                                             <img
-                                                src="https://via.placeholder.com/150"
-                                                alt="Upload Preview"
+                                               src={ teacherData.userAvatar}
+                                               alt="Upload Preview"
                                                 className="w-[180px] h-[220px] object-cover rounded-md"
                                             />
                                         </div>
@@ -110,12 +114,21 @@ function FormDetailTeacher({ teacherDetail }) {
                                             </div>
                                         </div>
                                         <div>
-                                            <p className="text-left">Gmail:</p>
+                                            <p className="text-left">Email:</p>
                                             <input
                                                 type="email"
                                                 readOnly
                                                 className="w-full h-[40px] border border-gray-300 rounded-md px-3"
                                                 value={teacherData.email}
+                                            />
+                                        </div>
+                                        <div>
+                                            <p className="text-left">Email cá nhân:</p>
+                                            <input
+                                                type="email"
+                                                readOnly
+                                                className="w-full h-[40px] border border-gray-300 rounded-md px-3"
+                                                value={teacherData.personalEmail}
                                             />
                                         </div>
                                         <div>
