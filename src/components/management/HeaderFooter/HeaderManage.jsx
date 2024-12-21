@@ -25,7 +25,7 @@ function HeaderManage() {
             <p className="text-lg italic">Quản lý lớp học</p>
           </>
         )}
-              {isActive("/manageRoom") && (
+        {isActive("/manageRoom") && (
           <>
             <i
               className="fas fa-door-open w-4 h-4"
@@ -33,11 +33,17 @@ function HeaderManage() {
             <p className="text-lg italic">Quản lý phòng học</p>
           </>
         )}
-         {isActive("/manageSemester") && (
+        {isActive("/manageSemester") && (
           <>
             <i className="fas fa-calendar-days w-4 h-4"></i>
             <p className="text-lg italic">Quản lý kì học</p>
           </>
+        )}
+        {isActive("/manageTeacher") && (
+          <>
+            <i className="fas fa-calendar-days w-4 h-4"></i>
+            <p className="text-lg italic">Quản lý giáo viên</p>
+            </>
         )}
         {isActive("/manageSubject") && (
           <>
@@ -45,7 +51,7 @@ function HeaderManage() {
             <p className="text-lg italic">Quản lý môn học</p>
           </>
         )}
-      </div>
+      </div>  
 
       {/* Right section with the avatar and logout */}
       <div className="flex items-center space-x-3">
