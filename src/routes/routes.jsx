@@ -19,6 +19,7 @@ import ManageSemester from '../pages/manage/semester/semester';
 import ManageTeacher from '../pages/manage/teacher/teacher';
 import ManageSubject from '../pages/manage/subject/subject';
 import StudentDetailClass from '../pages/user/Schedule/StudentDetailClass';
+import TeacherDetailClass from '../pages/user/Teacher/TeacherDetailClass';
 
 
 const AppRoutes = () => {
@@ -36,7 +37,7 @@ const AppRoutes = () => {
     { path: "/studentDetail", component: StudentDetail, layout: LayoutUser },
     { path: "/studentActivityDetail", component: StudentActivityDetail, layout: LayoutUser},
     { path: "/studentDetailClass", component: StudentDetailClass, layout: LayoutUser},
-    
+    { path: "/teacherDetailClass", component: TeacherDetailClass, layout: LayoutUser},
     //Manange Zone //
     { path: "/manageClass", component: ManageClass, layout: ManageLayout },
     { path: "/studentInClass", component: StudentInClass, layout: ManageLayout },
