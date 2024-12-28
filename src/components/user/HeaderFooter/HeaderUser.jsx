@@ -8,6 +8,7 @@ function HeaderUser() {
   const isDetailActivityPage = location.pathname === "/detail";
   const isHome = location.pathname === "/home";
   const isStudentActivityDetailPage = location.pathname === "/studentActivityDetail";
+  const isStudentDetailClassPage = location.pathname === "/studentDetailClass";
   return (
     <div className="w-screen h-auto">
       {/* Header start */}
@@ -52,6 +53,11 @@ function HeaderUser() {
                   {isStudentActivityDetailPage &&(
                     <span className="ml-2 text-[12px] sm:text-[16px] md:text-[24px] font-roboto">
                     / Chi tiết hoạt động
+                    </span>
+                  )}
+                  {isStudentDetailClassPage &&(
+                    <span className="ml-2 text-[12px] sm:text-[16px] md:text-[24px] font-roboto">
+                    / Chi tiết lớp học
                     </span>
                   )}
               </p>
