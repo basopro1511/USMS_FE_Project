@@ -13,6 +13,7 @@ function FormAddStudent({ onStudentAdded }) {
         email: "",
         phoneNumber: "",
         dateOfBirth: "",
+        status: "",
     });
 
     const [isFormVisible, setIsFormVisible] = useState(true);
@@ -257,6 +258,25 @@ function FormAddStudent({ onStudentAdded }) {
                                                     setNewStudent({
                                                         ...newStudent,
                                                         dateOfBirth: e.target.value,
+                                                    })
+                                                }
+                                            />
+                                        </div>
+
+                                        {/* Fifth Row: Status*/}
+                                        <div>
+                                            <label className="block text-sm font-medium mb-1">
+                                                Trạng thái:
+                                            </label>
+                                            <input
+                                                type="text"
+                                                required
+                                                className="w-full border rounded-md px-3 py-2"
+                                                placeholder="Nhập trạng thái"
+                                                onChange={(e) =>
+                                                    setNewStudent({
+                                                        ...newStudent,
+                                                        status: e.target.value,
                                                     })
                                                 }
                                             />

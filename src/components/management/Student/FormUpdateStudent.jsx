@@ -19,7 +19,8 @@ function FormUpdateStudent({ studentToUpdate, onStudentUpdated }) {
             phone: "",
             dateOfBirth: "",
             startYear: "",
-            userAvatar: "", // Giá trị mặc định cho avatar
+            userAvatar: "",
+            status: "", // Giá trị mặc định cho avatar
         }
     );
 
@@ -246,6 +247,17 @@ function FormUpdateStudent({ studentToUpdate, onStudentUpdated }) {
                                                 value={studentData.startYear}
                                                 className="w-full border rounded-md px-3 py-2"
                                                 placeholder="Nhập kì học"
+                                                onChange={(e) => handleInputChange("startYear", e.target.value)}
+                                            />
+                                        </div>
+                                        {/* Status */}
+                                        <div>
+                                            <label className="block text-sm font-medium mb-1">Trạng thái:</label>
+                                            <input
+                                                type="text"
+                                                value={studentData.status}
+                                                className="w-full border rounded-md px-3 py-2"
+                                                placeholder="Nhập trạng thái"
                                                 onChange={(e) => handleInputChange("startYear", e.target.value)}
                                             />
                                         </div>

@@ -13,6 +13,7 @@ function FormDetailStudent({ studentDetail, onStudentDetailUpdated }) {
         dateOfBirth: "",
         startYear: "",
         userAvatar: "",
+        status: "",
     });
     const [selectedImage, setSelectedImage] = useState(null);
     const fileInputRef = useRef(null);
@@ -174,6 +175,15 @@ function FormDetailStudent({ studentDetail, onStudentDetailUpdated }) {
                                             readOnly
                                             type="text"
                                             value={studentData.startYear}
+                                            className="w-full border rounded-md px-3 py-2"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium mb-1">Trạng thái:</label>
+                                        <input
+                                            readOnly
+                                            type="text"
+                                            value={studentData.status}
                                             className="w-full border rounded-md px-3 py-2"
                                         />
                                     </div>

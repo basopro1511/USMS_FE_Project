@@ -5,16 +5,16 @@ import FormDetailStudent from "../../../components/management/Student/FormDetail
 
 function ManageStudent() {
     const [studentData] = useState([
-        { studentId: "CE160815", firstName: "Nguyen", middleName: "Toan", lastName: "Thang", majorId: "0", age: 22, startYear: 2016, email: "ThangNTCE160815@example.com", phone: "0123456789", dateOfBirth: "2002-02-20", userAvatar: "https://binhminhdigital.com/StoreData/PageData/3429/Tim-hieu-ve-ban-quyen-hinh-anh%20(3).jpg" },
-        { studentId: "CE160461", firstName: "Nguyen", middleName: "Tuan", lastName: "Thinh", majorId: "1", age: 22, startYear: 2016, email: "lethib@example.com", phone: "0987654321", dateOfBirth: "2002-02-20", userAvatar: "https://binhminhdigital.com/StoreData/PageData/3429/Tim-hieu-ve-ban-quyen-hinh-anh%20(3).jpg" },
-        { studentId: "CE170288", firstName: "Nguyen", middleName: "Quoc", lastName: "Hoang", majorId: "2", age: 21, startYear: 2017, email: "HoangNQCE170288@fpt.edu.vn", phone: "0112233445", dateOfBirth: "2002-02-20", userAvatar: "https://binhminhdigital.com/StoreData/PageData/3429/Tim-hieu-ve-ban-quyen-hinh-anh%20(3).jpg" },
-        { studentId: "CE170724", firstName: "Phan", middleName: "Le Thai", lastName: "Nam", majorId: "0", age: 21, startYear: 2017, email: "NamPLTCE170724@fpt.edu.vn", phone: "0223344556", dateOfBirth: "2002-02-20", userAvatar: "https://binhminhdigital.com/StoreData/PageData/3429/Tim-hieu-ve-ban-quyen-hinh-anh%20(3).jpg" },
-        { studentId: "CE170717", firstName: "Le", middleName: "Duc", lastName: "An", majorId: "0", age: 21, startYear: 2017, email: "anldce170717@fpt.edu.vn", phone: "0223244556", dateOfBirth: "2002-02-20", userAvatar: "https://binhminhdigital.com/StoreData/PageData/3429/Tim-hieu-ve-ban-quyen-hinh-anh%20(3).jpg" },
-        { studentId: "CE160815", firstName: "Nguyen", middleName: "Toan", lastName: "Thang", majorId: "0", age: 22, startYear: 2016, email: "ThangNTCE160815@example.com", phone: "0123456789", dateOfBirth: "2002-02-20", userAvatar: "https://binhminhdigital.com/StoreData/PageData/3429/Tim-hieu-ve-ban-quyen-hinh-anh%20(3).jpg" },
-        { studentId: "CE160461", firstName: "Nguyen", middleName: "Tuan", lastName: "Thinh", majorId: "1", age: 22, startYear: 2016, email: "lethib@example.com", phone: "0987654321", dateOfBirth: "2002-02-20", userAvatar: "https://binhminhdigital.com/StoreData/PageData/3429/Tim-hieu-ve-ban-quyen-hinh-anh%20(3).jpg" },
-        { studentId: "CE170288", firstName: "Nguyen", middleName: "Quoc", lastName: "Hoang", majorId: "2", age: 21, startYear: 2017, email: "HoangNQCE170288@fpt.edu.vn", phone: "0112233445", dateOfBirth: "2002-02-20", userAvatar: "https://binhminhdigital.com/StoreData/PageData/3429/Tim-hieu-ve-ban-quyen-hinh-anh%20(3).jpg" },
-        { studentId: "CE170724", firstName: "Phan", middleName: "Le Thai", lastName: "Nam", majorId: "0", age: 21, startYear: 2017, email: "NamPLTCE170724@fpt.edu.vn", phone: "0223344556", dateOfBirth: "2002-02-20", userAvatar: "https://binhminhdigital.com/StoreData/PageData/3429/Tim-hieu-ve-ban-quyen-hinh-anh%20(3).jpg" },
-        { studentId: "CE170717", firstName: "Le", middleName: "Duc", lastName: "An", majorId: "0", age: 21, startYear: 2017, email: "anldce170717@fpt.edu.vn", phone: "0223244556", dateOfBirth: "2002-02-20", userAvatar: "https://binhminhdigital.com/StoreData/PageData/3429/Tim-hieu-ve-ban-quyen-hinh-anh%20(3).jpg" },
+        { studentId: "CE160815", firstName: "Nguyen", middleName: "Toan", lastName: "Thang", majorId: "0", age: 22, startYear: 2016, email: "ThangNTCE160815@example.com", phone: "0123456789", dateOfBirth: "2002-02-20", userAvatar: "https://binhminhdigital.com/StoreData/PageData/3429/Tim-hieu-ve-ban-quyen-hinh-anh%20(3).jpg", status:"Đang theo học" },
+        { studentId: "CE160461", firstName: "Nguyen", middleName: "Tuan", lastName: "Thinh", majorId: "1", age: 22, startYear: 2016, email: "lethib@example.com", phone: "0987654321", dateOfBirth: "2002-02-20", userAvatar: "https://binhminhdigital.com/StoreData/PageData/3429/Tim-hieu-ve-ban-quyen-hinh-anh%20(3).jpg", status:"Đang tạm hoãn" },
+        { studentId: "CE170288", firstName: "Nguyen", middleName: "Quoc", lastName: "Hoang", majorId: "2", age: 21, startYear: 2017, email: "HoangNQCE170288@fpt.edu.vn", phone: "0112233445", dateOfBirth: "2002-02-20", userAvatar: "https://binhminhdigital.com/StoreData/PageData/3429/Tim-hieu-ve-ban-quyen-hinh-anh%20(3).jpg", status:"Đã tốt nghiệp" },
+        { studentId: "CE170724", firstName: "Phan", middleName: "Le Thai", lastName: "Nam", majorId: "0", age: 21, startYear: 2017, email: "NamPLTCE170724@fpt.edu.vn", phone: "0223344556", dateOfBirth: "2002-02-20", userAvatar: "https://binhminhdigital.com/StoreData/PageData/3429/Tim-hieu-ve-ban-quyen-hinh-anh%20(3).jpg", status:"Đang theo học" },
+        { studentId: "CE170717", firstName: "Le", middleName: "Duc", lastName: "An", majorId: "0", age: 21, startYear: 2017, email: "anldce170717@fpt.edu.vn", phone: "0223244556", dateOfBirth: "2002-02-20", userAvatar: "https://binhminhdigital.com/StoreData/PageData/3429/Tim-hieu-ve-ban-quyen-hinh-anh%20(3).jpg", status:"Đã tốt nghiệp" },
+        { studentId: "CE160815", firstName: "Nguyen", middleName: "Toan", lastName: "Thang", majorId: "0", age: 22, startYear: 2016, email: "ThangNTCE160815@example.com", phone: "0123456789", dateOfBirth: "2002-02-20", userAvatar: "https://binhminhdigital.com/StoreData/PageData/3429/Tim-hieu-ve-ban-quyen-hinh-anh%20(3).jpg", status:"Đang tạm hoãn" },
+        { studentId: "CE160461", firstName: "Nguyen", middleName: "Tuan", lastName: "Thinh", majorId: "1", age: 22, startYear: 2016, email: "lethib@example.com", phone: "0987654321", dateOfBirth: "2002-02-20", userAvatar: "https://binhminhdigital.com/StoreData/PageData/3429/Tim-hieu-ve-ban-quyen-hinh-anh%20(3).jpg", status:"Đã tốt nghiệp" },
+        { studentId: "CE170288", firstName: "Nguyen", middleName: "Quoc", lastName: "Hoang", majorId: "2", age: 21, startYear: 2017, email: "HoangNQCE170288@fpt.edu.vn", phone: "0112233445", dateOfBirth: "2002-02-20", userAvatar: "https://binhminhdigital.com/StoreData/PageData/3429/Tim-hieu-ve-ban-quyen-hinh-anh%20(3).jpg", status:"Đang tạm hoãn" },
+        { studentId: "CE170724", firstName: "Phan", middleName: "Le Thai", lastName: "Nam", majorId: "0", age: 21, startYear: 2017, email: "NamPLTCE170724@fpt.edu.vn", phone: "0223344556", dateOfBirth: "2002-02-20", userAvatar: "https://binhminhdigital.com/StoreData/PageData/3429/Tim-hieu-ve-ban-quyen-hinh-anh%20(3).jpg", status:"Đang theo học" },
+        { studentId: "CE170717", firstName: "Le", middleName: "Duc", lastName: "An", majorId: "0", age: 21, startYear: 2017, email: "anldce170717@fpt.edu.vn", phone: "0223244556", dateOfBirth: "2002-02-20", userAvatar: "https://binhminhdigital.com/StoreData/PageData/3429/Tim-hieu-ve-ban-quyen-hinh-anh%20(3).jpg", status:"Đang theo học" },
     ]);
 
     const majorMapping = {
@@ -74,8 +74,10 @@ function ManageStudent() {
 
     useEffect(() => {
         const filteredData = studentData.filter(item =>
-            (!filter.studentId || item.studentId === filter.studentId) &&
-            (!filter.startYear || item.startYear === parseInt(filter.startYear))
+            (!filter.majorId || item.majorId === filter.majorId) &&
+            (!filter.startYear || item.startYear === parseInt(filter.startYear)) &&
+            (!filter.studentId || item.studentId.includes(filter.studentId)) &&
+            (!filter.fullName || (`${item.firstName} ${item.middleName} ${item.lastName}`.toLowerCase().includes(filter.fullName.toLowerCase())))
         );
         setFilteredStudents(filteredData);
     }, [filter, studentData]);
@@ -122,27 +124,47 @@ function ManageStudent() {
             <div className="flex w-full h-12 flex-wrap md:flex-nowrap">
                 <div className="flex w-full md:w-auto md:mb-0">
                     <select
-                        name="studentId"
-                        value={filter.studentId}
+                        name="majorId"
+                        value={filter.majorId}
                         onChange={handleFilterChange}
                         className="max-w-sm mx-auto ml-3 h-12 w-full md:w-[230px] border border-black rounded-xl"
                     >
-                        <option value="">Mã sinh viên</option>
-                        {studentData.map((student, index) => (
-                            <option key={index} value={student.studentId}>{student.studentId}</option>
+                        <option value="">Chuyên ngành</option>
+                        {[...new Set(studentData.map(student => student.majorId))].map((majorId) => (
+                            <option key={majorId} value={majorId}>
+                                {majorMapping[majorId]}
+                            </option>
                         ))}
-                    </select>
+                    </select>;
+
                     <select
                         name="startYear"
                         value={filter.startYear}
                         onChange={handleFilterChange}
                         className="max-w-sm mx-auto ml-3 h-12 w-full md:w-[168px] border border-black rounded-xl"
                     >
-                        <option value="">Năm bắt đầu</option>
+                        <option value="">Kỳ học</option>
                         {[...new Set(studentData.map(item => item.startYear))].map((year) => (
                             <option key={year} value={year}>{year}</option>
                         ))}
                     </select>
+                    <input
+                        type="text"
+                        name="studentId"
+                        placeholder="Tìm kiếm theo mã số sinh viên"
+                        value={filter.studentId}
+                        onChange={handleFilterChange}
+                        className="max-w-sm mx-auto ml-3 h-12 w-full md:w-[230px] border border-black rounded-xl px-3"
+                    />
+
+                    <input
+                        type="text"
+                        name="fullName"
+                        placeholder="Tìm kiếm theo họ và tên"
+                        value={filter.fullName}
+                        onChange={handleFilterChange}
+                        className="max-w-sm mx-auto ml-3 h-12 w-full md:w-[230px] border border-black rounded-xl px-3"
+                    />
                 </div>
                 {/* Add Semester Button moved to the right */}
                 <div className="flex ml-auto rounded-full transition-all duration-300 hover:scale-95 mr-4 mt-2 md:mt-0">
@@ -164,10 +186,10 @@ function ManageStudent() {
                             {[{ key: "studentId", label: "Mã sinh viên" },
                             { key: "fullName", label: "Họ và Tên" },
                             { key: "majorId", label: "Chuyên ngành" },
-                            { key: "age", label: "Tuổi" },
                             { key: "email", label: "Email" },
                             { key: "phone", label: "Số điện thoại" },
-                            { key: "startYear", label: "Năm bắt đầu" },
+                            { key: "startYear", label: "Kỳ học" },
+                            { key: "status", label: "Trạng thái" },
                             ].map(col => (
                                 <th
                                     key={col.key}
@@ -203,10 +225,10 @@ function ManageStudent() {
                                 <td className="p-4 text-center">{item.studentId}</td>
                                 <td className="p-4 text-center">{`${item.firstName} ${item.middleName} ${item.lastName}`}</td>
                                 <td className="p-4 text-center">{majorMapping[item.majorId]}</td>
-                                <td className="p-4 text-center">{item.age}</td>
                                 <td className="p-4 text-center">{item.email}</td>
                                 <td className="p-4 text-center">{item.phone}</td>
                                 <td className="p-4 text-center">{item.startYear}</td>
+                                <td className="p-4 text-center">{item.status}</td>
                                 <td className="p-4 text-center align-middle">
                                     {/* Edit and Detail Buttons */}
                                     <div className="flex justify-center space-x-2">
