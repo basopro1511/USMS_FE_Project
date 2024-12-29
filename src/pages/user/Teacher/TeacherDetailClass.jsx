@@ -23,8 +23,9 @@ function TeacherDetailClass() {
                 <table className="min-w-full text-left table-auto bg-white">
                     <thead className="bg-gray-100">
                         <tr>
-                            <th className="p-4 font-semibold text-white text-center align-middle bg-secondaryBlue">Mã SV</th>
+                            <th className="p-4 font-semibold text-white text-center align-middle bg-secondaryBlue">STT</th>
                             <th className="p-4 font-semibold text-white text-center align-middle bg-secondaryBlue">Hình ảnh</th>
+                            <th className="p-4 font-semibold text-white text-center align-middle bg-secondaryBlue">MSSV</th>
                             <th className="p-4 font-semibold text-white text-center align-middle bg-secondaryBlue">Họ</th>
                             <th className="p-4 font-semibold text-white text-center align-middle bg-secondaryBlue">Tên đệm</th>
                             <th className="p-4 font-semibold text-white text-center align-middle bg-secondaryBlue">Tên</th>
@@ -41,6 +42,7 @@ function TeacherDetailClass() {
                                         className="w-16 h-16 mx-auto"
                                     />
                                 </td>
+                                <td className="p-4 text-center align-middle">{student.mSSV}</td>
                                 <td className="p-4 text-center align-middle">{student.lastName}</td>
                                 <td className="p-4 text-center align-middle">{student.middleName}</td>
                                 <td className="p-4 text-center align-middle">{student.firstName}</td>
