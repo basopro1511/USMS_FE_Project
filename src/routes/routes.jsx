@@ -18,6 +18,7 @@ import ResetPassword from '../pages/Login/ResetPassword';
 import ManageSemester from '../pages/manage/semester/semester';
 import ManageTeacher from '../pages/manage/teacher/teacher';
 import ManageSubject from '../pages/manage/subject/subject';
+import ManageStudent from '../pages/manage/student/student';
 import StudentDetailClass from '../pages/user/Schedule/StudentDetailClass';
 import StudentViewExam from '../pages/user/Schedule/StudentViewExam';
 import TeacherDetailClass from '../pages/user/Teacher/TeacherDetailClass';
@@ -50,6 +51,7 @@ const AppRoutes = () => {
     { path: "/manageSemester", component: ManageSemester, layout: ManageLayout },
     { path: "/manageTeacher", component: ManageTeacher, layout: ManageLayout },
     { path: "/manageSubject", component: ManageSubject, layout: ManageLayout },
+    { path: "/manageStudent", component: ManageStudent, layout: ManageLayout },
 
 ];
   return (
