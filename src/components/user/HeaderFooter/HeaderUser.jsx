@@ -8,6 +8,10 @@ function HeaderUser() {
   const isDetailActivityPage = location.pathname === "/detail";
   const isHome = location.pathname === "/home";
   const isStudentActivityDetailPage = location.pathname === "/studentActivityDetail";
+  const isStudentDetailClassPage = location.pathname === "/studentDetailClass";
+  const isStudentViewExamPage = location.pathname === "/studentViewExam";
+  const isTeacherDetailClassPage = location.pathname === "/teacherDetailClass";
+  const isTeacherViewExamPage = location.pathname === "/teacherViewExam";
   return (
     <div className="w-screen h-auto">
       {/* Header start */}
@@ -54,6 +58,27 @@ function HeaderUser() {
                     / Chi tiết hoạt động
                     </span>
                   )}
+                  {isStudentDetailClassPage &&(
+                    <span className="ml-2 text-[12px] sm:text-[16px] md:text-[24px] font-roboto">
+                    / Chi tiết lớp học
+                    </span>
+                  )}
+                  {isTeacherDetailClassPage &&(
+                    <span className="ml-2 text-[12px] sm:text-[16px] md:text-[24px] font-roboto">
+                    / Chi tiết lớp học
+                    </span>
+                  )}
+                  {isStudentViewExamPage &&(
+                    <span className="ml-2 text-[12px] sm:text-[16px] md:text-[24px] font-roboto">
+                    / Xem lịch thi
+                    </span>
+                  )}
+                  { isTeacherViewExamPage &&(
+                    <span className="ml-2 text-[12px] sm:text-[16px] md:text-[24px] font-roboto">
+                    / Xem lịch thi
+                    </span>
+                  )}
+
               </p>
             </div>
             <div className="flex justify-center items-center h-auto md:h-[39px] w-full md:w-auto ml-auto md:mr-[8rem]">
