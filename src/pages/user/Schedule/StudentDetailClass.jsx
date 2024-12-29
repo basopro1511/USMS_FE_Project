@@ -24,6 +24,7 @@ function StudentDetailClass() {
                 <table className="min-w-full text-left table-auto bg-white">
                     <thead className="bg-gray-100">
                         <tr>
+                            <th className="p-4 font-semibold text-white text-center align-middle bg-secondaryBlue">STT</th>
                             <th className="p-4 font-semibold text-white text-center align-middle bg-secondaryBlue">Mã SV</th>
                             <th className="p-4 font-semibold text-white text-center align-middle bg-secondaryBlue">Hình ảnh</th>
                             <th className="p-4 font-semibold text-white text-center align-middle bg-secondaryBlue">Họ</th>
@@ -35,6 +36,7 @@ function StudentDetailClass() {
                         {studentData.map((student, index) => (
                             <tr key={index} className="hover:bg-gray-50 even:bg-gray-50">
                                 <td className="p-4 text-center align-middle">{student.sTT}</td>
+                                <td className="p-4 text-center align-middle">{student.studentId}</td>
                                 <td className="p-4 text-center align-middle">
                                     <img
                                         src={student.userAvatar}
