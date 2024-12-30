@@ -23,6 +23,7 @@ import StudentDetailClass from '../pages/user/Schedule/StudentDetailClass';
 import StudentViewExam from '../pages/user/Schedule/StudentViewExam';
 import TeacherDetailClass from '../pages/user/Teacher/TeacherDetailClass';
 import TeacherViewExam from '../pages/user/Teacher/TeacherViewExam';
+import ManageSlot from '../pages/manage/slot/slot';
 
 
 const AppRoutes = () => {
@@ -43,6 +44,7 @@ const AppRoutes = () => {
     { path: "/studentViewExam", component: StudentViewExam, layout: LayoutUser},
     { path: "/teacherDetailClass", component: TeacherDetailClass, layout: LayoutUser},
     { path: "/teacherViewExam", component: TeacherViewExam, layout: LayoutUser},
+
     //Manange Zone //
     { path: "/manageClass", component: ManageClass, layout: ManageLayout },
     { path: "/studentInClass", component: StudentInClass, layout: ManageLayout },
@@ -52,7 +54,7 @@ const AppRoutes = () => {
     { path: "/manageTeacher", component: ManageTeacher, layout: ManageLayout },
     { path: "/manageSubject", component: ManageSubject, layout: ManageLayout },
     { path: "/manageStudent", component: ManageStudent, layout: ManageLayout },
-
+    { path: "/manageSlot", component: ManageSlot, layout: ManageLayout },
 ];
   return (
     <Router>
