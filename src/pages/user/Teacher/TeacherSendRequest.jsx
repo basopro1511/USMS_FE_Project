@@ -19,6 +19,30 @@ function TeacherSendRequest() {
         NgonNgu: ["Cô Trúc", "Cô Isekai"],
     };
 
+    // danh sách thời gian đổi
+    const timeSlots = [
+        "Slot 1 (7:00 AM - 9:00 AM)",
+        "Slot 2 (9:00 AM - 11:00 AM)",
+        "Slot 3 (1:00 PM - 3:00 PM)",
+        "Slot 4 (3:00 PM - 5:00 PM)",
+        "Slot 5 (5:00 PM - 7:00 PM)",
+    ];
+
+    // Hàm lọc thời gian muốn thay đổi theo buổi dạy
+    const getFilteredTimeSlots = () => {
+        if (teachingTime === "sang") {
+            return timeSlots.slice(0, 2); // Slot 1 và Slot 2
+        }
+        if (teachingTime === "chieu") {
+            return timeSlots.slice(2, 4); // Slot 3 và Slot 4
+        }
+        if (teachingTime === "toi") {
+            return timeSlots.slice(4); // Slot 5
+        }
+        return []; // Không hiển thị nếu chưa chọn buổi
+    };
+
+
     // Hàm kiểm tra lỗi
     const validateForm = () => {
         const newErrors = {};
@@ -52,11 +76,8 @@ function TeacherSendRequest() {
 
         // Kiểm tra thời gian thay đổi
         if (!changeTime) {
-            newErrors.changeTime = "Vui lòng nhập thời gian muốn thay đổi.";
-        } else if (!/^(\d{1,2}:\d{2} (AM|PM)) - (\d{1,2}:\d{2} (AM|PM))$/.test(changeTime)) {
-            newErrors.changeTime = "Thời gian không đúng định dạng (ví dụ: '10:00 AM - 12:00 PM').";
+            newErrors.changeTime = "Vui lòng chọn thời gian muốn thay đổi.";
         }
-
         // Kiểm tra lý do
         if (!reason) {
             newErrors.reason = "Vui lòng nhập lý do.";
@@ -86,14 +107,15 @@ function TeacherSendRequest() {
             if (field === "teachingTime" && value) {
                 delete newErrors.teachingTime;
             }
-            if (field === "changeTime" && /^(\d{1,2}:\d{2} (AM|PM)) - (\d{1,2}:\d{2} (AM|PM))$/.test(value)) {
+            if (field === "changeTime" && value) {
                 delete newErrors.changeTime;
             }
-            if (field === "reason" && value) {
+            if (field === "reason" && value.trim() !== "") {
                 delete newErrors.reason;
             }
             return newErrors;
         });
+
         switch (field) {
             case "requestType":
                 setRequestType(value);
@@ -120,9 +142,6 @@ function TeacherSendRequest() {
                 break;
         }
     };
-    
-
-
     // Hàm xử lý gửi đơn
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -200,7 +219,8 @@ function TeacherSendRequest() {
                         id="mon-hoc"
                         value={selectedSubject}
                         onChange={(e) => handleInputChange("selectedSubject", e.target.value)}
-                        className="w-full border border-black rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-500"
+                        className={`w-full border rounded px-3 py-2 focus:outline-none focus:ring ${errors.selectedSubject ? "border-red-500 focus:ring-red-500" : "border-black focus:ring-blue-500"
+                            }`}
                     >
                         <option value="">Chọn môn học</option>
                         <option value="KTPM">PRM123</option>
@@ -220,7 +240,8 @@ function TeacherSendRequest() {
                             id="giao-vien-muon-doi"
                             value={selectedTeacher}
                             onChange={(e) => handleInputChange("selectedTeacher", e.target.value)}
-                            className="w-full border border-black rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-500"
+                            className={`w-full border rounded px-3 py-2 focus:outline-none focus:ring ${errors.selectedTeacher ? "border-red-500 focus:ring-red-500" : "border-black focus:ring-blue-500"
+                                }`}
                         >
                             <option value="">Chọn giáo viên</option>
                             {teacherOptions[selectedSubject]?.map((teacher, index) => (
@@ -259,7 +280,8 @@ function TeacherSendRequest() {
                         id="buoi-day"
                         value={teachingTime}
                         onChange={(e) => handleInputChange("teachingTime", e.target.value)}
-                        className="w-full border border-black rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-500"
+                        className={`w-full border rounded px-3 py-2 focus:outline-none focus:ring ${errors.teachingTime ? "border-red-500 focus:ring-red-500" : "border-black focus:ring-blue-500"
+                            }`}
                     >
                         <option value="">Chọn buổi</option>
                         <option value="sang">Sáng</option>
@@ -274,31 +296,37 @@ function TeacherSendRequest() {
                     <label className="block text-gray-700 font-medium mb-2" htmlFor="thoi-gian-thay-doi">
                         Thời gian muốn thay đổi
                     </label>
-                    <input
-                        type="text"
+                    <select
                         id="thoi-gian-thay-doi"
                         value={changeTime}
                         onChange={(e) => handleInputChange("changeTime", e.target.value)}
-                        placeholder="Nhập thời gian (ví dụ: 10:00 AM - 12:00 PM)"
                         className={`w-full border rounded px-3 py-2 focus:outline-none focus:ring ${errors.changeTime ? "border-red-500 focus:ring-red-500" : "border-black focus:ring-blue-500"
                             }`}
-                    />
+                    >
+                        <option value="">Chọn thời gian muốn thay đổi</option>
+                        {getFilteredTimeSlots().map((slot, index) => (
+                            <option key={index} value={slot}>
+                                {slot}
+                            </option>
+                        ))}
+                    </select>
                     {errors.changeTime && <p className="text-red-500 text-sm">{errors.changeTime}</p>}
                 </div>
-                {/* Lý do */}
-                <div className="mb-6">
-                    <label className="block text-gray-700 font-medium mb-2" htmlFor="ly-do">
+                {/* Input lý do */}
+                <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-2 ">
                         Lý do
                     </label>
                     <textarea
-                        id="ly-do"
                         value={reason}
                         onChange={(e) => handleInputChange("reason", e.target.value)}
-                        placeholder="Nhập lý do"
-                        className="w-full h-32 border border-black rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-500"
-                    ></textarea>
+                        placeholder="Nhập lý do thay đổi thời gian dạy"
+                        className={`w-full border rounded px-3 py-2 focus:outline-none focus:ring ${errors.reason ? "border-red-500 focus:ring-red-500" : "border-black focus:ring-blue-500"
+                            }`}
+                    />
                     {errors.reason && <p className="text-red-500 text-sm">{errors.reason}</p>}
                 </div>
+
 
                 {/* Nút hành động */}
                 <div className="flex justify-between">
