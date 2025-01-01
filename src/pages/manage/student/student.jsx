@@ -166,11 +166,22 @@ function ManageStudent() {
                         className="max-w-sm mx-auto ml-3 h-12 w-full md:w-[230px] border border-black rounded-xl px-3"
                     />
                 </div>
-                {/* Add Semester Button moved to the right */}
-                <div className="flex ml-auto rounded-full transition-all duration-300 hover:scale-95 mr-4 mt-2 md:mt-0">
+                 {/* Button Container */}
+                 <div className="flex ml-auto space-x-4 mt-2 md:mt-0 mr-4">
+                    {/* Import Teacher Button */}
                     <button
                         type="button"
-                        className="border border-white rounded-xl w-full md:w-[150px] bg-secondaryGreen hover:bg-primaryGreen text-white font-semibold"
+                        className="border border-white rounded-xl w-full md:w-[181px] bg-secondaryGreen hover:bg-primaryGreen text-white font-semibold"
+                        onClick={toggleShowForm}
+                    >
+                        <i className="fa fa-upload mr-2" aria-hidden="true"></i>
+                        Import sinh viên
+                    </button>
+
+                    {/* Add Teacher Button */}
+                    <button
+                        type="button"
+                        className="border border-white rounded-xl w-full md:w-[181px] bg-secondaryGreen hover:bg-primaryGreen text-white font-semibold"
                         onClick={toggleShowForm}
                     >
                         <i className="fa fa-plus mr-2" aria-hidden="true"></i>
