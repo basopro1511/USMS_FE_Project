@@ -19,21 +19,10 @@ function ManageSemester() {
     ]
     );
 
-    // // Fetch Data Semester - Start
-    //   const [semesterData1, setSemesterData] = useState([]);
-    //   useEffect(() => {
-    //     const fetchSemesterData = async () => {
-    //       const data = await SemesterData(); //Lấy ra list semester rtong database
-    //       setRoomData(data.result);
-    //     };
-    //     fetchSemesterData();
-    //   }, []);
-    //   //Fetch Data Semester - End
-
     //Update bảng mà không cần reload
     const handleSemesterReload = async () => {
-        const data = await getSemesters(); // Gọi API để lấy lại tất cả các kìkì
-        setSemesterData(data.result); // Cập nhật lại dữ liệu kìkì
+        const data = await getSemesters(); // Gọi API để lấy lại tất cả các kì
+        setSemesterData(data.result); // Cập nhật lại dữ liệu kì
     };
     //Update bảng mà không cần reload
 
@@ -58,7 +47,7 @@ function ManageSemester() {
     };
     // Show form Update semester - End
 
-    //Lấy Data gắn qua form Update
+    //Lấy Data gắn qua form Detail
     const [semesterDetail, setSemesterDetail] = useState(null);
     const handleDetailClick = (semester) => {
         setSemesterDetail(semester);
@@ -398,7 +387,6 @@ function ManageSemester() {
                     <FormUpdateSemester semesterToUpdate={semesterToUpdate} onSemesterUpdated={handleSemesterReload} />
                 </>
             )}
-
             {/* Show Form Update Semester - End */}
             {/* Show Form Detail Semester - Start */}
             {showDetailForm && (

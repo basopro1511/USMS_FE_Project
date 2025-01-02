@@ -22,8 +22,8 @@ function SidebarManage() {
             <Link to="/manageClass">
               <li
                 className={`flex items-center cursor-pointer w-56 mb-2 ml-2 rounded-lg p-2 transition-all duration-300 ${isActive("/manageClass")
-                    ? "bg-quaternartyBlue pl-6"
-                    : "hover:bg-quaternartyBlue hover:pl-6"
+                  ? "bg-quaternartyBlue pl-6"
+                  : "hover:bg-quaternartyBlue hover:pl-6"
                   }`}
               >
                 <i className="fa-solid fa-table-list mr-2"></i>
@@ -34,8 +34,8 @@ function SidebarManage() {
             <Link to="/manageSubject">
               <li
                 className={`flex items-center cursor-pointer w-56 mb-2 ml-2 rounded-lg p-2 transition-all duration-300 ${isActive("/manageSubject")
-                    ? "bg-quaternartyBlue pl-6"
-                    : "hover:bg-quaternartyBlue hover:pl-6"
+                  ? "bg-quaternartyBlue pl-6"
+                  : "hover:bg-quaternartyBlue hover:pl-6"
                   }`}
               >
                 {" "}
@@ -47,8 +47,8 @@ function SidebarManage() {
             <Link to="/manageSemester">
               <li
                 className={`flex items-center cursor-pointer w-56 mb-2 ml-2 rounded-lg p-2 transition-all duration-300 ${isActive("/manageSemester")
-                    ? "bg-quaternartyBlue pl-6"
-                    : "hover:bg-quaternartyBlue hover:pl-6"
+                  ? "bg-quaternartyBlue pl-6"
+                  : "hover:bg-quaternartyBlue hover:pl-6"
                   }`}
               >
                 <i className="fas fa-calendar-week mr-2"></i>
@@ -59,8 +59,8 @@ function SidebarManage() {
             <Link to="/manageRoom">
               <li
                 className={`flex items-center cursor-pointer w-56 mb-2 ml-2 rounded-lg p-2 transition-all duration-300 ${isActive("/manageRoom")
-                    ? "bg-quaternartyBlue pl-6"
-                    : "hover:bg-quaternartyBlue hover:pl-6"
+                  ? "bg-quaternartyBlue pl-6"
+                  : "hover:bg-quaternartyBlue hover:pl-6"
                   }`}
               >
                 {" "}
@@ -72,8 +72,8 @@ function SidebarManage() {
             <Link to="/manageSchedule">
               <li
                 className={`flex items-center cursor-pointer w-56 mb-2 ml-2 rounded-lg p-2 transition-all duration-300 ${isActive("/manageSchedule")
-                    ? "bg-quaternartyBlue pl-6"
-                    : "hover:bg-quaternartyBlue hover:pl-6"
+                  ? "bg-quaternartyBlue pl-6"
+                  : "hover:bg-quaternartyBlue hover:pl-6"
                   }`}
               >
                 <i className="fas fa-calendar-alt mr-2"></i>
@@ -84,8 +84,8 @@ function SidebarManage() {
             <Link to="/manageStudent">
               <li
                 className={`flex items-center cursor-pointer w-56 mb-2 ml-2 rounded-lg p-2 transition-all duration-300 ${isActive("/manageStudent")
-                    ? "bg-quaternartyBlue pl-6"
-                    : "hover:bg-quaternartyBlue hover:pl-6"
+                  ? "bg-quaternartyBlue pl-6"
+                  : "hover:bg-quaternartyBlue hover:pl-6"
                   }`}
               >
                 <i className="fas fa-user-graduate mr-2"></i>
@@ -95,13 +95,12 @@ function SidebarManage() {
 
             <Link to="/manageTeacher">
               <li
-                className={`flex items-center cursor-pointer w-56 mb-2 ml-2 rounded-lg p-2 transition-all duration-300 ${
-                  isActive("/manageTeacher")
+                className={`flex items-center cursor-pointer w-56 mb-2 ml-2 rounded-lg p-2 transition-all duration-300 ${isActive("/manageTeacher")
                     ? "bg-quaternartyBlue pl-6"
                     : "hover:bg-quaternartyBlue hover:pl-6"
-                }`}
+                  }`}
               >
-                <i className="fas fa-calendar-alt mr-2"></i>
+                <i className="fas fa-chalkboard-teacher mr-2"></i>
                 <span>Quản lý giáo viên</span>
               </li>
             </Link>
