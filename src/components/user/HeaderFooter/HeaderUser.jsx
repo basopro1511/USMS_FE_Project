@@ -12,6 +12,7 @@ function HeaderUser() {
   const isStudentViewExamPage = location.pathname === "/studentViewExam";
   const isTeacherDetailClassPage = location.pathname === "/teacherDetailClass";
   const isTeacherViewExamPage = location.pathname === "/teacherViewExam";
+  const isTeacherSendRequestPage = location.pathname === "/teacherSendRequest"
   return (
     <div className="w-screen h-auto">
       {/* Header start */}
@@ -76,6 +77,11 @@ function HeaderUser() {
                   { isTeacherViewExamPage &&(
                     <span className="ml-2 text-[12px] sm:text-[16px] md:text-[24px] font-roboto">
                     / Xem lịch thi
+                    </span>
+                  )}
+                  { isTeacherSendRequestPage &&(
+                    <span className="ml-2 text-[12px] sm:text-[16px] md:text-[24px] font-roboto">
+                    / Gửi yêu cầu đổi lịch dạy
                     </span>
                   )}
 
