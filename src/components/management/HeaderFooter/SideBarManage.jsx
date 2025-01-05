@@ -101,15 +101,26 @@ function SidebarManage() {
                     : "hover:bg-quaternartyBlue hover:pl-6"
                 }`}
               >
-                <i className="fas fa-calendar-alt mr-2"></i>
+                <i className="fas fa-chalkboard-teacher mr-2"></i>
                 <span>Quản lý giáo viên</span>
+              </li>
+            </Link>
+            
+            <Link to="/manageSlot">
+              <li
+                className={`flex items-center cursor-pointer w-56 mb-2 ml-2 rounded-lg p-2 transition-all duration-300 ${isActive("/manageSlot")
+                    ? "bg-quaternartyBlue pl-6"
+                    : "hover:bg-quaternartyBlue hover:pl-6"
+                  }`}
+              >         
+                <i className="fa-regular fa-clock mr-2"></i>
+                <span>Quản lý buổi học </span>
               </li>
             </Link>
 
             <Link to="/manageNotification">
             <li
-                className={`flex items-center cursor-pointer w-56 mb-2 ml-2 rounded-lg p-2 transition-all duration-300 ${
-                  isActive("/manageNotification")
+                className={`flex items-center cursor-pointer w-56 mb-2 ml-2 rounded-lg p-2 transition-all duration-300 ${isActive("/manageNotification")
                     ? "bg-quaternartyBlue pl-6"
                     : "hover:bg-quaternartyBlue hover:pl-6"
                 }`}

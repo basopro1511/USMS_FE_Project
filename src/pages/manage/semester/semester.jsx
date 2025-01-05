@@ -15,7 +15,7 @@ function ManageSemester() {
         { semesterId: "SU21", semesterName: "Summer21", startDate: "2021-06-01", endDate: "2021-09-01", status: "1" },
         { semesterId: "SP22", semesterName: "Spring22", startDate: "2022-04-01", endDate: "2022-07-01", status: "1" },
         { semesterId: "SU25", semesterName: "Summer25", startDate: "2025-07-01", endDate: "2025-10-01", status: "1" },
-        { semesterId: "SU2020", semesterName: "Summer2020", startDate: "2020-08-01", endDate: "2020-11-01", status: "1" }
+        { semesterId: "SU20", semesterName: "Summer2020", startDate: "2020-08-01", endDate: "2020-11-01", status: "1" }
     ]
     );
 
