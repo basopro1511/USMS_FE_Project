@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import FormAddSubject from "../../../components/management/Subject/FormAddSubject";
-import FormUpdateSubject from "../../../components/management/Subject/FormUpdateSubject";
-import FormDetailSubject from "../../../components/management/Subject/FormDetailSubject";
+import FormAddSlot from "../../../components/management/Slot/FormAddSlot";
+import FormUpdateSlot from "../../../components/management/Slot/FormUpdateSlot";
+import FormDetailSlot from "../../../components/management/Slot/FormDetailSlot";
 
 function ManageSlot() {
     const [slotData] = useState([
@@ -11,6 +11,7 @@ function ManageSlot() {
         { slotId: 4, startTime: "15:30", endTime: "17:45", status: "1" },
         { slotId: 5, startTime: "18:00", endTime: "18:15", status: "1" },
     ]);
+    
     //Update bảng mà không cần reload
     const handleSlotReload = async () => {
         // const data = await getSlots(); // Gọi API để lấy lại tất cả các slot dạy
@@ -23,7 +24,7 @@ function ManageSlot() {
     };
 
     // Quản lý trạng thái form Edit
-    const [subjectToUpdate, setSubjectToUpdate] = useState(null);
+    const [slotToUpdate, setSubjectToUpdate] = useState(null);
 
     // Hàm xử lý khi bấm nút sửa
     const handleUpdateClick = (subject) => {
@@ -56,8 +57,8 @@ function ManageSlot() {
         subjectId: "",
         status: "",
     });
+
     // Function to get the major name by majorId
-    const [availableSubjects, setAvailableSubjects] = useState([]);
     const [availableStatuses] = useState([
         { id: "1", label: "Đang khả dụng" },
         { id: "0", label: "Vô hiệu hóa" }
@@ -67,9 +68,6 @@ function ManageSlot() {
     const [currentPage, setCurrentPage] = useState(1);
     const pageSize = 9;
 
-    useEffect(() => {
-        setAvailableSubjects(Array.from(new Set(slotData.map(item => item.subjectId))));
-    }, [slotData]);
 
     useEffect(() => {
         const filteredData = slotData.filter(item =>
@@ -119,22 +117,12 @@ function ManageSlot() {
             {/* Filter Section */}
             <div className="flex w-full h-12 flex-wrap md:flex-nowrap">
                 <div className="flex w-full md:w-auto md:mb-0">
-                    <select
-                        name="subjectId"
-                        value={filter.slotId}
-                        onChange={handleFilterChange}
-                        className="max-w-sm mx-auto ml-3 h-12 w-full md:w-[230px] border border-black rounded-xl"
-                    >
-                        <option value="">Mã buổi học</option>
-                        {availableSubjects.map((subject, index) => (
-                            <option key={index} value={subject}>{subject}</option>
-                        ))}
-                    </select>
+               
                     <select
                         name="status"
                         value={filter.status}
                         onChange={handleFilterChange}
-                        className="max-w-sm mx-auto ml-3 h-12 w-full md:w-[168px] border border-black rounded-xl"
+                        className="max-w-sm mx-auto ml-3 h-12 w-full md:w-[200px] border border-black rounded-xl"
                     >
                         <option value="">Trạng thái</option>
                         {availableStatuses.map((status) => (
@@ -254,19 +242,19 @@ function ManageSlot() {
                     Trang Sau <span className="font-bold text-xl">&gt;</span>
                 </button>
             </div>
-            {/* Phân trang - end */}
+            {/* Phân trang - end */}    
             {/* Đường dẫn tới formAddSubject - Start */}
-            {showAddForm && <FormAddSubject onSubjectAdded={handleSlotReload} />}
+            {showAddForm && <FormAddSlot onSlotAdded={handleSlotReload} />}
             {/* Đường dẫn tới formAddSubject - End */}
             {/* Đường dẫn tới form edit - Start */}
             {showUpdateForm && (
-                <FormUpdateSubject subjectToUpdate={subjectToUpdate} onSubjectUpdated={handleSlotReload} />
+                <FormUpdateSlot SlotToUpdate={slotToUpdate} onSlotUpdated={handleSlotReload} />
             )}
             {/* Đường dẫn tới form edit - End */}
             {/*Đường dẫn tới trang form detail - Star */}
             {showDetailForm && (
                 <>
-                <FormDetailSubject subjectDetail={slotDetail} onSubjectDetailUpdated={handleSlotReload}></FormDetailSubject>
+                <FormDetailSlot SlotDetail={slotDetail} onSlotDetailUpdated={handleSlotReload}/>
                 </>
             )}
             {/*Đường dẫn tới trang form detail - End*/}
