@@ -41,30 +41,23 @@ function HeaderManage() {
         )}
         {isActive("/manageTeacher") && (
           <>
-            <i className="fas fa-calendar-days w-4 h-4"></i>
+            <i className="fas fa-chalkboard-teacher w-4 h-4"></i>
             <p className="text-lg italic">Quản lý giáo viên</p>
             </>
-        )}
+        )}  
         {isActive("/manageSubject") && (
           <>
             <i className="fas fa-calendar-days w-4 h-4"></i>
             <p className="text-lg italic">Quản lý môn học</p>
           </>
         )}
-        {isActive("/manageStudent") && (
+         {isActive("/manageSlot") && (
           <>
-            <i className="fas fa-calendar-days w-4 h-4"></i>
-            <p className="text-lg italic">Quản lý sinh viên</p>
+            <i className="fa-regular fa-clock w-4 h-4"></i>
+            <p className="text-lg italic">Quản lý buổi học</p>
           </>
         )}
-        {isActive("/manageNotification") && (
-          <>
-            <i className="fas fa-bell mr-2"></i>
-            <p className="text-lg italic">Quản lý thông báo</p>
-          </>
-        )}
-      </div>
-
+      </div>  
 
       {/* Right section with the avatar and logout */}
       <div className="flex items-center space-x-3">
