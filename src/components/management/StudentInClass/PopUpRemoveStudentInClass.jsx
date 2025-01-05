@@ -55,15 +55,7 @@ function PopUpRemoveStudentInClass({ onStudentRemove, student }) {
                 </div>
             )}
 
-            {/* Hiển thị thông báo nếu có */}
-            {alertType && (
-                <div
-                    className={`mt-4 text-lg ${alertType === "success" ? "text-green-500" : "text-red-500"
-                        }`}
-                >
-                    {message}
-                </div>
-            )}
+            
         </>
     );
 }

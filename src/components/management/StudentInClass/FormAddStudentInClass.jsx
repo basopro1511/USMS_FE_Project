@@ -5,9 +5,12 @@ function FormAddStudentInClass({ onStudentAdded }) {
     const [alertType, setAlertType] = useState(""); // Use alertType to handle success/error
 
     const [studentData, setStudentData] = useState([
-        { studentId: "ThangNT", lastName: "Nguyễn", middleName: "Toàn", firstName: "Thắng", phoneNumber: "0123123123", email: "ThangNT23912@gmail.com", major: "Kỹ thuật phần mềm", dateOfBirth: "2002-04-01", createdAt: "2020-01-01", updatedAt: "2020-01-01", personalEmail: "Ex@email.com", userAvatar: "https://i.pinimg.com/736x/c2/b1/36/c2b1367627ae11fc45f6e1d51d9efd13.jpg" },
-        { studentId: "ThangNT2", lastName: "Nguyễn", middleName: "Toàn", firstName: "Thắng2", phoneNumber: "0123123124", email: "ThangNT239@gmail.com", major: "Kỹ thuật phần mềm", dateOfBirth: "2002-04-01", createdAt: "2020-01-01", updatedAt: "2020-01-01", personalEmail: "Ex@email.com", userAvatar: "https://i.pinimg.com/736x/c2/b1/36/c2b1367627ae11fc45f6e1d51d9efd13.jpg" },
-        { studentId: "ThangNT3", lastName: "Nguyễn", middleName: "Toàn", firstName: "Quoc", phoneNumber: "0123123125", email: "ThangNT23913@gmail.com", major: "Kỹ thuật phần mềm", dateOfBirth: "2002-04-01", createdAt: "2020-01-01", updatedAt: "2020-01-01", personalEmail: "Ex@email.com", userAvatar: "https://i.pinimg.com/736x/c2/b1/36/c2b1367627ae11fc45f6e1d51d9efd13.jpg" },
+        { studentId: "ThangNT", lastName: "Nguyễn", middleName: "Toàn", firstName: "Thắng", phoneNumber: "0123123123", email: "ThangNT23912@gmail.com", major: "Kỹ thuật phần mềm", dateOfBirth: "2002-04-01", createdAt: "2020-01-01", updatedAt: "2020-01-01", personalEmail: "Ex@email.com", userAvatar: "https://i.pinimg.com/736x/c2/b1/36/c2b1367627ae11fc45f6e1d51d9efd13.jpg", semesterId: "FA24" },
+        { studentId: "ThangNT2", lastName: "Nguyễn", middleName: "Toàn", firstName: "Thắng2", phoneNumber: "0123123124", email: "ThangNT239@gmail.com", major: "Kinh doanh quốc tế", dateOfBirth: "2002-04-01", createdAt: "2020-01-01", updatedAt: "2020-01-01", personalEmail: "Ex@email.com", userAvatar: "https://i.pinimg.com/736x/c2/b1/36/c2b1367627ae11fc45f6e1d51d9efd13.jpg", semesterId: "SP24" },
+        { studentId: "ThangNT3", lastName: "Nguyễn", middleName: "Toàn", firstName: "Quoc", phoneNumber: "0123123125", email: "ThangNT23913@gmail.com", major: "Ngôn ngữ anh", dateOfBirth: "2002-04-01", createdAt: "2020-01-01", updatedAt: "2020-01-01", personalEmail: "Ex@email.com", userAvatar: "https://i.pinimg.com/736x/c2/b1/36/c2b1367627ae11fc45f6e1d51d9efd13.jpg", semesterId: "SU24" },
+        { studentId: "ThangNT4", lastName: "Nguyễn", middleName: "Toàn", firstName: "Quoc", phoneNumber: "0123123125", email: "ThangNT23913@gmail.com", major: "Trí tuệ nhân tạo    ", dateOfBirth: "2002-04-01", createdAt: "2020-01-01", updatedAt: "2020-01-01", personalEmail: "Ex@email.com", userAvatar: "https://i.pinimg.com/736x/c2/b1/36/c2b1367627ae11fc45f6e1d51d9efd13.jpg", semesterId: "SU24" },
+        { studentId: "ThangNT5", lastName: "Nguyễn", middleName: "Toàn", firstName: "Quoc", phoneNumber: "0123123125", email: "ThangNT23913@gmail.com", major: "Kỹ thuật phần mềm", dateOfBirth: "2002-04-01", createdAt: "2020-01-01", updatedAt: "2020-01-01", personalEmail: "Ex@email.com", userAvatar: "https://i.pinimg.com/736x/c2/b1/36/c2b1367627ae11fc45f6e1d51d9efd13.jpg", semesterId: "SU24" },
+
     ]);
 
     const [isFormVisible, setIsFormVisible] = useState(true);
@@ -20,7 +23,7 @@ function FormAddStudentInClass({ onStudentAdded }) {
         const direction = sortConfig.key === key && sortConfig.direction === "asc" ? "desc" : "asc";
         setSortConfig({ key, direction });
     };
-    const [filters, setFilters] = useState({ studentId: "", firstName: "" });
+    const [filters, setFilters] = useState({ studentId: "", major: "", semesterId: "" });
     const handleFilterChange = (e) => {
         const { name, value } = e.target;
         setFilters((prev) => ({ ...prev, [name]: value }));
@@ -32,8 +35,10 @@ function FormAddStudentInClass({ onStudentAdded }) {
             (item) =>
                 // Filter by studentId if available
                 (!filters.studentId || item.studentId.includes(filters.studentId)) &&
-                // Filter by first name if available
-                (!filters.firstName || item.firstName.toLowerCase().includes(filters.firstName.toLowerCase()))
+                // Filter by major if available
+                (!filters.major || (item.major && item.major.toLowerCase().includes(filters.major.toLowerCase()))) &&
+                // Filter by semesterId if available
+                (!filters.semesterId || item.semesterId.includes(filters.semesterId))
         );
         setFilteredStudents(filteredData);
     }, [filters, studentData]);
@@ -63,25 +68,25 @@ function FormAddStudentInClass({ onStudentAdded }) {
 
     const handleAddStudent = async (e) => {
         e.preventDefault();
-        try {
-            const response = await AddStudent(newStudent); // Replace with actual service call
-            if (response.isSuccess) {
-                setAlertType("success");
-                setSuccessMessage(response.message);
-                onStudentAdded(response.student);
-                setTimeout(() => setAlertType(""), 3000); // Hide alert after 3 seconds
-                setIsFormVisible(false);
-            } else {
-                setAlertType("error");
-                setErrorMessage(response.message);
-                setTimeout(() => setAlertType(""), 3000); // Hide alert after 3 seconds
-            }
-        } catch (error) {
-            console.error("Error adding student:", error);
-            setAlertType("error");
-            setErrorMessage("An unexpected error occurred.");
-            setTimeout(() => setAlertType(""), 3000);
-        }
+        // try {
+        //     const response = await AddStudent(newStudent); // Replace with actual service call
+        //     if (response.isSuccess) {
+        //         setAlertType("success");
+        //         setSuccessMessage(response.message);
+        //         onStudentAdded(response.student);
+        //         setTimeout(() => setAlertType(""), 3000); // Hide alert after 3 seconds
+        //         setIsFormVisible(false);
+        //     } else {
+        //         setAlertType("error");
+        //         setErrorMessage(response.message);
+        //         setTimeout(() => setAlertType(""), 3000); // Hide alert after 3 seconds
+        //     }
+        // } catch (error) {
+        //     console.error("Error adding student:", error);
+        //     setAlertType("error");
+        //     setErrorMessage("An unexpected error occurred.");
+        //     setTimeout(() => setAlertType(""), 3000);
+        // }
     };
 
     const [selectedStudents, setSelectedStudents] = useState([]);
@@ -157,19 +162,35 @@ function FormAddStudentInClass({ onStudentAdded }) {
                                         className="max-w-sm mx-auto ml-3 h-12 px-3 w-full md:w-[230px] border border-black rounded-xl"
                                         placeholder="Mã sinh viên"
                                     />
-                                    {/* Filter by first name */}
-                                    <input
-                                        type="text"
-                                        name="firstName"
-                                        value={filters.firstName}
+                                    {/* Filter by major */}
+                                    <select
+                                        name="major"
+                                        value={filters.major}
                                         onChange={handleFilterChange}
                                         className="max-w-sm mx-auto ml-3 h-12 px-3 w-full md:w-[230px] border border-black rounded-xl"
-                                        placeholder="Tên sinh viên"
-                                    />
+                                    >
+                                        <option value="">Chuyên ngành</option>
+                                        <option value="Kỹ thuật phần mềm">Kỹ thuật phần mềm</option>
+                                        <option value="Kinh doanh quốc tế">Kinh doanh quốc tế</option>
+                                        <option value="Ngôn ngữ anh">Ngôn ngữ anh</option>
+                                        <option value="Trí tuệ nhân tạo">Trí tuệ nhân tạo</option>                                    </select>
+
+                                    {/* Filter by semesterId */}
+                                    <select
+                                        name="semesterId"
+                                        value={filters.semesterId}
+                                        onChange={handleFilterChange}
+                                        className="max-w-sm mx-auto ml-3 h-12 px-3 w-full md:w-[230px] border border-black rounded-xl"
+                                    >
+                                        <option value="">Kỳ học</option>
+                                        <option value="FA24">FA24</option>
+                                        <option value="SP24">SP24</option>
+                                        <option value="SU24">SU24</option>
+                                    </select>
                                 </div>
                             </div>
                             <form onSubmit={handleAddStudent}>
-                                <div className="w-full overflow-x-auto relative flex flex-col mt-4 bg-white shadow-md rounded-2xl border border-gray overflow-hidden">
+                                <div className="w-[1510px] mx-auto overflow-x-auto relative flex flex-col mt-4 bg-white shadow-md rounded-2xl border border-gray overflow-hidden">
                                     <table className="min-w-full text-left table-auto bg-white">
                                         <thead className="bg-gray-100">
                                             <tr>
@@ -355,7 +376,7 @@ function FormAddStudentInClass({ onStudentAdded }) {
                                                         <button
                                                             onClick={() => handleAddStudent(student)}
                                                             type="button"
-                                                            className="border border-white w-[70px] h-[30px] bg-green-600 text-white font-bold rounded-full transition-all duration-300 hover:scale-95"
+                                                            className="border border-white w-[40px] h-[40px] bg-green-600 text-white font-bold rounded-[10px] transition-all duration-300 hover:scale-95"
                                                         >
                                                             <i className="fa fa-plus text-white"></i>
                                                         </button>
@@ -393,14 +414,14 @@ function FormAddStudentInClass({ onStudentAdded }) {
                                 <div className="flex justify-center gap-8 mt-10 mb-8">
                                     <button
                                         type="submit"
-                                        className="w-[180px] h-[45px] bg-secondaryBlue text-white rounded-md font-bold"
+                                        className="w-[200px] h-[50px] bg-secondaryBlue text-white border rounded-3xl font-bold"
                                         onClick={() => handleAddStudent(student)}
                                     >
                                         Thêm
                                     </button>
                                     <button
                                         type="button"
-                                        className="w-[180px] h-[45px] bg-red-500 text-white rounded-md font-bold"
+                                        className="w-[200px] h-[50px] bg-red-500 text-white border rounded-3xl font-bold"
                                         onClick={handleCancel}
                                     >
                                         Hủy

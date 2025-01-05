@@ -361,7 +361,7 @@ function StudentInClass() {
                   <button
                     onClick={toggleShowDeletePopup}
                     type="button"
-                    className="border border-white w-[70px] h-[30px] bg-red-600 text-white font-bold rounded-full transition-all duration-300  hover:scale-95"
+                    className="border border-white w-[45px] h-[35px] bg-red-600 text-white font-bold rounded-[10px] transition-all duration-300  hover:scale-95"
                   >
                     <i
                       className="fa fa-trash  w-13 h-21 text-white m-auto"
