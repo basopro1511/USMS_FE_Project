@@ -155,7 +155,7 @@ function ManageTeacher() {
                         className="border border-white rounded-xl w-full md:w-[181px] bg-secondaryGreen hover:bg-primaryGreen text-white font-semibold"
                         onClick={toggleShowForm}
                     >
-                        <i className="fa fa-plus mr-2" aria-hidden="true"></i>
+                        <i className="fa fa-upload mr-2" aria-hidden="true"></i>
                         Import giáo viên
                     </button>
 

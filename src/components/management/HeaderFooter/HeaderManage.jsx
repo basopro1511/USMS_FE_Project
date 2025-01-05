@@ -57,6 +57,12 @@ function HeaderManage() {
             <p className="text-lg italic">Quản lý sinh viên</p>
           </>
         )}
+        {isActive("/manageNotification") && (
+          <>
+            <i className="fas fa-bell mr-2"></i>
+            <p className="text-lg italic">Quản lý thông báo</p>
+          </>
+        )}
       </div>
 
 

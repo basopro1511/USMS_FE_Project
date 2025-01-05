@@ -23,6 +23,7 @@ import StudentDetailClass from '../pages/user/Student/StudentDetailClass';
 import StudentViewExam from '../pages/user/Student/StudentViewExam';
 import TeacherDetailClass from '../pages/user/Teacher/TeacherDetailClass';
 import TeacherViewExam from '../pages/user/Teacher/TeacherViewExam';
+import Notification from '../pages/manage/notification/notification';
 import TeacherSendRequest from '../pages/user/Teacher/TeacherSendRequest';
 
 
@@ -54,7 +55,7 @@ const AppRoutes = () => {
     { path: "/manageTeacher", component: ManageTeacher, layout: ManageLayout },
     { path: "/manageSubject", component: ManageSubject, layout: ManageLayout },
     { path: "/manageStudent", component: ManageStudent, layout: ManageLayout },
-
+    { path: "/manageNotification", component: Notification, layout: ManageLayout},
 ];
   return (
     <Router>
