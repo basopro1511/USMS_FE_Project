@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { UpdateSlot } from "../../../services/slotService";
 
 // eslint-disable-next-line react/prop-types
-function FormUpdateSlot({ dataToUpdate, onUpdated }) {
+function FormUpdateSlot({ dataToUpdate, onUpdated}) {
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [showAlert, setShowAlert] = useState(false); // Alert để thông báo thành công hay thất bại
@@ -35,7 +35,7 @@ function FormUpdateSlot({ dataToUpdate, onUpdated }) {
       if (response.isSuccess) {
         setShowAlert("success");
         setSuccessMessage(response.message);
-        onUpdated(response.slot); // Trả về data mới nhất cho trang Manageslot để update lên bảng
+        onUpdated(response.data);
         setTimeout(() => setShowAlert(false), 3000); // Ẩn bảng thông báo sau 3 giây
         setIsFormVisible(false); 
       } else {

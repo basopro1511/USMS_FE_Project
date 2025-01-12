@@ -65,8 +65,8 @@ function ManageSlot() {
 
 
     const [availableStatuses] = useState([
-        { status: 1, label: "Đang khả dụng" },
-        { status: 0, label: "Vô hiệu hóa" }
+        { id: 1, label: "Đang khả dụng" },
+        { id: 0, label: "Vô hiệu hóa" }
     ]);
 
     const [sortConfig, setSortConfig] = useState({ key: "slotId", direction: "asc" });
@@ -77,7 +77,7 @@ function ManageSlot() {
     useEffect(() => {
         const filteredData = slotData.filter(item =>
             (!filter.subjectId || item.subjectId === filter.subjectId) &&
-            (!filter.status || item.status === filter.status)
+            (!filter.status || item.status === parseInt(filter.status))
         );
         setFilteredSlot(filteredData);
     }, [filter, slotData]);
@@ -253,7 +253,7 @@ function ManageSlot() {
             {/* Đường dẫn tới formAddSubject - End */}
             {/* Đường dẫn tới form edit - Start */}
             {showUpdateForm && (
-                <FormUpdateSlot dataToUpdate={slotToUpdate} onSlotUpdated={handleSlotReload} />
+                <FormUpdateSlot dataToUpdate={slotToUpdate} onUpdated={handleSlotReload} />
             )}
             {/* Đường dẫn tới form edit - End */}
             {/*Đường dẫn tới trang form detail - Star */}
