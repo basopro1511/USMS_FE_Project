@@ -2,21 +2,26 @@ import { useEffect, useState } from "react";
 import FormAddSlot from "../../../components/management/Slot/FormAddSlot";
 import FormUpdateSlot from "../../../components/management/Slot/FormUpdateSlot";
 import FormDetailSlot from "../../../components/management/Slot/FormDetailSlot";
+import { getSlots } from "../../../services/slotService";
 
 function ManageSlot() {
-    const [slotData] = useState([
-        { slotId: 1, startTime: "07:00", endTime: "09:15", status: "1" },
-        { slotId: 2, startTime: "09:30", endTime: "11:45", status: "1" },
-        { slotId: 3, startTime: "13:00", endTime: "15:15", status: "1" },
-        { slotId: 4, startTime: "15:30", endTime: "17:45", status: "1" },
-        { slotId: 5, startTime: "18:00", endTime: "18:15", status: "1" },
-    ]);
+    // Fetch Data Slot - Start
+      const [slotData, setSlotData] = useState([]);
+      useEffect(() => {
+        const fetchRoomData = async () => {
+          const data = await getSlots(); //Lấy ra list room rtong database
+          setSlotData(data.result);
+        };
+        fetchRoomData();
+      }, []);
+    //Fetch Data Room - End
     
     //Update bảng mà không cần reload
     const handleSlotReload = async () => {
-        // const data = await getSlots(); // Gọi API để lấy lại tất cả các slot dạy
-        // setSlotData(data.result); // Cập nhật lại dữ liệu slot dạy
+        const data = await getSlots(); // Gọi API để lấy lại tất cả các slot dạy
+        setSlotData(data.result); // Cập nhật lại dữ liệu slot dạy
     };
+
     // Show form Add New semester - Start
     const [showAddForm, setAddForm] = useState(false); // Dùng để hiển thị form
     const toggleShowForm = () => {
@@ -58,10 +63,10 @@ function ManageSlot() {
         status: "",
     });
 
-    // Function to get the major name by majorId
+
     const [availableStatuses] = useState([
-        { id: "1", label: "Đang khả dụng" },
-        { id: "0", label: "Vô hiệu hóa" }
+        { id: 1, label: "Đang khả dụng" },
+        { id: 0, label: "Vô hiệu hóa" }
     ]);
 
     const [sortConfig, setSortConfig] = useState({ key: "slotId", direction: "asc" });
@@ -72,7 +77,7 @@ function ManageSlot() {
     useEffect(() => {
         const filteredData = slotData.filter(item =>
             (!filter.subjectId || item.subjectId === filter.subjectId) &&
-            (!filter.status || item.status === filter.status)
+            (!filter.status || item.status === parseInt(filter.status))
         );
         setFilteredSlot(filteredData);
     }, [filter, slotData]);
@@ -138,7 +143,7 @@ function ManageSlot() {
                         onClick={toggleShowForm}
                     >
                         <i className="fa fa-plus mr-2" aria-hidden="true"></i>
-                        Thêm môn học
+                        Thêm buổi học
                     </button>
                 </div>
             </div>
@@ -190,7 +195,7 @@ function ManageSlot() {
                                 <td className="p-4 text-center">{item.startTime}</td>
                                 <td className="p-4 text-center">{item.endTime}</td>
                                 <td className="p-4 text-center">
-                                    {item.status === "0" ? "Vô hiệu hóa" : item.status === "1" ? "Đang khả dụng" : "Chưa bắt đầu"}
+                                    {item.status === 0 ? "Vô hiệu hóa" : item.status === 1 ?  "Đang khả dụng" : "Chưa bắt đầu" }
                                 </td>
                                 <td className="p-4 text-center align-middle">
                                     {/* Edit and Detail Buttons */}
@@ -248,13 +253,13 @@ function ManageSlot() {
             {/* Đường dẫn tới formAddSubject - End */}
             {/* Đường dẫn tới form edit - Start */}
             {showUpdateForm && (
-                <FormUpdateSlot SlotToUpdate={slotToUpdate} onSlotUpdated={handleSlotReload} />
+                <FormUpdateSlot dataToUpdate={slotToUpdate} onUpdated={handleSlotReload} />
             )}
             {/* Đường dẫn tới form edit - End */}
             {/*Đường dẫn tới trang form detail - Star */}
             {showDetailForm && (
                 <>
-                <FormDetailSlot SlotDetail={slotDetail} onSlotDetailUpdated={handleSlotReload}/>
+                <FormDetailSlot detail={slotDetail} onDetailUpdated={handleSlotReload}/>
                 </>
             )}
             {/*Đường dẫn tới trang form detail - End*/}

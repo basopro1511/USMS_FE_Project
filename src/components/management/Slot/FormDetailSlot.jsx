@@ -1,30 +1,27 @@
 import { useEffect, useState } from "react";
-import { changeRoomStatus } from "../../../services/roomService";
+import { changeSlotStatus } from "../../../services/slotService";
 
 // eslint-disable-next-line react/prop-types
-function FormDetailSlot({ roomDetail, onRoomDetailUpdated }) {
+function FormDetailSlot({ detail, onDetailUpdated }) {
+
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [showAlert, setShowAlert] = useState(false); // Alert để thông báo thành công hay thất bại
   const [isFormVisible, setIsFormVisible] = useState(true); // State để điều khiển việc hiển thị form
 
-  const [roomData, setRoomData] = useState(
-    roomDetail || {
-      roomId: "",
-      location: "",
-      isOnline: false,
-      onlineURL: null,
-      status: 0,
-      createAt: new Date().toISOString(),
-      updateAt: new Date().toISOString(),
-    }
-  );
+  const [slotData, setSlotData] = useState({
+    // tạo 1 model đễ lấy dữ liệu từ api
+    slotId: "",
+    startTime: "",
+    endTime: "",
+    status: 0,
+  });
 
   useEffect(() => {
-    if (roomDetail) {
-      setRoomData(roomDetail);
+    if (detail) {
+      setSlotData(detail);
     }
-  }, [roomDetail]);
+  }, [detail]);
 
   //đóng form
   const handleCancel = () => {
@@ -32,13 +29,13 @@ function FormDetailSlot({ roomDetail, onRoomDetailUpdated }) {
   };
 
   // Xử lý thay đổi trạng thái phòng
-  const handleChangeRoomStatus = async (roomId, status) => {
+  const handleChangeStatus = async (id, status) => {
     try {
-      const response = await changeRoomStatus(roomId, status); // Gọi API Update phòng
+      const response = await changeSlotStatus(id, status); // Gọi API Update data
       if (response.isSuccess) {
         setShowAlert("success");
         setSuccessMessage(response.message);
-        onRoomDetailUpdated(response.room);
+        onDetailUpdated(response.data);
         setTimeout(() => setShowAlert(false), 3000); // Ẩn bảng thông báo sau 3 giây
         setIsFormVisible(false); // Ẩn form
       } else {
@@ -113,7 +110,7 @@ function FormDetailSlot({ roomDetail, onRoomDetailUpdated }) {
                 type="text"
                 required
                 className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl px-4 text-xl"
-                value={roomData.roomId}
+                value={slotData.slotId}
               />
 
               <p className="text-left ml-[100px] text-xl mt-3">Thời gian bắt đầu: </p>
@@ -123,7 +120,7 @@ function FormDetailSlot({ roomDetail, onRoomDetailUpdated }) {
                 readOnly
                 placeholder="Nhập vị trí"
                 className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl px-4 text-xl"
-                value={roomData.location}
+                value={slotData.startTime}
               />
 
                 <p className="text-left ml-[100px] text-xl mt-3">Thời gian kết thúc: </p>
@@ -133,7 +130,7 @@ function FormDetailSlot({ roomDetail, onRoomDetailUpdated }) {
                 readOnly
                 placeholder="Nhập vị trí"
                 className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl px-4 text-xl"
-                value={roomData.location}
+                value={slotData.endTime}
               />
               <p className="text-left ml-[100px] text-xl mt-3">
                 Trạng thái hiện tại:{" "}
@@ -145,9 +142,9 @@ function FormDetailSlot({ roomDetail, onRoomDetailUpdated }) {
                 placeholder="Nhập vị trí"
                 className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl  px-4 text-xl"
                 value={
-                  roomData.status === 0
+                  slotData.status === 0
                     ? "Vô hiệu hóa"
-                    : roomData.status === 1
+                    : slotData.status === 1
                     ? "Đang khả dụng"
                     : ""
                 }
@@ -159,14 +156,14 @@ function FormDetailSlot({ roomDetail, onRoomDetailUpdated }) {
                 <button
                   type="button"
                   className=" w-full max-w-[150px] h-[50px] sm:h-[45px] border rounded-2xl bg-gray-500 text-white font-bold text-lg sm:text-xl transition-all hover:scale-105 hover:bg-primaryBlue mt-auto mb-auto"
-                  onClick={() => handleChangeRoomStatus(roomData.roomId, 0)}
+                  onClick={() => handleChangeStatus(slotData.slotId, 0)}
                 >
                   Vô hiệu hóa
                 </button>
                 <button
                   type="button"
                   className=" w-full max-w-[150px] h-[50px] sm:h-[45px] border rounded-2xl bg-yellow-500 text-white font-bold text-lg sm:text-xl transition-all hover:scale-105 hover:bg-yellow-600 mt-auto mb-auto"
-                  onClick={() => handleChangeRoomStatus(roomData.roomId, 1)}
+                  onClick={() => handleChangeStatus(slotData.slotId, 1)}
                 >
                   Khả dụng
                 </button>

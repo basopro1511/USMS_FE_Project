@@ -1,20 +1,17 @@
 import { useState } from "react";
-import { AddRoom } from "../../../services/roomService";
+import { AddSlot } from "../../../services/slotService";
 
 // eslint-disable-next-line react/prop-types
 function FormAddSlot({onSlotAdded}) {
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [showAlert, setShowAlert] = useState(false); // Alert để thông báo thành công hay thất bại
-  const [newRoom, setNewRoom] = useState({
+  const [newSlot, setNewSlot] = useState({
     // tạo 1 model đễ lấy dữ liệu từ api
-    roomId: "",
-    location: "",
-    isOnline: false,
-    onlineURL: null,
+    slotId: "",
+    startTime: "",
+    endTime: "",
     status: 0,
-    createAt: new Date().toISOString(),
-    updateAt: new Date().toISOString(),
   });
 
   const [isFormVisible, setIsFormVisible] = useState(true); // State để điều khiển việc hiển thị form
@@ -23,14 +20,15 @@ function FormAddSlot({onSlotAdded}) {
   };
 
   // Xử lý form AddRoom
-  const handleAddRoom = async (e) => {
+  const handleAddSlot = async (e) => {
     e.preventDefault(); 
     try {
-      const response = await AddRoom(newRoom); 
+      const response = await AddSlot(newSlot); 
+      console.log(newSlot);
       if (response.isSuccess) {
         setShowAlert("success");
         setSuccessMessage(response.message);
-        onRoomAdded(response.room);
+        onSlotAdded(response.slot);
         setTimeout(() => setShowAlert(false), 3000); 
         setIsFormVisible(false); 
       } else {
@@ -88,7 +86,7 @@ function FormAddSlot({onSlotAdded}) {
               <p className="font-bold text-3xl sm:text-4xl md:text-5xl mt-8 text-secondaryBlue">
                 Thêm buổi học
               </p>
-              <form onSubmit={handleAddRoom}>
+              <form onSubmit={handleAddSlot}>
                 <p className="text-left ml-[100px] text-xl mt-8">
                   Mã buổi học:{" "}
                 </p>
@@ -98,7 +96,7 @@ function FormAddSlot({onSlotAdded}) {
                   placeholder="Mã số buổi học"
                   className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl px-4"
                   onChange={(e) =>
-                    setNewRoom({ ...newRoom, roomId: e.target.value })
+                    setNewSlot({ ...newSlot, slotId: e.target.value })
                   }
                 />{" "}
                 <p className="text-left ml-[100px] text-xl mt-3">Thời gian bắt đầu : </p>
@@ -107,7 +105,7 @@ function FormAddSlot({onSlotAdded}) {
                   required
                   className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl px-4"
                   onChange={(e) =>
-                    setNewRoom({ ...newRoom, location: e.target.value })
+                    setNewSlot({ ...newSlot, startTime: `${e.target.value}:00` }) // Thêm giây mặc định
                   }
                 />
                    <p className="text-left ml-[100px] text-xl mt-3">Thời gian kết thúc : </p>
@@ -116,7 +114,7 @@ function FormAddSlot({onSlotAdded}) {
                   required
                   className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl mb-8 px-4"
                   onChange={(e) =>
-                    setNewRoom({ ...newRoom, location: e.target.value })
+                    setNewSlot({ ...newSlot, endTime:  `${e.target.value}:00` }) // Thêm giây mặc định
                   }
                 />
                 <div className="flex flex-wrap justify-center gap-4">

@@ -1,42 +1,41 @@
 import { useEffect, useState } from "react";
+import { UpdateSlot } from "../../../services/slotService";
 
 // eslint-disable-next-line react/prop-types
-function FormUpdateSlot({ slotToUpdate, onSlotUpdated }) {
+function FormUpdateSlot({ dataToUpdate, onUpdated}) {
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [showAlert, setShowAlert] = useState(false); // Alert để thông báo thành công hay thất bại
-
   const [isFormVisible, setIsFormVisible] = useState(true); // State để điều khiển việc hiển thị form
+
   const handleCancel = () => {
     setIsFormVisible(false); // Ẩn form khi nhấn nút hủy
   };
+  
   const [slotData, setslotData] = useState(
-    slotToUpdate || {
+    dataToUpdate || {
       slotId: "",
-      location: "",
-      isOnline: false,
-      onlineURL: null,
+      startTime: "",
+      endTime: "",
       status: 0,
-      createAt: new Date().toISOString(),
-      updateAt: new Date().toISOString(),
     }
   );
 
   useEffect(() => {
-    if (slotToUpdate) {
-      setslotData(slotToUpdate);
+    if (dataToUpdate) {
+      setslotData(dataToUpdate);
     }
-  }, [slotToUpdate]);
+  }, [dataToUpdate]);
 
   // Xử lý form Update
-  const handleUpdateSlot = async (e) => {
+  const handleUpdate= async (e) => {
     e.preventDefault(); 
     try {
       const response = await UpdateSlot(slotData); 
       if (response.isSuccess) {
         setShowAlert("success");
         setSuccessMessage(response.message);
-        onSlotUpdated(response.slot); // Trả về data mới nhất cho trang Manageslot để update lên bảng
+        onUpdated(response.data);
         setTimeout(() => setShowAlert(false), 3000); // Ẩn bảng thông báo sau 3 giây
         setIsFormVisible(false); 
       } else {
@@ -94,7 +93,7 @@ function FormUpdateSlot({ slotToUpdate, onSlotUpdated }) {
               <p className="font-bold text-3xl sm:text-4xl md:text-5xl mt-8 text-secondaryBlue">
                 Cập nhật buổi học
               </p>
-              <form >
+              <form  onSubmit={handleUpdate}>
                 <p className="text-left ml-[100px] text-xl mt-8">
                   Mã buổi học:{" "}
                 </p>
@@ -113,9 +112,9 @@ function FormUpdateSlot({ slotToUpdate, onSlotUpdated }) {
                   type="time"
                   required
                   className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl px-4"
-                  value={slotData.location}
+                  value={slotData.startTime}
                   onChange={(e) =>
-                    setslotData({ ...slotData, location: e.target.value })
+                    setslotData({ ...slotData, startTime: `${e.target.value}:00` })
                   }
                 />
 
@@ -124,9 +123,9 @@ function FormUpdateSlot({ slotToUpdate, onSlotUpdated }) {
                   type="time"
                   required
                   className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl mb-8 px-4"
-                  value={slotData.location}
+                  value={slotData.endTime}
                   onChange={(e) =>
-                    setslotData({ ...slotData, location: e.target.value })
+                    setslotData({ ...slotData, endTime: `${e.target.value}:00` })
                   }
                 />
                 <div className="flex flex-wrap justify-center gap-4">
