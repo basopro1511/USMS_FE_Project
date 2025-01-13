@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { UpdateSemester } from "../../../services/semesterService";
 // import { updateSemester } from "../../../services/semesterService"; // Gọi dịch vụ liên quan đến kỳ học
 
 // eslint-disable-next-line react/prop-types
@@ -34,8 +35,24 @@ function FormUpdateSemester({ semesterToUpdate, onSemesterUpdated }) {
     // Xử lý form Update
     const handleUpdateSemester = async (e) => {
         e.preventDefault();
+    
+        // Kiểm tra tên kỳ có đúng định dạng Fall, Summer, Spring + 2 số hay không
+        const semesterNameRegex = /^(Fall|Summer|Spring)\d{2}$/;
+        if (!semesterNameRegex.test(semesterData.semesterName)) {
+            alert("Tên kỳ học phải là Fall, Summer hoặc Spring + 2 chữ số (VD: Fall23, Summer24).");
+            return;
+        }
+    
+        // Kiểm tra ngày bắt đầu phải trước ngày kết thúc
+        const startDate = new Date(semesterData.startDate);
+        const endDate = new Date(semesterData.endDate);
+        if (startDate >= endDate) {
+            alert("Ngày bắt đầu phải trước ngày kết thúc.");
+            return;
+        }
+    
         try {
-            const response = await updateSemester(semesterData); // Gọi API cập nhật kỳ học
+            const response = await UpdateSemester(semesterData); // Gọi API cập nhật kỳ học
             if (response.isSuccess) {
                 setShowAlert("success");
                 setSuccessMessage(response.message);

@@ -2,38 +2,23 @@ import React, { useState, useEffect } from "react";
 import FormUpdateSemester from "../../../components/management/Semester/FormUpdateSemester";
 import FormAddSemester from "../../../components/management/Semester/FormAddSemester";
 import FormDetailSemester from "../../../components/management/Semester/FormDetailSemester";
+import { getSemesters } from "../../../services/semesterService";
 function ManageSemester() {
-    const [semesterData] = useState([
-        { semesterId: "FA24", semesterName: "Fall2024", startDate: "2024-01-02", endDate: "2025-04-29", status: "2" },
-        { semesterId: "SU23", semesterName: "Summer23", startDate: "2023-05-05", endDate: "2023-08-05", status: "2" },
-        { semesterId: "SU24", semesterName: "Summer24", startDate: "2024-06-05", endDate: "2024-09-05", status: "2" },
-        { semesterId: "SP24", semesterName: "Spring24", startDate: "2024-02-01", endDate: "2024-05-01", status: "2" },
-        { semesterId: "SP25", semesterName: "Spring25", startDate: "2025-04-01", endDate: "2025-07-01", status: "1" },
-        { semesterId: "SU24", semesterName: "Summer24", startDate: "2024-06-01", endDate: "2024-09-01", status: "1" },
-        { semesterId: "FA23", semesterName: "Fall23", startDate: "2023-03-01", endDate: "2023-06-01", status: "1" },
-        { semesterId: "FA21", semesterName: "Fall21", startDate: "2021-02-01", endDate: "2021-05-01", status: "1" },
-        { semesterId: "SU21", semesterName: "Summer21", startDate: "2021-06-01", endDate: "2021-09-01", status: "1" },
-        { semesterId: "SP22", semesterName: "Spring22", startDate: "2022-04-01", endDate: "2022-07-01", status: "1" },
-        { semesterId: "SU25", semesterName: "Summer25", startDate: "2025-07-01", endDate: "2025-10-01", status: "1" },
-        { semesterId: "SU20", semesterName: "Summer2020", startDate: "2020-08-01", endDate: "2020-11-01", status: "1" }
-    ]
-    );
-
-    // // Fetch Data Semester - Start
-    //   const [semesterData1, setSemesterData] = useState([]);
-    //   useEffect(() => {
-    //     const fetchSemesterData = async () => {
-    //       const data = await SemesterData(); //Lấy ra list semester rtong database
-    //       setRoomData(data.result);
-    //     };
-    //     fetchSemesterData();
-    //   }, []);
-    //   //Fetch Data Semester - End
-
+   
+// Fetch Data Semester - Start
+  const [semesterData, setSemesterData] = useState([]);
+  useEffect(() => {
+    const fetchSemesterData = async () => {
+      const data = await getSemesters(); //Lấy ra list Semester trong database
+      setSemesterData(data.result);
+    };
+    fetchSemesterData();
+  }, []);
+  //Fetch Data Semester - End
     //Update bảng mà không cần reload
     const handleSemesterReload = async () => {
-        const data = await getSemesters(); // Gọi API để lấy lại tất cả các kìkì
-        setSemesterData(data.result); // Cập nhật lại dữ liệu kìkì
+        const data = await getSemesters(); // Gọi API để lấy lại tất cả các kì
+        setSemesterData(data.result); // Cập nhật lại dữ liệu kì
     };
     //Update bảng mà không cần reload
 
@@ -79,9 +64,9 @@ function ManageSemester() {
 
     const [availableSemesters, setAvailableSemesters] = useState([]);
     const [availableStatuses, setAvailableStatuses] = useState([
-        { id: "1", label: "Đang diễn ra" },
-        { id: "2", label: "Đã kết thúc" },
-        { id: "0", label: "Chưa bắt đầu" }
+        { id: 1, label: "Đang diễn ra" },
+        { id: 0, label: "Đã kết thúc" },
+        { id: 2, label: "Chưa bắt đầu" }
     ]);
 
     useEffect(() => {
@@ -93,7 +78,7 @@ function ManageSemester() {
         // Filter data based on selected filters
         const filteredData = semesterData.filter(item =>
             (!filters.semesterId || item.semesterId === filters.semesterId) &&
-            (!filters.status || item.status === filters.status)
+            (!filters.status || item.status === Number(filters.status))
         );
         setFilteredSemesters(filteredData);
     }, [filters, semesterData]);
@@ -137,7 +122,7 @@ function ManageSemester() {
     return (
         <div className="border mt-4 h-auto pb-7 w-[1600px] bg-white rounded-2xl">
             <div className="flex justify-center">
-                <p className="mt-8 text-3xl font-bold">Quản lý kì học</p>
+                <p className="mt-8 text-3xl font-bold">Quản lý kỳ học</p>
             </div>
             <p className="ml-4 mt-5">Tìm kiếm: </p>
             {/* Filter Section */}
@@ -150,7 +135,7 @@ function ManageSemester() {
                         onChange={handleFilterChange}
                         className="max-w-sm mx-auto ml-3 h-12 w-full md:w-[230px] border border-black rounded-xl"
                     >
-                        <option value="">Mã kì học</option>
+                        <option value="">Mã kỳ học</option>
                         {availableSemesters.map((semester, index) => (
                             <option key={index} value={semester}>
                                 {semester}
@@ -173,7 +158,7 @@ function ManageSemester() {
                     </select>
                 </div>
 
-                {/* Add Semester Button moved to the right */}
+                {/* Add Semester Button */}
                 <div className="flex ml-auto rounded-full transition-all duration-300 hover:scale-95 mr-4 mt-2 md:mt-0">
                     <button
                         type="button"
@@ -181,7 +166,7 @@ function ManageSemester() {
                         onClick={toggleShowForm}
                     >
                         <i className="fa fa-plus mr-2" aria-hidden="true"></i>
-                        Thêm kì học
+                        Thêm kỳ học
                     </button>
                 </div>
             </div>
@@ -197,7 +182,7 @@ function ManageSemester() {
                             >
                                 <div className="flex items-center justify-between">
                                     <p className="m-auto transition-all hover:scale-105">
-                                        Mã kì học
+                                        Mã kỳ học
                                     </p>
                                     <svg
                                         xmlns="http://www.w3.org/2000/svg"
@@ -222,7 +207,7 @@ function ManageSemester() {
                             >
                                 <div className="flex items-center justify-between">
                                     <p className="m-auto transition-all hover:scale-105">
-                                        Tên kì học
+                                        Tên kỳ học
                                     </p>
                                     <svg
                                         xmlns="http://www.w3.org/2000/svg"
@@ -335,7 +320,7 @@ function ManageSemester() {
                                 <td className="p-4 text-center align-middle">{item.startDate}</td>
                                 <td className="p-4 text-center align-middle">{item.endDate}</td>
                                 <td className="p-4 text-center align-middle">
-                                    {item.status === "1" ? "Đang diễn ra" : "Đã kết thúc"}
+                                {item.status === 1 ? "Đang diễn ra" : item.status === 0 ? "Đã kết thúc" : "Chưa bắt đầu"}
                                 </td>
                                 <td className="p-4 text-center align-middle">
                                     {/* Edit and Detail Buttons */}

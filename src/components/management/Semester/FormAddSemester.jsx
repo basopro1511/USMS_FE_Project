@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { AddSemester } from "../../../services/semesterService";
 // import { AddSemester } from "../../../services/semesterService"; // Update to match your service
 
 // eslint-disable-next-line react/prop-types
@@ -23,6 +24,30 @@ function FormAddSemester({ onSemesterAdded }) {
     // Handle form AddSemester
     const handleAddSemester = async (e) => {
         e.preventDefault();
+        // Kiểm tra mã kỳ có đúng định dạng 2 chữ cái (FA, SU, SP) + 2 số hay không
+    const semesterIdRegex = /^(FA|SU|SP)\d{2}$/;
+    if (!semesterIdRegex.test(newSemester.semesterId)) {
+        alert("Mã kỳ học phải là FA, SU hoặc SP + 2 chữ số (VD: FA23, SU24).");
+        return;
+    }
+
+    // Kiểm tra tên kỳ có đúng định dạng Fall, Summer, Spring + 2 số hay không
+    const semesterNameRegex = /^(Fall|Summer|Spring)\d{2}$/;
+    if (!semesterNameRegex.test(newSemester.semesterName)) {
+        alert("Tên kỳ học phải là Fall, Summer hoặc Spring + 2 chữ số (VD: Fall23, Summer24).");
+        return;
+    }
+
+    // Kiểm tra ngày bắt đầu phải trước ngày kết thúc
+    const startDate = new Date(newSemester.startDate);
+    const endDate = new Date(newSemester.endDate);
+    if (startDate >= endDate) {
+        alert("Ngày bắt đầu phải trước ngày kết thúc.");
+        return;
+    }
+
+    // Nếu các điều kiện hợp lệ, tiến hành xử lý thêm kỳ học
+    console.log("Thêm kỳ học thành công", newSemester);
         try {
             const response = await AddSemester(newSemester);
             if (response.isSuccess) {
@@ -86,21 +111,21 @@ function FormAddSemester({ onSemesterAdded }) {
                                 Thêm kỳ học
                             </p>
                             <form onSubmit={handleAddSemester}>
-                                <p className="text-left ml-[100px] text-xl mt-5">Mã kì học:</p>
+                                <p className="text-left ml-[100px] text-xl mt-5">Mã kỳ học:</p>
                                 <input
                                     type="text"
                                     required
-                                    placeholder="Mã kì học"
+                                    placeholder="Mã kỳ học"
                                     className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl mb-3 px-4"
                                     onChange={(e) =>
                                         setNewSemester({ ...newSemester, semesterId: e.target.value })
                                     }
                                 />
-                                <p className="text-left ml-[100px] text-xl ">Tên kì học:</p>
+                                <p className="text-left ml-[100px] text-xl ">Tên kỳ học:</p>
                                 <input
                                     type="text"
                                     required
-                                    placeholder="Tên kì học"
+                                    placeholder="Tên kỳ học"
                                     className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl mb-3 px-4"
                                     onChange={(e) =>
                                         setNewSemester({ ...newSemester, semesterName: e.target.value })
