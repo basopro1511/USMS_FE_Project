@@ -95,7 +95,7 @@ function FormAddStudent({ onStudentAdded }) {
                                         <img
                                             src={avatar || "https://via.placeholder.com/150"}
                                             alt="Avatar"
-                                            className="w-180 h-220 object-cover border"
+                                            className="w-[180px] h-[220px] object-cover border rounded-md"
                                         />
                                         <label
                                             htmlFor="avatar"

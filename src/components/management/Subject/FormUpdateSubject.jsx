@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { UpdateSubject } from "../../../services/subjectService";
 
 function FormUpdateSubject({ subjectToUpdate, onSubjectUpdated }) {
     const [errorMessage, setErrorMessage] = useState("");
@@ -17,27 +18,30 @@ function FormUpdateSubject({ subjectToUpdate, onSubjectUpdated }) {
             majorId: 0,
             numberOfSlot: "",
             description: "",
+            term: 0,
             status: 0, // 0: Inactive, 1: Active
             createAt: new Date().toISOString(),
             updateAt: new Date().toISOString(),
         }
     );
 
+    const [availableStatuses] = useState([
+        { id: 1, label: "Đang diễn ra" },
+        { id: 2, label: "Chưa bắt đầu" },
+        { id: 0, label: "Đã kết thúc" },
+    ]);
+
     useEffect(() => {
         if (subjectToUpdate) {
-            setSubjectData({
-                ...subjectToUpdate,
-                majorId: subjectToUpdate.majorId || 0,
-                status: subjectToUpdate.status || 0,
-            });
+            setSubjectData(subjectToUpdate);
         }
-    }, [subjectToUpdate]);    
+    }, [subjectToUpdate]);
 
     const handleUpdateSubject = async (e) => {
         e.preventDefault();
         try {
             // Gọi API cập nhật môn học (thay thế bằng hàm thực tế của bạn)
-            const response = await fakeUpdateSubjectAPI(subjectData);
+            const response = await UpdateSubject(subjectData);
             if (response.isSuccess) {
                 setShowAlert("success");
                 setSuccessMessage(response.message);
@@ -121,6 +125,17 @@ function FormUpdateSubject({ subjectToUpdate, onSubjectUpdated }) {
                                         setSubjectData({ ...subjectData, subjectName: e.target.value })
                                     }
                                 />
+                                <p className="text-left ml-[100px] text-xl ">Chuyên ngành: </p>
+                                <input
+                                    type="text"
+                                    required
+                                    placeholder="Tên môn học"
+                                    className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl mb-3 px-4"
+                                    value={subjectData.majorId}
+                                    onChange={(e) =>
+                                        setSubjectData({ ...subjectData, majorId: e.target.value })
+                                    }
+                                />
                                 <p className="text-left ml-[100px] text-xl ">Số buổi học: </p>
                                 <input
                                     type="number"
@@ -132,21 +147,36 @@ function FormUpdateSubject({ subjectToUpdate, onSubjectUpdated }) {
                                         setSubjectData({ ...subjectData, numberOfSlot: e.target.value })
                                     }
                                 />
-                                {/* Chuyên ngành */}
-                                <p className="text-left ml-[100px] text-xl">Chuyên ngành: </p>
-                                <select
+                                <p className="text-left ml-[100px] text-xl ">Kì học: </p>
+                                <input
+                                    type="text"
                                     required
+                                    placeholder="Kỳ học"
                                     className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl mb-3 px-4"
-                                    value={subjectData.majorId}
+                                    value={subjectData.term}
                                     onChange={(e) =>
-                                        setSubjectData({ ...subjectData, majorId: Number(e.target.value) })
+                                        setSubjectData({ ...subjectData, term: e.target.value })
+                                    }
+                                />
+
+                                <p className="text-left ml-[100px] text-xl ">Trạng thái: </p>
+                                <select
+                                    id="status"
+                                    name="status"
+                                    className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl mb-3 px-4"
+                                    value={subjectData.status}
+                                    onChange={(e) =>
+                                        setSubjectData({ ...subjectData, status: parseInt(e.target.value, 10) })
                                     }
                                 >
-                                    <option value={0}>Kỹ thuật phần mềm</option>
-                                    <option value={1}>Ngôn ngữ Anh</option>
-                                    <option value={2}>Quản trị kinh doanh</option>
+                                    {availableStatuses.map((status) => (
+                                        <option key={status.id} value={status.id}>
+                                            {status.label}
+                                        </option>
+                                    ))}
                                 </select>
-                           
+
+
                                 <p className="text-left ml-[100px] text-xl ">Mô tả: </p>
                                 <textarea
                                     className="w-full max-w-[500px] h-[100px] text-black border border-black rounded-xl mb-3 px-4 py-1"
@@ -182,10 +212,3 @@ function FormUpdateSubject({ subjectToUpdate, onSubjectUpdated }) {
 }
 
 export default FormUpdateSubject;
-
-// Giả lập hàm update subject API
-async function fakeUpdateSubjectAPI(subjectData) {
-    return new Promise((resolve) =>
-        setTimeout(() => resolve({ isSuccess: true, message: "Cập nhật thành công!", subject: subjectData }), 1000)
-    );
-}
