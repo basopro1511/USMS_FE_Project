@@ -135,7 +135,7 @@ function ManageStudent() {
                                 {majorMapping[majorId]}
                             </option>
                         ))}
-                    </select>;
+                    </select>
 
                     <select
                         name="startYear"
@@ -151,16 +151,16 @@ function ManageStudent() {
                     <input
                         type="text"
                         name="studentId"
-                        placeholder="Tìm kiếm theo mã số sinh viên"
+                        placeholder="Mã số sinh viên"
                         value={filter.studentId}
                         onChange={handleFilterChange}
-                        className="max-w-sm mx-auto ml-3 h-12 w-full md:w-[230px] border border-black rounded-xl px-3"
+                        className="max-w-sm mx-auto ml-3 h-12 w-full md:w-[150px] border border-black rounded-xl px-3"
                     />
 
                     <input
                         type="text"
                         name="fullName"
-                        placeholder="Tìm kiếm theo họ và tên"
+                        placeholder="Họ và tên"
                         value={filter.fullName}
                         onChange={handleFilterChange}
                         className="max-w-sm mx-auto ml-3 h-12 w-full md:w-[230px] border border-black rounded-xl px-3"

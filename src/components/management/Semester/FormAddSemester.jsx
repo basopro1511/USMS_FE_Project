@@ -24,46 +24,54 @@ function FormAddSemester({ onSemesterAdded }) {
     // Handle form AddSemester
     const handleAddSemester = async (e) => {
         e.preventDefault();
-        // Kiểm tra mã kỳ có đúng định dạng 2 chữ cái (FA, SU, SP) + 2 số hay không
+       // Kiểm tra mã kỳ có đúng định dạng 2 chữ cái (FA, SU, SP) + 2 số hay không
     const semesterIdRegex = /^(FA|SU|SP)\d{2}$/;
     if (!semesterIdRegex.test(newSemester.semesterId)) {
-        alert("Mã kỳ học phải là FA, SU hoặc SP + 2 chữ số (VD: FA23, SU24).");
+        setShowAlert("error");
+        setErrorMessage("Mã kỳ học phải là FA, SU hoặc SP + 2 chữ số (VD: FA23, SU24).");
+        setTimeout(() => setShowAlert(false), 3000); // Ẩn thông báo sau 3 giây
         return;
     }
 
-    // Kiểm tra tên kỳ có đúng định dạng Fall, Summer, Spring + 2 số hay không
-    const semesterNameRegex = /^(Fall|Summer|Spring)\d{2}$/;
+    // Kiểm tra tên kỳ có đúng định dạng Fall, Summer, Spring + 4 số hay không
+    const semesterNameRegex = /^(Fall|Summer|Spring)\d{4}$/;
     if (!semesterNameRegex.test(newSemester.semesterName)) {
-        alert("Tên kỳ học phải là Fall, Summer hoặc Spring + 2 chữ số (VD: Fall23, Summer24).");
+        setShowAlert("error");
+        setErrorMessage("Tên kỳ học phải là Fall, Summer hoặc Spring + 4 chữ số (VD: Fall2023, Summer2024).");
+        setTimeout(() => setShowAlert(false), 3000); // Ẩn thông báo sau 3 giây
         return;
     }
 
-    // Kiểm tra ngày bắt đầu phải trước ngày kết thúc
-    const startDate = new Date(newSemester.startDate);
-    const endDate = new Date(newSemester.endDate);
-    if (startDate >= endDate) {
-        alert("Ngày bắt đầu phải trước ngày kết thúc.");
-        return;
-    }
-
+     // Kiểm tra ngày bắt đầu phải trước ngày kết thúc
+     const startDate = new Date(newSemester.startDate);
+     const endDate = new Date(newSemester.endDate);
+     if (startDate >= endDate) {
+         setShowAlert("error");
+         setErrorMessage("Ngày bắt đầu phải trước ngày kết thúc.");
+         setTimeout(() => setShowAlert(false), 3000); // Ẩn thông báo sau 3 giây
+         return;
+     }
     // Nếu các điều kiện hợp lệ, tiến hành xử lý thêm kỳ học
     console.log("Thêm kỳ học thành công", newSemester);
-        try {
-            const response = await AddSemester(newSemester);
-            if (response.isSuccess) {
-                setShowAlert("success");
-                setSuccessMessage(response.message);
-                onSemesterAdded(response.semester);
-                setTimeout(() => setShowAlert(false), 3000);
-                setIsFormVisible(false); // Hide the form after success
-            } else {
-                setShowAlert("error");
-                setErrorMessage(response.message);
-                setTimeout(() => setShowAlert(false), 3000);
-            }
-        } catch (error) {
-            console.error("Error adding semester:", error);
+    try {
+        const response = await AddSemester(newSemester); // Gọi API thêm kỳ học
+        if (response.isSuccess) {
+            setShowAlert("success");
+            setSuccessMessage(response.message);
+            onSemesterAdded(response.semester); // Trả về dữ liệu mới nhất để cập nhật bảng
+            setTimeout(() => setShowAlert(false), 3000); // Ẩn thông báo sau 3 giây
+            setIsFormVisible(false); // Ẩn form
+        } else {
+            setShowAlert("error");
+            setErrorMessage(response.message);
+            setTimeout(() => setShowAlert(false), 3000); // Ẩn thông báo sau 3 giây
         }
+    } catch (error) {
+        setShowAlert("error");
+        setErrorMessage(response.message);
+        setTimeout(() => setShowAlert(false), 3000); // Ẩn thông báo sau 3 giây
+        console.error("Error adding semester:", error);
+    }
     };
 
     return (

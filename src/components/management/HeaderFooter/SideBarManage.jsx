@@ -52,7 +52,7 @@ function SidebarManage() {
                   }`}
               >
                 <i className="fas fa-calendar-week mr-2"></i>
-                <span>Quản lý kì học</span>
+                <span>Quản lý kỳ học</span>
               </li>
             </Link>
 
