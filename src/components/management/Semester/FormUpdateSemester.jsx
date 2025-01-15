@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { UpdateSemester } from "../../../services/semesterService";
 // import { updateSemester } from "../../../services/semesterService"; // Gọi dịch vụ liên quan đến kỳ học
 
 // eslint-disable-next-line react/prop-types
@@ -34,22 +35,44 @@ function FormUpdateSemester({ semesterToUpdate, onSemesterUpdated }) {
     // Xử lý form Update
     const handleUpdateSemester = async (e) => {
         e.preventDefault();
-        try {
-            const response = await updateSemester(semesterData); // Gọi API cập nhật kỳ học
-            if (response.isSuccess) {
-                setShowAlert("success");
-                setSuccessMessage(response.message);
-                onSemesterUpdated(response.semester); // Trả về dữ liệu mới nhất cho trang ManageSemester để cập nhật lên bảng
-                setTimeout(() => setShowAlert(false), 3000); // Ẩn bảng thông báo sau 3 giây
-                setIsFormVisible(false); // Ẩn form
-            } else {
-                setShowAlert("error");
-                setErrorMessage(response.message);
-                setTimeout(() => setShowAlert(false), 3000); // Ẩn bảng thông báo sau 3 giây
-            }
-        } catch (error) {
-            console.error("Error updating semester:", error);
+    // Kiểm tra tên kỳ có đúng định dạng Fall, Summer, Spring + 4 số hay không
+    const semesterNameRegex = /^(Fall|Summer|Spring)\d{4}$/;
+    if (!semesterNameRegex.test(semesterData.semesterName)) {
+        setShowAlert("error");
+        setErrorMessage("Tên kỳ học phải là Fall, Summer hoặc Spring + 4 chữ số (VD: Fall2023, Summer2024).");
+        setTimeout(() => setShowAlert(false), 3000); // Ẩn thông báo sau 3 giây
+        return;
+    }
+    
+        // Kiểm tra ngày bắt đầu phải trước ngày kết thúc
+    const startDate = new Date(semesterData.startDate);
+    const endDate = new Date(semesterData.endDate);
+    if (startDate >= endDate) {
+        setShowAlert("error");
+        setErrorMessage("Ngày bắt đầu phải trước ngày kết thúc.");
+        setTimeout(() => setShowAlert(false), 3000); // Ẩn thông báo sau 3 giây
+        return;
+    }
+    
+    try {
+        const response = await UpdateSemester(semesterData); // Gọi API cập nhật kỳ học
+        if (response.isSuccess) {
+            setShowAlert("success");
+            setSuccessMessage(response.message);
+            onSemesterUpdated(response.semester); // Trả về dữ liệu mới nhất cho trang ManageSemester để cập nhật lên bảng
+            setTimeout(() => setShowAlert(false), 3000); // Ẩn bảng thông báo sau 3 giây
+            setIsFormVisible(false); // Ẩn form
+        } else {
+            setShowAlert("error");
+            setErrorMessage(response.message);
+            setTimeout(() => setShowAlert(false), 3000); // Ẩn bảng thông báo sau 3 giây
         }
+    } catch (error) {
+        setShowAlert("error");
+        setErrorMessage(response.message);
+        setTimeout(() => setShowAlert(false), 3000); // Ẩn bảng thông báo sau 3 giây
+        console.error("Error updating semester:", error);
+    }
     };
 
     return (
@@ -144,24 +167,31 @@ function FormUpdateSemester({ semesterToUpdate, onSemesterUpdated }) {
                                 />
                                 <p className="text-left ml-[100px] text-xl ">Trạng thái: </p>
 
-                                <input
+
+                                <select
                                     type="text"
                                     required
                                     className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl mb-3 px-4"
-                                    value={
-                                        Number(semesterData.status) === 0
-                                            ? "Chưa bắt đầu"
-                                            : Number(semesterData.status) === 1
-                                                ? "Đang diễn ra"
-                                                : Number(semesterData.status) === 2
-                                                    ? "Đã kết thúc"
-                                                    : ""
-                                    }
-                                    
-                                    onChange={(e) =>
+                                    // value={
+                                    //     Number(semesterData.status) === 0
+                                    //         ? "Chưa bắt đầu"
+                                    //         : Number(semesterData.status) === 1
+                                    //             ? "Đang diễn ra"
+                                    //             : Number(semesterData.status) === 2
+                                    //                 ? "Đã kết thúc"
+                                    //                 : ""
+                                    // }
+                                >
+                                    <option  onChange={(e) =>
                                         setSemesterData({ ...semesterData, status: e.target.value })
-                                    }
-                                />
+                                    } value={(semesterData.status) === 2}>Đã kết thúc</option>
+                                    <option  onChange={(e) =>
+                                        setSemesterData({ ...semesterData, status: e.target.value })
+                                    } value={(semesterData.status) === 1}>Đang diễn ra</option>
+                                    <option  onChange={(e) =>
+                                        setSemesterData({ ...semesterData, status: e.target.value })
+                                    } value={(semesterData.status) === 0}>Chưa bắt đầu</option>
+                                </select>
                                 <div className="flex flex-wrap justify-center gap-4">
                                     <button
                                         type="submit"
