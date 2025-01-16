@@ -161,7 +161,7 @@ function FormAddSubject({ onSubjectAdded }) {
                                     setNewSubject({ ...newSubject, numberOfSlot: e.target.value })
                                 }
                             />
-                            <p htmlFor="term" className="text-left ml-[100px] text-xl">Kì Học:</p>
+                            <p htmlFor="term" className="text-left ml-[100px] text-xl">Kỳ Học:</p>
                             <input
                                 type="number"
                                 id="term"
