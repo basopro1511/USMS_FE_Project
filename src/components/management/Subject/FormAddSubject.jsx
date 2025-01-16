@@ -22,13 +22,15 @@ function FormAddSubject({ onSubjectAdded }) {
     };
     const [availableStatuses] = useState([
         { id: 1, label: "Đang diễn ra" },
-        { id: 2, label: "Chưa bắt đầu" },
-        { id: 0, label: "Đã kết thúc" },
+        { id: 2, label: "Đã kết thúc" },
+        { id: 0, label: "Chưa bắt đầu" },
     ]);
     const handleAddSubject = async (e) => {
         e.preventDefault();
+    
         try {
             const response = await AddSubject(newSubject);
+            console.log(newSubject);
             if (response.isSuccess) {
                 setShowAlert("success");
                 setSuccessMessage(response.message);
@@ -36,14 +38,37 @@ function FormAddSubject({ onSubjectAdded }) {
                 setTimeout(() => setShowAlert(false), 3000);
                 setIsFormVisible(false);
             } else {
-                setShowAlert("error");
-                setErrorMessage(response.message);
-                setTimeout(() => setShowAlert(false), 3000);
+                handleError(response.message);
             }
         } catch (error) {
-            console.error("Error adding subject:", error);
+            handleServerError(error);
         }
     };
+    
+    const handleError = (message) => {
+        setShowAlert("error");
+        setErrorMessage(message);
+        setTimeout(() => setShowAlert(false), 3000);
+    };
+    
+    const handleServerError = (error) => {
+        if (error.response && error.response.status === 400) {
+            const { data } = error.response;
+            const validationErrors = data.errors || {};
+            const errorMessage =
+                Object.values(validationErrors).flat()[0] || // Lấy thông báo lỗi đầu tiên
+                data.message ||
+                "Có lỗi xảy ra.";
+    
+            handleError(errorMessage);
+        } else {
+            console.error("Error adding subject:", error);
+            handleError("Có lỗi không xác định xảy ra!");
+        }
+    };
+    
+    
+
 
     return (
         <>
@@ -109,19 +134,21 @@ function FormAddSubject({ onSubjectAdded }) {
                                     setNewSubject({ ...newSubject, subjectName: e.target.value })
                                 }
                             />
-
                             <p htmlFor="majorId" className="text-left ml-[100px] text-xl">Chuyên ngành:</p>
-                            <input
+                            <select
                                 id="majorId"
                                 name="majorId"
-                                placeholder="Nhập chuyên ngành"
                                 className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl mb-3 px-4"
                                 required
                                 onChange={(e) =>
                                     setNewSubject({ ...newSubject, majorId: e.target.value })
                                 }
-                            />
-
+                            >
+                                <option value="">Chọn chuyên ngành</option>
+                                <option value="IT">Công nghệ thông tin</option>
+                                <option value="CS">Quản trị kinh doanh</option>
+                                <option value="CA">Ngôn ngữ Anh</option>
+                            </select>
                             <p htmlFor="numberOfSlot" className="text-left ml-[100px] text-xl">Số buổi học:</p>
                             <input
                                 type="number"
@@ -134,7 +161,6 @@ function FormAddSubject({ onSubjectAdded }) {
                                     setNewSubject({ ...newSubject, numberOfSlot: e.target.value })
                                 }
                             />
-
                             <p htmlFor="term" className="text-left ml-[100px] text-xl">Kì Học:</p>
                             <input
                                 type="number"
@@ -147,24 +173,6 @@ function FormAddSubject({ onSubjectAdded }) {
                                     setNewSubject({ ...newSubject, term: e.target.value })
                                 }
                             />
-
-                            <p htmlFor="status" className="text-left ml-[100px] text-xl">Trạng thái:</p>
-                            <select
-                                id="status"
-                                name="status"
-                                className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl mb-3 px-4"
-                                value={newSubject.status}
-                                onChange={(e) =>
-                                    setNewSubject({ ...newSubject, status: parseInt(e.target.value, 10) })
-                                }
-                            >
-                                {availableStatuses.map((status) => (
-                                    <option key={status.id} value={status.id}>
-                                        {status.label}
-                                    </option>
-                                ))}
-                            </select>
-
                             <p htmlFor="description" className="text-left ml-[100px] text-xl">Mô tả:</p>
                             <textarea
                                 id="description"
@@ -176,7 +184,6 @@ function FormAddSubject({ onSubjectAdded }) {
                                     setNewSubject({ ...newSubject, description: e.target.value })
                                 }
                             ></textarea>
-
                             <div className="flex flex-wrap justify-center gap-4">
                                 <button
                                     type="submit"

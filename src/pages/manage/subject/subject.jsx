@@ -8,7 +8,7 @@ function ManageSubject() {
     const [subjectData, setSemesterData] = useState([]);
     useEffect(() => {
         const fetchSubjectData = async () => {
-            const data = await getSubjects(); //Lấy ra list room trong database
+            const data = await getSubjects(); //Lấy ra list subject trong database
             setSemesterData(data.result);
         };
         fetchSubjectData();
@@ -53,13 +53,15 @@ function ManageSubject() {
     const [filter, setFilters] = useState({
         subjectId: "",
         status: "",
+        majobId: "",
+        term: "",
     });
 
     const [availableSubjects, setAvailableSubjects] = useState([]);
     const [availableStatuses] = useState([
-        { id: 0, label: "Đã kết thúc" },
+        { id: 0, label: "Chưa bắt đầu" },
         { id: 1, label: "Đang diễn ra" },
-        { id: 2, label: "Chưa bắt đầu" },
+        { id: 2, label: "Đã kết thúc" },
     ]);
 
     const [sortConfig, setSortConfig] = useState({ key: "subjectId", direction: "asc" });
@@ -73,7 +75,9 @@ function ManageSubject() {
     useEffect(() => {
         const filteredData = subjectData.filter(item =>
             (!filter.subjectId || item.subjectId === filter.subjectId) &&
-            (!filter.status || item.status === parseInt(filter.status)) // Chuyển đổi filter.status thành số
+            (!filter.status || item.status === parseInt(filter.status)) && // Chuyển đổi filter.status thành số
+            (!filter.majorId || item.majorId === filter.majorId) &&
+            (!filter.term || item.term === filter.term) 
         );
         setFilteredSubjects(filteredData);
     }, [filter, subjectData]);
@@ -119,6 +123,17 @@ function ManageSubject() {
             <div className="flex w-full h-12 flex-wrap md:flex-nowrap">
                 <div className="flex w-full md:w-auto md:mb-0">
                     <select
+                        name="majorId"
+                        value={filter.majorId}
+                        onChange={handleFilterChange}
+                        className="max-w-sm mx-auto ml-3 h-12 w-full md:w-[200px] border border-black rounded-xl"
+                    >
+                        <option value="">Chuyên ngành</option>
+                        {availableMajors.map((major, index) => (
+                            <option key={index} value={major}>{major}</option>
+                        ))}
+                    </select>
+                    <select
                         name="subjectId"
                         value={filter.subjectId}
                         onChange={handleFilterChange}
@@ -127,6 +142,17 @@ function ManageSubject() {
                         <option value="">Mã môn học</option>
                         {availableSubjects.map((subject, index) => (
                             <option key={index} value={subject}>{subject}</option>
+                        ))}
+                    </select>
+                    <select
+                        name="term"
+                        value={filter.term}
+                        onChange={handleFilterChange}
+                        className="max-w-sm mx-auto ml-3 h-12 w-full md:w-[150px] border border-black rounded-xl"
+                    >
+                        <option value="">Kì học</option>
+                        {availableTerms.map((term, index) => (
+                            <option key={index} value={term}>{term}</option>
                         ))}
                     </select>
                     <select
@@ -164,7 +190,7 @@ function ManageSubject() {
                                 { key: "subjectName", label: "Tên môn học" },
                                 { key: "majorId", label: "Chuyên ngành" },
                                 { key: "numberOfSlot", label: "Số buổi học" },
-                                { key: "term", label: "Kì học"},
+                                { key: "term", label: "Kì học" },
                                 { key: "status", label: "Trạng thái" },
                             ].map(col => (
                                 <th
@@ -206,7 +232,7 @@ function ManageSubject() {
                                 <td className="p-4 text-center">{item.numberOfSlot}</td>
                                 <td className="p-4 text-center">{item.term}</td>
                                 <td className="p-4 text-center">
-                                    {item.status === 1 ? "Đang diễn ra" : item.status === 2 ? "Chưa bắt đầu" : "Đã kết thúc"}
+                                    {item.status === 1 ? "Đang diễn ra" : item.status === 2 ? "Đã kết thúc" : "Chưa bắt đầu"}
                                 </td>
                                 <td className="p-4 text-center align-middle">
                                     {/* Edit and Detail Buttons */}

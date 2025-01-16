@@ -27,8 +27,8 @@ function FormUpdateSubject({ subjectToUpdate, onSubjectUpdated }) {
 
     const [availableStatuses] = useState([
         { id: 1, label: "Đang diễn ra" },
-        { id: 2, label: "Chưa bắt đầu" },
-        { id: 0, label: "Đã kết thúc" },
+        { id: 2, label: "Đã kết thúc" },
+        { id: 0, label: "Chưa bắt đầu" },
     ]);
 
     useEffect(() => {
@@ -125,17 +125,21 @@ function FormUpdateSubject({ subjectToUpdate, onSubjectUpdated }) {
                                         setSubjectData({ ...subjectData, subjectName: e.target.value })
                                     }
                                 />
-                                <p className="text-left ml-[100px] text-xl ">Chuyên ngành: </p>
-                                <input
-                                    type="text"
-                                    required
-                                    placeholder="Tên môn học"
+                                <p htmlFor="majorId" className="text-left ml-[100px] text-xl">Chuyên ngành:</p>
+                                <select
+                                    id="majorId"
+                                    name="majorId"
                                     className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl mb-3 px-4"
+                                    required
                                     value={subjectData.majorId}
                                     onChange={(e) =>
-                                        setSubjectData({ ...subjectData, majorId: e.target.value })
+                                        setNewSubject({ ...newSubject, majorId: e.target.value })
                                     }
-                                />
+                                >
+                                    <option value="IT">Công nghệ thông tin</option>
+                                    <option value="CS">Quản trị kinh doanh</option>
+                                    <option value="CA">Ngôn ngữ Anh</option>
+                                </select>
                                 <p className="text-left ml-[100px] text-xl ">Số buổi học: </p>
                                 <input
                                     type="number"
@@ -159,22 +163,20 @@ function FormUpdateSubject({ subjectToUpdate, onSubjectUpdated }) {
                                     }
                                 />
 
-                                <p className="text-left ml-[100px] text-xl ">Trạng thái: </p>
-                                <select
+                                {/* <p className="text-left ml-[100px] text-xl ">Trạng thái: </p> */}
+                                {/*fiend của Status*/}
+                                <input
+                                    hidden
                                     id="status"
                                     name="status"
                                     className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl mb-3 px-4"
-                                    value={subjectData.status}
+                                    value={0}
                                     onChange={(e) =>
                                         setSubjectData({ ...subjectData, status: parseInt(e.target.value, 10) })
                                     }
                                 >
-                                    {availableStatuses.map((status) => (
-                                        <option key={status.id} value={status.id}>
-                                            {status.label}
-                                        </option>
-                                    ))}
-                                </select>
+                                </input>
+
 
 
                                 <p className="text-left ml-[100px] text-xl ">Mô tả: </p>
