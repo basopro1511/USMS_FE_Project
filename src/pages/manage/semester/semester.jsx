@@ -4,6 +4,22 @@ import FormAddSemester from "../../../components/management/Semester/FormAddSeme
 import FormDetailSemester from "../../../components/management/Semester/FormDetailSemester";
 import { getSemesters } from "../../../services/semesterService";
 function ManageSemester() {
+    const [semesterData] = useState([
+        { semesterId: "FA24", semesterName: "Fall2024", startDate: "2024-01-02", endDate: "2025-04-29", status: "2" },
+        { semesterId: "SU23", semesterName: "Summer23", startDate: "2023-05-05", endDate: "2023-08-05", status: "2" },
+        { semesterId: "SU24", semesterName: "Summer24", startDate: "2024-06-05", endDate: "2024-09-05", status: "2" },
+        { semesterId: "SP24", semesterName: "Spring24", startDate: "2024-02-01", endDate: "2024-05-01", status: "2" },
+        { semesterId: "SP25", semesterName: "Spring25", startDate: "2025-04-01", endDate: "2025-07-01", status: "1" },
+        { semesterId: "SU24", semesterName: "Summer24", startDate: "2024-06-01", endDate: "2024-09-01", status: "1" },
+        { semesterId: "FA23", semesterName: "Fall23", startDate: "2023-03-01", endDate: "2023-06-01", status: "1" },
+        { semesterId: "FA21", semesterName: "Fall21", startDate: "2021-02-01", endDate: "2021-05-01", status: "1" },
+        { semesterId: "SU21", semesterName: "Summer21", startDate: "2021-06-01", endDate: "2021-09-01", status: "1" },
+        { semesterId: "SP22", semesterName: "Spring22", startDate: "2022-04-01", endDate: "2022-07-01", status: "1" },
+        { semesterId: "SU25", semesterName: "Summer25", startDate: "2025-07-01", endDate: "2025-10-01", status: "1" },
+        { semesterId: "SU2020", semesterName: "Summer2020", startDate: "2020-08-01", endDate: "2020-11-01", status: "1" }
+    ]
+    );
+
    
 // Fetch Data Semester - Start
   const [semesterData, setSemesterData] = useState([]);
@@ -43,7 +59,7 @@ function ManageSemester() {
     };
     // Show form Update semester - End
 
-    //Lấy Data gắn qua form Update
+    //Lấy Data gắn qua form Detail
     const [semesterDetail, setSemesterDetail] = useState(null);
     const handleDetailClick = (semester) => {
         setSemesterDetail(semester);
@@ -383,7 +399,6 @@ function ManageSemester() {
                     <FormUpdateSemester semesterToUpdate={semesterToUpdate} onSemesterUpdated={handleSemesterReload} />
                 </>
             )}
-
             {/* Show Form Update Semester - End */}
             {/* Show Form Detail Semester - Start */}
             {showDetailForm && (

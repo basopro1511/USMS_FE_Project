@@ -10,14 +10,7 @@ function ManageTeacher() {
         { teacherId: "MinhT", lastName: "Trần", middleName: "Minh", firstName: "Tuấn", phoneNumber: "0123123125", email: "MinhT@gmail.com", major: "Hệ thống thông tin", dateOfBirth: "1999-04-01", createdAt: "2023-01-01", updatedAt: "2023-01-01" ,personalEmail:"Ex@email.com", userAvatar:"https://i.pinimg.com/736x/c2/b1/36/c2b1367627ae11fc45f6e1d51d9efd13.jpg"},
         // Add more teachers as needed
     ]);
-
-    // Fetch Data Teacher - Start
-    const handleTeacherReload = async () => {
-        const data = await getTeachers(); // Call API to fetch teachers
-        setTeacherData(data.result); // Update teacher data
-    };
-    // Fetch Data Teacher - End
-
+    
     // Add Teacher Form visibility toggle
     const [showAddForm, setAddForm] = useState(false);
     const toggleShowForm = () => setAddForm(!showAddForm);
@@ -177,7 +170,7 @@ function ManageTeacher() {
                     <thead className="bg-gray-100">
                         <tr>
                             <th
-                                className="p-4 font-semibold cursor-pointer  transition-all hover:bg-primaryBlue text-white text-center align-middle bg-secondaryBlue "
+                                className="p-4 font-semibold cursor-pointer transition-all hover:bg-primaryBlue text-white text-center align-middle bg-secondaryBlue "
                                 onClick={() => handleSort("teacherId")}
                             >
                                 <div className="flex items-center justify-between">
@@ -203,7 +196,7 @@ function ManageTeacher() {
                             </th>
                             <th
                                 className="p-4 font-semibold cursor-pointer  transition-all hover:bg-primaryBlue text-white text-center align-middle bg-secondaryBlue "
-                                onClick={() => handleSort("teacherName")}
+                                onClick={() => handleSort("firstName")}
                             >
                                 <div className="flex items-center justify-between">
                                     <p className="m-auto transition-all hover:scale-105">
@@ -365,15 +358,15 @@ function ManageTeacher() {
             {/* Phân trang - end */}
 
             {/* Form for Add Teacher */}
-            {showAddForm && <FormAddTeacher onClose={toggleShowForm} onTeacherAdded={handleTeacherReload} />}
+            {showAddForm && <FormAddTeacher onClose={toggleShowForm}  />}
             {showUpdateForm && (
                 <>
-                    <FormUpdateTeacher teacherToUpdate={teacherToUpdate} onTeacherUpdated={handleTeacherReload}></FormUpdateTeacher>
+                    <FormUpdateTeacher teacherToUpdate={teacherToUpdate} ></FormUpdateTeacher>
                 </>
             )}
             {showDetailForm && (
                 <>
-                    <FormDetailTeacher teacherDetail={teacherDetail} onTeacherDetailUpdated={handleTeacherReload}></FormDetailTeacher>
+                    <FormDetailTeacher teacherDetail={teacherDetail} ></FormDetailTeacher>
                 </>
             )}
         </div>
