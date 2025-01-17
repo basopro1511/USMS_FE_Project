@@ -5,11 +5,11 @@ import LayoutDefault from '../layouts/LayoutDefault';
 import ManageSchedule from '../pages/manage/schedule/schedule';
 import ManageClass from '../pages/manage/class/class';
 import LayoutUser from '../layouts/LayoutUser';
-import StudentSchedule from '../pages/user/Schedule/StudentSchedule';
+import StudentSchedule from '../pages/user/Student/StudentSchedule';
 import UserHome from '../pages/user/Home/UserHome';
-import StudentDetail from '../pages/user/Schedule/StudentDetail';
+import StudentDetail from '../pages/user/Student/StudentDetail';
 import StudentInClass from '../pages/manage/class/studentInClass';
-import StudentActivityDetail from '../pages/user/Schedule/StudentActivityDetail';
+import StudentActivityDetail from '../pages/user/Student/StudentActivityDetail';
 import ManageRoom from '../pages/manage/room/room';
 import FormDetailRoom from '../components/management/Room/FormDetailRoom';
 import ForgotPassword from '../pages/Login/ForgotPassword';
@@ -19,20 +19,23 @@ import ManageSemester from '../pages/manage/semester/semester';
 import ManageTeacher from '../pages/manage/teacher/teacher';
 import ManageSubject from '../pages/manage/subject/subject';
 import ManageStudent from '../pages/manage/student/student';
-import StudentDetailClass from '../pages/user/Schedule/StudentDetailClass';
-import StudentViewExam from '../pages/user/Schedule/StudentViewExam';
+import StudentDetailClass from '../pages/user/Student/StudentDetailClass';
+import StudentViewExam from '../pages/user/Student/StudentViewExam';
 import TeacherDetailClass from '../pages/user/Teacher/TeacherDetailClass';
 import TeacherViewExam from '../pages/user/Teacher/TeacherViewExam';
+import ManageSlot from '../pages/manage/slot/slot';
+import Notification from '../pages/manage/notification/notification';
+import TeacherSendRequest from '../pages/user/Teacher/TeacherSendRequest';
 
 
 const AppRoutes = () => {
   const routes = [
     //Login Zone //
     { path: "/", component: Login, layout: LayoutDefault },
-    { path: "/Form", component: FormDetailRoom, layout: LayoutDefault },
-    { path: "/ForgotPassword", component: ForgotPassword, layout: LayoutDefault },
-    { path: "/SentOTP", component: SentOTP, layout: LayoutDefault },
-    { path: "/ResetPassword", component: ResetPassword, layout: LayoutDefault },
+    { path: "/form", component: FormDetailRoom, layout: LayoutDefault },
+    { path: "/forgotPassword", component: ForgotPassword, layout: LayoutDefault },
+    { path: "/sentOTP", component: SentOTP, layout: LayoutDefault },
+    { path: "/resetPassword", component: ResetPassword, layout: LayoutDefault },
 
     //User Zone (Teacher, Student )
     { path: "/home", component: UserHome, layout: LayoutUser },
@@ -43,6 +46,8 @@ const AppRoutes = () => {
     { path: "/studentViewExam", component: StudentViewExam, layout: LayoutUser},
     { path: "/teacherDetailClass", component: TeacherDetailClass, layout: LayoutUser},
     { path: "/teacherViewExam", component: TeacherViewExam, layout: LayoutUser},
+    { path: "/teacherSendRequest", component: TeacherSendRequest, layout: LayoutUser},
+
     //Manange Zone //
     { path: "/manageClass", component: ManageClass, layout: ManageLayout },
     { path: "/studentInClass", component: StudentInClass, layout: ManageLayout },
@@ -52,6 +57,8 @@ const AppRoutes = () => {
     { path: "/manageTeacher", component: ManageTeacher, layout: ManageLayout },
     { path: "/manageSubject", component: ManageSubject, layout: ManageLayout },
     { path: "/manageStudent", component: ManageStudent, layout: ManageLayout },
+    { path: "/manageSlot", component: ManageSlot, layout: ManageLayout },
+    { path: "/manageNotification", component: Notification, layout: ManageLayout},
 
 ];
   return (

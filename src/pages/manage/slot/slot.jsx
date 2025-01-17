@@ -1,23 +1,25 @@
 import { useEffect, useState } from "react";
-import FormAddSubject from "../../../components/management/Subject/FormAddSubject";
-import FormUpdateSubject from "../../../components/management/Subject/FormUpdateSubject";
-import FormDetailSubject from "../../../components/management/Subject/FormDetailSubject";
-import { getSubjects } from "../../../services/subjectService";
+import FormAddSlot from "../../../components/management/Slot/FormAddSlot";
+import FormUpdateSlot from "../../../components/management/Slot/FormUpdateSlot";
+import FormDetailSlot from "../../../components/management/Slot/FormDetailSlot";
+import { getSlots } from "../../../services/slotService";
 
-function ManageSubject() {
-    const [subjectData, setSemesterData] = useState([]);
-    useEffect(() => {
-        const fetchSubjectData = async () => {
-            const data = await getSubjects(); //Lấy ra list room trong database
-            setSemesterData(data.result);
+function ManageSlot() {
+    // Fetch Data Slot - Start
+      const [slotData, setSlotData] = useState([]);
+      useEffect(() => {
+        const fetchRoomData = async () => {
+          const data = await getSlots(); //Lấy ra list room rtong database
+          setSlotData(data.result);
         };
-        fetchSubjectData();
-    }, []);
-
-    // Update bảng mà không cần reload
-    const handleSubjectReload = async () => {
-        const data = await getSubjects(); // Gọi API để lấy lại tất cả các môn học
-        setSemesterData(data.result); // Cập nhật lại dữ liệu môn học
+        fetchRoomData();
+      }, []);
+    //Fetch Data Room - End
+    
+    //Update bảng mà không cần reload
+    const handleSlotReload = async () => {
+        const data = await getSlots(); // Gọi API để lấy lại tất cả các slot dạy
+        setSlotData(data.result); // Cập nhật lại dữ liệu slot dạy
     };
 
     // Show form Add New semester - Start
@@ -27,7 +29,9 @@ function ManageSubject() {
     };
 
     // Quản lý trạng thái form Edit
-    const [subjectToUpdate, setSubjectToUpdate] = useState(null);
+    const [slotToUpdate, setSubjectToUpdate] = useState(null);
+
+    // Hàm xử lý khi bấm nút sửa
     const handleUpdateClick = (subject) => {
         setSubjectToUpdate(subject);
         toggleShowUpdateForm();
@@ -36,47 +40,47 @@ function ManageSubject() {
     const toggleShowUpdateForm = () => {
         setUpdateForm(!showUpdateForm);
     };
+    // Hàm xử lí nút edit 
 
-    // Hàm xử lý khi nhấn vào nút detail
-    const [subjectDetail, setSubjectDetail] = useState(null);
-    const handleDetailClick = (subject) => {
-        setSubjectDetail(subject);
-        toggleShowDetailForm();
-    };
+    // Dưới đây là hàm xử lí khi nhấn vào nút detail
+    const [slotDetail, setSlotDetail] = useState(null);
+    //Hàm này xử lí khi người dùng ấn vào nút detail
     const [showDetailForm, setDetailForm] = useState(false);
     const toggleShowDetailForm = () => {
         setDetailForm(!showDetailForm);
     };
 
-    // Hàm xử lý filter
-    const [filteredSubjects, setFilteredSubjects] = useState(subjectData);
+    const handleDetailClick = (slot) => {
+        setSlotDetail(slot);
+        toggleShowDetailForm();
+    };
+    // Hết hàm xử lí khi nhắn nút detail 
+
+    //Hàm xử lí filter
+    const [filteredSlot, setFilteredSlot] = useState(slotData);
     const [filter, setFilters] = useState({
         subjectId: "",
         status: "",
     });
 
-    const [availableSubjects, setAvailableSubjects] = useState([]);
+
     const [availableStatuses] = useState([
-        { id: 0, label: "Chưa bắt đầu" },
-        { id: 1, label: "Đang diễn ra" },
-        { id: 2, label: "Đã kết thúc" },
+        { id: 1, label: "Đang khả dụng" },
+        { id: 0, label: "Vô hiệu hóa" }
     ]);
 
-    const [sortConfig, setSortConfig] = useState({ key: "subjectId", direction: "asc" });
+    const [sortConfig, setSortConfig] = useState({ key: "slotId", direction: "asc" });
     const [currentPage, setCurrentPage] = useState(1);
     const pageSize = 9;
 
-    useEffect(() => {
-        setAvailableSubjects(Array.from(new Set(subjectData.map(item => item.subjectId))));
-    }, [subjectData]);
 
     useEffect(() => {
-        const filteredData = subjectData.filter(item =>
+        const filteredData = slotData.filter(item =>
             (!filter.subjectId || item.subjectId === filter.subjectId) &&
-            (!filter.status || item.status === parseInt(filter.status)) // Chuyển đổi filter.status thành số
+            (!filter.status || item.status === parseInt(filter.status))
         );
-        setFilteredSubjects(filteredData);
-    }, [filter, subjectData]);
+        setFilteredSlot(filteredData);
+    }, [filter, slotData]);
 
     const handleFilterChange = (e) => {
         const { name, value } = e.target;
@@ -88,7 +92,7 @@ function ManageSubject() {
         setSortConfig({ key, direction });
     };
 
-    const sortedData = [...filteredSubjects].sort((a, b) => {
+    const sortedData = [...filteredSlot].sort((a, b) => {
         if (a[sortConfig.key] < b[sortConfig.key]) {
             return sortConfig.direction === "asc" ? -1 : 1;
         }
@@ -111,29 +115,19 @@ function ManageSubject() {
     return (
         <div className="border mt-4 h-auto pb-7 w-[1600px] bg-white rounded-2xl">
             <div className="flex justify-center">
-                <p className="mt-8 text-3xl font-bold">Quản lý môn học</p>
+                <p className="mt-8 text-3xl font-bold">Quản lý buổi học</p>
             </div>
             <p className="ml-4 mt-5">Tìm kiếm</p>
 
             {/* Filter Section */}
             <div className="flex w-full h-12 flex-wrap md:flex-nowrap">
                 <div className="flex w-full md:w-auto md:mb-0">
-                    <select
-                        name="subjectId"
-                        value={filter.subjectId}
-                        onChange={handleFilterChange}
-                        className="max-w-sm mx-auto ml-3 h-12 w-full md:w-[230px] border border-black rounded-xl"
-                    >
-                        <option value="">Mã môn học</option>
-                        {availableSubjects.map((subject, index) => (
-                            <option key={index} value={subject}>{subject}</option>
-                        ))}
-                    </select>
+               
                     <select
                         name="status"
                         value={filter.status}
                         onChange={handleFilterChange}
-                        className="max-w-sm mx-auto ml-3 h-12 w-full md:w-[168px] border border-black rounded-xl"
+                        className="max-w-sm mx-auto ml-3 h-12 w-full md:w-[200px] border border-black rounded-xl"
                     >
                         <option value="">Trạng thái</option>
                         {availableStatuses.map((status) => (
@@ -149,23 +143,20 @@ function ManageSubject() {
                         onClick={toggleShowForm}
                     >
                         <i className="fa fa-plus mr-2" aria-hidden="true"></i>
-                        Thêm môn học
+                        Thêm buổi học
                     </button>
                 </div>
             </div>
-
             {/* Table Section */}
             <div className="w-[1570px] overflow-x-auto ml-3 relative flex flex-col mt-4 bg-white shadow-md rounded-2xl border border-gray overflow-hidden">
                 <table className="min-w-full text-left table-auto bg-white">
                     <thead className="bg-gray-100">
                         <tr>
                             {[
-                                { key: "subjectId", label: "Mã môn học" },
-                                { key: "subjectName", label: "Tên môn học" },
-                                { key: "majorId", label: "Chuyên ngành" },
-                                { key: "numberOfSlot", label: "Số buổi học" },
-                                { key: "term", label: "Kì học"},
-                                { key: "status", label: "Trạng thái" },
+                                { key: "slotId", label: "Mã buổi học" },
+                                { key: "startTime", label: "Thời gian bắt đầu" },
+                                { key: "endTime", label: "Thời gian kết thúc" },
+                                { key: "status", label: "Trạng thái" }
                             ].map(col => (
                                 <th
                                     key={col.key}
@@ -200,13 +191,11 @@ function ManageSubject() {
                     <tbody>
                         {currentData.map((item, index) => (
                             <tr key={index} className="hover:bg-gray-50 even:bg-gray-50">
-                                <td className="p-4 text-center">{item.subjectId}</td>
-                                <td className="p-4 text-center">{item.subjectName}</td>
-                                <td className="p-4 text-center">{item.majorId}</td>
-                                <td className="p-4 text-center">{item.numberOfSlot}</td>
-                                <td className="p-4 text-center">{item.term}</td>
+                                <td className="p-4 text-center">{item.slotId}</td>
+                                <td className="p-4 text-center">{item.startTime}</td>
+                                <td className="p-4 text-center">{item.endTime}</td>
                                 <td className="p-4 text-center">
-                                    {item.status === 1 ? "Đang diễn ra" : item.status === 2 ? "Đã kết thúc" : "Chưa bắt đầu"}
+                                    {item.status === 0 ? "Vô hiệu hóa" : item.status === 1 ?  "Đang khả dụng" : "Chưa bắt đầu" }
                                 </td>
                                 <td className="p-4 text-center align-middle">
                                     {/* Edit and Detail Buttons */}
@@ -216,6 +205,7 @@ function ManageSubject() {
                                             onClick={() => handleUpdateClick(item)}
                                         >
                                             <i className="fa-solid fa-pen-fancy"></i>
+
                                         </button>
                                         <button
                                             className="w-8 h-8 bg-green-600 text-white rounded-xl shadow-md hover:bg-green-700 transition-all hover:scale-125"
@@ -228,11 +218,13 @@ function ManageSubject() {
                             </tr>
                         ))}
                     </tbody>
+
                 </table>
             </div>
 
-            {/* Pagination Section */}
+            {/* Phân trang - start */}
             <div className="flex mt-5">
+                {/* Button: Previous */}
                 <button
                     type="button"
                     className="rounded-2xl transition-all duration-300 hover:bg-quaternarty hover:scale-95 border border-white w-[130px] h-[40px] bg-[#3c6470] text-white font-semibold ml-auto mr-4 flex items-center justify-center"
@@ -255,19 +247,24 @@ function ManageSubject() {
                     Trang Sau <span className="font-bold text-xl">&gt;</span>
                 </button>
             </div>
-
-            {/* Form Add Subject */}
-            {showAddForm && <FormAddSubject onSubjectAdded={handleSubjectReload} />}
-            {/* Form Update Subject */}
+            {/* Phân trang - end */}    
+            {/* Đường dẫn tới formAddSubject - Start */}
+            {showAddForm && <FormAddSlot onSlotAdded={handleSlotReload} />}
+            {/* Đường dẫn tới formAddSubject - End */}
+            {/* Đường dẫn tới form edit - Start */}
             {showUpdateForm && (
-                <FormUpdateSubject subjectToUpdate={subjectToUpdate} onSubjectUpdated={handleSubjectReload} />
+                <FormUpdateSlot dataToUpdate={slotToUpdate} onUpdated={handleSlotReload} />
             )}
-            {/* Form Detail Subject */}
+            {/* Đường dẫn tới form edit - End */}
+            {/*Đường dẫn tới trang form detail - Star */}
             {showDetailForm && (
-                <FormDetailSubject subjectDetail={subjectDetail} onSubjectDetailUpdated={handleSubjectReload} />
+                <>
+                <FormDetailSlot detail={slotDetail} onDetailUpdated={handleSlotReload}/>
+                </>
             )}
+            {/*Đường dẫn tới trang form detail - End*/}
         </div>
     );
 }
 
-export default ManageSubject;
+export default ManageSlot;

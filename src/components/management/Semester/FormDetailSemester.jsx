@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { changeSemesterStatus } from "../../../services/semesterService";
 // import { updateSemesterStatus } from "../../../services/semesterService"; // API service cho việc thay đổi trạng thái kỳ học
 
 // eslint-disable-next-line react/prop-types
@@ -34,7 +35,7 @@ function FormDetailSemester({ semesterDetail, onSemesterDetailUpdated }) {
     // Xử lý thay đổi trạng thái kỳ học
     const handleChangeSemesterStatus = async (semesterId, status) => {
         try {
-            const response = await updateSemesterStatus(semesterId, status); // Gọi API Update kỳ học
+            const response = await changeSemesterStatus(semesterId, status); // Gọi API Update kỳ học
             if (response.isSuccess) {
                 setShowAlert("success");
                 setSuccessMessage(response.message);
@@ -166,21 +167,21 @@ function FormDetailSemester({ semesterDetail, onSemesterDetailUpdated }) {
                 <button
                   type="button"
                   className=" w-full max-w-[150px] h-[50px] sm:h-[45px] border rounded-2xl bg-gray-500 text-white font-bold text-lg sm:text-xl transition-all hover:scale-105 hover:bg-primaryBlue mt-auto mb-auto"
-                  onClick={() => handleChangeRoomStatus(roomData.roomId, 0)}
+                  onClick={() => handleChangeSemesterStatus(semesterData.semesterId, 2)}
                 >
                   Chưa bắt đầu
                 </button>
                 <button
                   type="button"
                   className=" w-full max-w-[150px] h-[50px] sm:h-[45px] border rounded-2xl bg-yellow-500 text-white font-bold text-lg sm:text-xl transition-all hover:scale-105 hover:bg-yellow-600 mt-auto mb-auto"
-                  onClick={() => handleChangeRoomStatus(roomData.roomId, 1)}
+                  onClick={() => handleChangeSemesterStatus(semesterData.semesterId, 1)}
                 >
                   Đang diễn ra
                 </button>
                 <button
                   type="button"
                   className=" w-full max-w-[150px] h-[50px] sm:h-[45px] border rounded-2xl bg-red-500 text-white font-bold text-lg sm:text-xl transition-all hover:scale-105 hover:bg-red-600 mt-auto mb-auto"
-                  onClick={() => handleChangeRoomStatus(roomData.roomId, 2)}
+                  onClick={() => handleChangeSemesterStatus(semesterData.semesterId, 0)}
                 >
                   Đã kết thúc
                 </button>

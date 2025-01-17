@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { AddSemester } from "../../../services/semesterService";
 // import { AddSemester } from "../../../services/semesterService"; // Update to match your service
 
 // eslint-disable-next-line react/prop-types
@@ -23,22 +24,54 @@ function FormAddSemester({ onSemesterAdded }) {
     // Handle form AddSemester
     const handleAddSemester = async (e) => {
         e.preventDefault();
-        try {
-            const response = await AddSemester(newSemester);
-            if (response.isSuccess) {
-                setShowAlert("success");
-                setSuccessMessage(response.message);
-                onSemesterAdded(response.semester);
-                setTimeout(() => setShowAlert(false), 3000);
-                setIsFormVisible(false); // Hide the form after success
-            } else {
-                setShowAlert("error");
-                setErrorMessage(response.message);
-                setTimeout(() => setShowAlert(false), 3000);
-            }
-        } catch (error) {
-            console.error("Error adding semester:", error);
+       // Kiểm tra mã kỳ có đúng định dạng 2 chữ cái (FA, SU, SP) + 2 số hay không
+    const semesterIdRegex = /^(FA|SU|SP)\d{2}$/;
+    if (!semesterIdRegex.test(newSemester.semesterId)) {
+        setShowAlert("error");
+        setErrorMessage("Mã kỳ học phải là FA, SU hoặc SP + 2 chữ số (VD: FA23, SU24).");
+        setTimeout(() => setShowAlert(false), 3000); // Ẩn thông báo sau 3 giây
+        return;
+    }
+
+    // Kiểm tra tên kỳ có đúng định dạng Fall, Summer, Spring + 4 số hay không
+    const semesterNameRegex = /^(Fall|Summer|Spring)\d{4}$/;
+    if (!semesterNameRegex.test(newSemester.semesterName)) {
+        setShowAlert("error");
+        setErrorMessage("Tên kỳ học phải là Fall, Summer hoặc Spring + 4 chữ số (VD: Fall2023, Summer2024).");
+        setTimeout(() => setShowAlert(false), 3000); // Ẩn thông báo sau 3 giây
+        return;
+    }
+
+     // Kiểm tra ngày bắt đầu phải trước ngày kết thúc
+     const startDate = new Date(newSemester.startDate);
+     const endDate = new Date(newSemester.endDate);
+     if (startDate >= endDate) {
+         setShowAlert("error");
+         setErrorMessage("Ngày bắt đầu phải trước ngày kết thúc.");
+         setTimeout(() => setShowAlert(false), 3000); // Ẩn thông báo sau 3 giây
+         return;
+     }
+    // Nếu các điều kiện hợp lệ, tiến hành xử lý thêm kỳ học
+    console.log("Thêm kỳ học thành công", newSemester);
+    try {
+        const response = await AddSemester(newSemester); // Gọi API thêm kỳ học
+        if (response.isSuccess) {
+            setShowAlert("success");
+            setSuccessMessage(response.message);
+            onSemesterAdded(response.semester); // Trả về dữ liệu mới nhất để cập nhật bảng
+            setTimeout(() => setShowAlert(false), 3000); // Ẩn thông báo sau 3 giây
+            setIsFormVisible(false); // Ẩn form
+        } else {
+            setShowAlert("error");
+            setErrorMessage(response.message);
+            setTimeout(() => setShowAlert(false), 3000); // Ẩn thông báo sau 3 giây
         }
+    } catch (error) {
+        setShowAlert("error");
+        setErrorMessage(response.message);
+        setTimeout(() => setShowAlert(false), 3000); // Ẩn thông báo sau 3 giây
+        console.error("Error adding semester:", error);
+    }
     };
 
     return (
@@ -86,21 +119,21 @@ function FormAddSemester({ onSemesterAdded }) {
                                 Thêm kỳ học
                             </p>
                             <form onSubmit={handleAddSemester}>
-                                <p className="text-left ml-[100px] text-xl mt-5">Mã kì học:</p>
+                                <p className="text-left ml-[100px] text-xl mt-5">Mã kỳ học:</p>
                                 <input
                                     type="text"
                                     required
-                                    placeholder="Mã kì học"
+                                    placeholder="Mã kỳ học"
                                     className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl mb-3 px-4"
                                     onChange={(e) =>
                                         setNewSemester({ ...newSemester, semesterId: e.target.value })
                                     }
                                 />
-                                <p className="text-left ml-[100px] text-xl ">Tên kì học:</p>
+                                <p className="text-left ml-[100px] text-xl ">Tên kỳ học:</p>
                                 <input
                                     type="text"
                                     required
-                                    placeholder="Tên kì học"
+                                    placeholder="Tên kỳ học"
                                     className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl mb-3 px-4"
                                     onChange={(e) =>
                                         setNewSemester({ ...newSemester, semesterName: e.target.value })

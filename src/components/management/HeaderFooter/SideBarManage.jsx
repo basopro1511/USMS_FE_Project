@@ -52,7 +52,7 @@ function SidebarManage() {
                   }`}
               >
                 <i className="fas fa-calendar-week mr-2"></i>
-                <span>Quản lý kì học</span>
+                <span>Quản lý kỳ học</span>
               </li>
             </Link>
 
@@ -104,9 +104,26 @@ function SidebarManage() {
                 <span>Quản lý giáo viên</span>
               </li>
             </Link>
+            
+            <Link to="/manageSlot">
+              <li
+                className={`flex items-center cursor-pointer w-56 mb-2 ml-2 rounded-lg p-2 transition-all duration-300 ${isActive("/manageSlot")
+                    ? "bg-quaternartyBlue pl-6"
+                    : "hover:bg-quaternartyBlue hover:pl-6"
+                  }`}
+              >         
+                <i className="fa-regular fa-clock mr-2"></i>
+                <span>Quản lý buổi học </span>
+              </li>
+            </Link>
 
-            <Link to="/">
-              <li className="flex items-center cursor-pointer w-56 mb-2 ml-2 rounded-lg p-2 hover:bg-quaternartyBlue hover:pl-6 transition-all duration-300">
+            <Link to="/manageNotification">
+            <li
+                className={`flex items-center cursor-pointer w-56 mb-2 ml-2 rounded-lg p-2 transition-all duration-300 ${isActive("/manageNotification")
+                    ? "bg-quaternartyBlue pl-6"
+                    : "hover:bg-quaternartyBlue hover:pl-6"
+                }`}
+              >
                 <i className="fas fa-bell mr-2"></i>
                 <span>Quản lý thông báo</span>
               </li>
