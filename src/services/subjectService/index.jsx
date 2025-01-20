@@ -45,3 +45,15 @@ export const changeSubjectStatus = async (id, status) => {
     }
 }
 
+//Get Subjects By Major Id và Term
+export const getSubjectsByMajorAndTerm = async (id, term) => {
+    try {
+        // Construct the URL with id and status
+        const response = await request.get(`/Subjects/GetSubjectByMajorAndTerm/${id}/${term}`);
+        console.log(response.data);
+        return response.data;
+    } catch (error) {
+        console.log(error);
+    }
+}
+

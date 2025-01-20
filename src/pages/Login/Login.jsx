@@ -1,6 +1,5 @@
 import  { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { doRequest } from "../../utils/Common";
 
 function Login() {
   const [values, setValues] = useState({
@@ -16,31 +15,31 @@ function Login() {
   const [showAlert, setShowAlert] = useState(false); // Cho alert chung
   const navigate = useNavigate();
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
+  // const handleSubmit = async (event) => {
+  //   event.preventDefault();
 
-    const res = await doRequest("post", "/login", { data: values });
+  //   const res = await doRequest("post", "/login", { data: values });
 
-    if (res.isError) {
-      if (res.error.response?.status === 400) {
-        setErrorMessage("Invalid email or password.");
-      } else {
-        setErrorMessage("Something went wrong. Please try again later.");
-      }
-      setShowAlert("error");
-      setTimeout(() => setShowAlert(false), 3000); // Ẩn sau 3 giây
-    } else {
-      setSuccessMessage("Login successful!");
-      setShowAlert("success");
-      localStorage.setItem("access_token", res.data.token);
+  //   if (res.isError) {
+  //     if (res.error.response?.status === 400) {
+  //       setErrorMessage("Invalid email or password.");
+  //     } else {
+  //       setErrorMessage("Something went wrong. Please try again later.");
+  //     }
+  //     setShowAlert("error");
+  //     setTimeout(() => setShowAlert(false), 3000); // Ẩn sau 3 giây
+  //   } else {
+  //     setSuccessMessage("Login successful!");
+  //     setShowAlert("success");
+  //     localStorage.setItem("access_token", res.data.token);
 
-      // Chờ 2 giây trước khi chuyển trang
-      setTimeout(() => {
-        setShowAlert(false);
-        navigate("/Home");
-      }, 2000);
-    }
-  };
+  //     // Chờ 2 giây trước khi chuyển trang
+  //     setTimeout(() => {
+  //       setShowAlert(false);
+  //       navigate("/Home");
+  //     }, 2000);
+  //   }
+  // };
 
   return (
     <>
@@ -100,7 +99,7 @@ function Login() {
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="mt-6 text-center">
+          <form  className="mt-6 text-center">
             {/* Email Input */}
             <div className="w-full max-w-[450px] mx-auto mb-4 text-left">
               <label className="text-gray-500 text-sm font-medium">Email</label>
