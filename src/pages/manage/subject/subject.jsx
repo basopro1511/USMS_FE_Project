@@ -43,6 +43,7 @@ function ManageSubject() {
         setSubjectDetail(subject);
         toggleShowDetailForm();
     };
+    
     const [showDetailForm, setDetailForm] = useState(false);
     const toggleShowDetailForm = () => {
         setDetailForm(!showDetailForm);

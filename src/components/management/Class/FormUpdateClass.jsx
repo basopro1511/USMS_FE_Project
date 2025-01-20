@@ -1,5 +1,10 @@
 import { useEffect, useState } from "react";
+import { UpdateClass } from "../../../services/classService";
+import { getSemesters } from "../../../services/semesterService";
+import { getMajors } from "../../../services/majorService";
+import { getSubjectsByMajorAndTerm } from "../../../services/subjectService";
 
+// eslint-disable-next-line react/prop-types
 function FormUpdateClass({ classToUpdate, onClassUpdated }) {
     const [errorMessage, setErrorMessage] = useState("");
     const [successMessage, setSuccessMessage] = useState("");
@@ -13,15 +18,65 @@ function FormUpdateClass({ classToUpdate, onClassUpdated }) {
     // Dữ liệu lớp học
     const [classData, setClassData] = useState(
         classToUpdate || {
-            id: "",
+            classSubjectId: 0,
             classId: "",
             subjectId: "",
             semesterId: "",
+            majorId: "",
+            term: "",
+            createAt: "",
             status: 0,
-            startDate: "",
-            endDate: "",
         }
     );
+  // Fetch Data Major - Start
+  const [majorData, setMajorData] = useState([]);
+  useEffect(() => {
+    const fetchMajorData = async () => {
+      const majorData = await getMajors(); //Lấy ra list room rtong database
+      setMajorData(majorData.result);
+    };
+    fetchMajorData();
+  }, []);
+  //Fetch Data Major - End
+
+  // Fetch Data Semester - Start
+  const [semesterData, setSemesterData] = useState([]);
+  useEffect(() => {
+    const fetchSemesterData = async () => {
+      const semesterData = await getSemesters(); //Lấy ra list room rtong database
+      setSemesterData(semesterData.result);
+    };
+    fetchSemesterData();
+  }, []);
+  //Fetch Data Major - End
+
+  // Fetch Data Subjcet - Start
+  const [subjectData, setSubjectData] = useState([]);
+  useEffect(() => {
+    if (classData.majorId && classData.term) {
+      const fetchSubjectData = async () => {
+        try {
+          const subjectResponse = await getSubjectsByMajorAndTerm(
+            classData.majorId,
+            classData.term
+          );
+          setSubjectData(subjectResponse.result);
+        } catch (error) {
+          console.error("Error fetching subjects:", error);
+        }
+      };
+      fetchSubjectData();
+    }
+  }, [classData.majorId, classData.term]);
+  //Fetch Data Major - End
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setClassData({
+      ...classData,
+      [name]: value,
+    });
+  };
 
     useEffect(() => {
         if (classToUpdate) {
@@ -30,15 +85,15 @@ function FormUpdateClass({ classToUpdate, onClassUpdated }) {
     }, [classToUpdate]);
 
     // Xử lý form Update
-    const handleUpdateClass = async (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         try {
             // API cập nhật lớp học
-            const response = await updateClass(classData);
+            const response = await UpdateClass(classData);
             if (response.isSuccess) {
                 setShowAlert("success");
                 setSuccessMessage(response.message);
-                onClassUpdated(response.classData); // Trả về dữ liệu mới nhất
+                onClassUpdated(response.data); // Trả về dữ liệu mới nhất
                 setTimeout(() => setShowAlert(false), 3000); // Ẩn bảng thông báo sau 3 giây
                 setIsFormVisible(false); // Ẩn form
             } else {
@@ -81,107 +136,130 @@ function FormUpdateClass({ classToUpdate, onClassUpdated }) {
                         <p className="font-bold text-3xl sm:text-4xl md:text-5xl mt-8 text-secondaryBlue">
                             Cập nhật lớp học
                         </p>
-                        <form onSubmit={handleUpdateClass}>
-                            {/* Mã số lớp học */}
-                            <p className="text-left ml-[100px] text-xl mt-5">Mã số lớp học:</p>
-                            <input
-                                readOnly
-                                type="text"
-                                required
-                                className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl px-4"
-                                value={classData.id}
-                            />
+                        <form onSubmit={handleSubmit}>
+              <p className="text-left ml-[100px] text-xl mt-5">
+                Chọn chuyên ngành:
+              </p>
+              <select
+                name="majorId"
+                value={classData.majorId}
+                onChange={handleInputChange}
+                required
+                className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl px-4"
+              >
+                <option value="" disabled selected>
+                  Chọn chuyên ngành
+                </option>
+                {majorData.map((major) => (
+                  <option key={major.majorId} value={major.majorId}>
+                    {major.majorName}
+                  </option>
+                ))}
+              </select>
 
-                            {/* Tên lớp học */}
-                            <p className="text-left ml-[100px] text-xl">Tên lớp học:</p>
-                            <input
-                                type="text"
-                                required
-                                className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl px-4"
-                                value={classData.classId}
-                                onChange={(e) =>
-                                    setClassData({ ...classData, classId: e.target.value })
-                                }
-                            />
+              <p className="text-left ml-[100px] text-xl">Mã số kỳ học:</p>
+              <select
+                type="number"
+                name="term"
+                value={classData.term}
+                onChange={handleInputChange}
+                placeholder="Nhập kì học"
+                className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl px-4"
+                required
+              >
+                <option value="" disabled>
+                  Nhập kỳ học
+                </option>
+                {Array.from({ length: 9 }, (_, index) => index + 1).map(
+                  (term) => (
+                    <option key={term} value={term}>
+                      {term}
+                    </option>
+                  )
+                )}
+              </select>
+              <p className="text-left ml-[100px] text-xl ">Chọn môn học :</p>
+              <select
+                name="subjectId"
+                value={classData.subjectId}
+                onChange={handleInputChange}
+                required
+                className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl px-4"
+              >
+                <option value="" disabled selected>
+                  Chọn môn học
+                </option>
+                {subjectData.map((subject) => (
+                  <option key={subject.subjectId} value={subject.subjectId}>
+                    {subject.subjectName}
+                  </option>
+                ))}
+              </select>
 
-                            {/* Mã môn */}
-                            <p className="text-left ml-[100px] text-xl">Mã môn:</p>
-                            <input
-                                type="text"
-                                required
-                                className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl px-4"
-                                value={classData.subjectId}
-                                onChange={(e) =>
-                                    setClassData({ ...classData, subjectId: e.target.value })
-                                }
-                            />
+              {/* Mã số lớp học */}
+              <p className="text-left ml-[100px] text-xl ">Mã lớp học:</p>
+              <input
+                name="classId"
+                type="text"
+                value={classData.classId}
+                onChange={handleInputChange}
+                required
+                className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl px-4"
+              />
 
-                            {/* Mã kỳ học */}
-                            <p className="text-left ml-[100px] text-xl">Mã kỳ học:</p>
-                            <input
-                                type="text"
-                                required
-                                className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl px-4"
-                                value={classData.semesterId}
-                                onChange={(e) =>
-                                    setClassData({ ...classData, semesterId: e.target.value })
-                                }
-                            />
+              {/* Mã kỳ học */}
+              <p className="text-left ml-[100px] text-xl">Kỳ học:</p>
+              <select
+                name="semesterId"
+                value={classData.semesterId}
+                onChange={handleInputChange}
+                required
+                className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl px-4"
+              >
+                <option value="" disabled selected>
+                  Chọn kỳ học:
+                </option>
+                {semesterData.map((semester) => (
+                  <option key={semester.semesterId} value={semester.semesterId}>
+                    {semester.semesterName}
+                  </option>
+                ))}
+              </select>
 
-                            {/* Trạng thái */}
-                            <p className="text-left ml-[100px] text-xl">Trạng thái: </p>
-                            <select
-                                className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl px-4"
-                                value={classData.status}
-                                onChange={(e) =>
-                                    setClassData({ ...classData, status: Number(e.target.value) })
-                                }
-                            >
-                                <option value={0}>Chưa bắt đầu</option>
-                                <option value={1}>Đang diễn ra</option>
-                                <option value={2}>Đã kết thúc</option>
-                            </select>
+              {/* Trạng thái */}
+              <p className="text-left ml-[100px] text-xl">Trạng thái</p>
+<select
+  name="status"
+  value={classData.status}
+  onChange={handleInputChange}
+  required
+  className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl px-4"
+>
+  <option value="" disabled selected>
+    Chọn trạng thái:
+  </option>
+  <option value="0">Chưa bắt đầu</option>
+  <option value="1">Đang diễn ra</option>
+  <option value="2">Đã kết thúc</option>
+</select>
 
-                            {/* Ngày bắt đầu */}
-                            <p className="text-left ml-[100px] text-xl">Ngày bắt đầu:</p>
-                            <input
-                                type="date"
-                                required
-                                className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl px-4"
-                                value={classData.startDate}
-                                onChange={(e) =>
-                                    setClassData({ ...classData, startDate: e.target.value })
-                                }
-                            />
 
-                            {/* Ngày kết thúc */}
-                            <p className="text-left ml-[100px] text-xl">Ngày kết thúc:</p>
-                            <input
-                                type="date"
-                                required
-                                className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl px-4"
-                                value={classData.endDate}
-                                onChange={(e) =>
-                                    setClassData({ ...classData, endDate: e.target.value })
-                                }
-                            />
-
-                            <div className="flex flex-wrap justify-center gap-4 mt-4 mb-4">
-                                <button
-                                    type="submit"
-                                    className="w-full max-w-[200px] h-[50px] border rounded-3xl bg-secondaryBlue text-white font-bold text-lg transition-all hover:scale-105 hover:bg-primaryBlue"
-                                >
-                                    Cập nhật
-                                </button>
-                                <button
-                                    type="button"
-                                    className="w-full max-w-[200px] h-[50px] border rounded-3xl bg-red-500 text-white font-bold text-lg transition-all hover:scale-105 hover:bg-red-700"
-                                    onClick={handleCancel}
-                                >
-                                    Hủy
-                                </button>
-                            </div>
-                        </form>
+              <div className="flex flex-wrap justify-center gap-4 mt-4 mb-4">
+                <button
+                  type="submit"
+                  className="w-full max-w-[200px] h-[50px] border rounded-3xl bg-secondaryBlue text-white font-bold text-lg transition-all hover:scale-105 hover:bg-primaryBlue"
+                >
+                  Thêm
+                </button>
+                <button
+                  type="button"
+                  className="w-full max-w-[200px] h-[50px] border rounded-3xl bg-red-500 text-white font-bold text-lg transition-all hover:scale-105 hover:bg-red-700"
+                  onClick={handleCancel}
+                >
+                  Hủy
+                </button>
+              </div>
+            </form>
                     </div>
                 </div>
             )}

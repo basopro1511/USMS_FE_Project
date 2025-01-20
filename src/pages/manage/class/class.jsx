@@ -2,42 +2,25 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import FormAddClass from "../../../components/management/Class/FormAddClass";
 import FormUpdateClass from "../../../components/management/Class/FormUpdateClass";
+import { getClasses } from "../../../services/classService";
 function ManageClass() {
-  const [data] = useState([
-    { id: "1",  classId: "SE1702", subjectId: "PRM392", semesterId: "FA24", major: "Information Technology", term: "9", status: "1",startDate: "2024-01-02", endDate: "2025-04-29", },
-    { id: "2",  classId: "SE1702", subjectId: "PRN231", semesterId: "FA24", major: "Information Technology", term: "9", status: "0",startDate: "2024-01-02", endDate: "2025-04-29", },
-    { id: "3",  classId: "SE1703", subjectId: "PRM101", semesterId: "FA24", major: "Computer Science", term: "8", status: "2",startDate: "2024-01-02", endDate: "2025-04-29", },
-    { id: "4",  classId: "SE1704", subjectId: "PRM102", semesterId: "FA24", major: "Information Technology", term: "9", status: "1",startDate: "2024-01-02", endDate: "2025-04-29", },
-    { id: "5",  classId: "SE1705", subjectId: "PRN202", semesterId: "FA24", major: "Computer Science", term: "8", status: "2",startDate: "2024-01-02", endDate: "2025-04-29", },
-    { id: "6",  classId: "SE1706", subjectId: "PRM232", semesterId: "FA24", major: "Mathematics", term: "2", status: "0",startDate: "2024-01-02", endDate: "2025-04-29", },
-    { id: "7",  classId: "SE1707", subjectId: "PRM303", semesterId: "FA24", major: "Physics", term: "8", status: "1",startDate: "2024-01-02", endDate: "2025-04-29", },
-    { id: "8",  classId: "SE1708", subjectId: "PRM404", semesterId: "FA24", major: "Engineering", term: "9", status: "2",startDate: "2024-01-02", endDate: "2025-04-29", },
-    { id: "9",  classId: "SE1709", subjectId: "PRN101", semesterId: "FA25", major: "Information Technology", term: "9", status: "0",startDate: "2024-01-02", endDate: "2025-04-29", },
-    { id: "10", classId: "SE1710", subjectId: "PRN102", semesterId: "FA24", major: "Computer Science", term: "8", status: "1",startDate: "2024-01-02", endDate: "2025-04-29", },
-    { id: "11", classId: "SE1711", subjectId: "PRM303", semesterId: "FA24", major: "Physics", term: "8", status: "2",startDate: "2024-01-02", endDate: "2025-04-29", },
-    { id: "12", classId: "SE1712", subjectId: "PRM404", semesterId: "FA24", major: "Engineering", term: "9", status: "0",startDate: "2024-01-02", endDate: "2025-04-29", },
-    { id: "13", classId: "SE1713", subjectId: "PRM503", semesterId: "FA25", major: "Mathematics", term: "9", status: "1",startDate: "2024-01-02", endDate: "2025-04-29", },
-    { id: "14", classId: "SE1714", subjectId: "PRN211", semesterId: "FA24", major: "Engineering", term: "9", status: "2",startDate: "2024-01-02", endDate: "2025-04-29", },
-    { id: "15", classId: "SE1715", subjectId: "PRM512", semesterId: "FA24", major: "Physics", term: "8", status: "1",startDate: "2024-01-02", endDate: "2025-04-29", },
-    { id: "16", classId: "SE1716", subjectId: "PRM400", semesterId: "FA24", major: "Computer Science", term: "9", status: "0",startDate: "2024-01-02", endDate: "2025-04-29", },
-    { id: "17", classId: "SE1717", subjectId: "PRM301", semesterId: "FA24", major: "Information Technology", term: "8", status: "2",startDate: "2024-01-02", endDate: "2025-04-29", },
-    { id: "18", classId: "SE1718", subjectId: "PRM201", semesterId: "FA25", major: "Mathematics", term: "9", status: "0",startDate: "2024-01-02", endDate: "2025-04-29", },
-    { id: "19", classId: "SE1719", subjectId: "PRM302", semesterId: "FA25", major: "Engineering", term: "9", status: "1",startDate: "2024-01-02", endDate: "2025-04-29", },
-    { id: "20", classId: "SE1720", subjectId: "PRM303", semesterId: "FA24", major: "Computer Science", term: "8", status: "2",startDate: "2024-01-02", endDate: "2025-04-29", },
-    { id: "21", classId: "SE1721", subjectId: "PRM202", semesterId: "FA24", major: "Physics", term: "9", status: "1",startDate: "2024-01-02", endDate: "2025-04-29", },
-    { id: "22", classId: "SE1722", subjectId: "PRM301", semesterId: "FA25", major: "Mathematics", term: "9", status: "2",startDate: "2024-01-02", endDate: "2025-04-29", },
-    { id: "23", classId: "SE1723", subjectId: "PRM404", semesterId: "FA24", major: "Engineering", term: "9", status: "0",startDate: "2024-01-02", endDate: "2025-04-29", },
-    { id: "24", classId: "SE1724", subjectId: "PRM503", semesterId: "FA25", major: "Computer Science", term: "9", status: "1",startDate: "2024-01-02", endDate: "2025-04-29", },
-    { id: "25", classId: "SE1725", subjectId: "PRM601", semesterId: "FA24", major: "Information Technology", term: "8", status: "2",startDate: "2024-01-02", endDate: "2025-04-29", },
-    { id: "26", classId: "SE1726", subjectId: "PRM404", semesterId: "FA24", major: "Mathematics", term: "8", status: "1",startDate: "2024-01-02", endDate: "2025-04-29", },
-    { id: "27", classId: "SE1727", subjectId: "PRN101", semesterId: "FA24", major: "Computer Science", term: "9", status: "0",startDate: "2024-01-02", endDate: "2025-04-29", },
-    { id: "28", classId: "SE1728", subjectId: "PRN202", semesterId: "FA25", major: "Physics", term: "9", status: "1",startDate: "2024-01-02", endDate: "2025-04-29", },
-    { id: "29", classId: "SE1729", subjectId: "PRM202", semesterId: "FA24", major: "Engineering", term: "8", status: "0",startDate: "2024-01-02", endDate: "2025-04-29", },
-    { id: "30", classId: "SE1730", subjectId: "PRM303", semesterId: "FA24", major: "Information Technology", term: "9", status: "1",startDate: "2024-01-02", endDate: "2025-04-29", }
-  ]);
-  
+  // const [data1,setClassData] = useState([
+  //   { id: "1",  classId: "SE1702", subjectId: "PRM392", semesterId: "FA24", major: "Information Technology", term: "9", status: "1",startDate: "2024-01-02", endDate: "2025-04-29", },
+  // ]);
+
+      // Fetch Data Slot - Start
+        const [data, setData] = useState([]);
+        useEffect(() => {
+          const fetchRoomData = async () => {
+            const data = await getClasses(); //Lấy ra list room rtong database
+            setData(data.result);
+          };
+          fetchRoomData();
+        }, []);
+      //Fetch Data Room - End
+
   const [filters, setFilters] = useState({
-    major: "",
+    majorName: "",
     classId: "",
     subjectId: "",
     semesterId: "",
@@ -48,11 +31,11 @@ function ManageClass() {
   const [availableSemesters, setAvailableSemesters] = useState([]);
 
   // Get all unique values for major, classId, subjectId, and semesterId
-  const majors = Array.from(new Set(data.map(item => item.major)));
+  const majors = Array.from(new Set(data.map(item => item.majorName)));
 
   useEffect(() => {
     // Bước 1: Lọc theo major (nếu có filter major)
-    let filteredSubjects = data.filter(item => filters.major ? item.major === filters.major : true);
+    let filteredSubjects = data.filter(item => filters.majorName ? item.majorName === filters.majorName : true);
   
     // Bước 2: Lọc subjectId duy nhất từ filteredSubjects
     filteredSubjects = Array.from(new Set(filteredSubjects.map(item => item.subjectId)))
@@ -85,7 +68,7 @@ function ManageClass() {
    //Update bảng mà không cần reload
    const handleClassReload = async () => {
     const data = await getClasses(); // Gọi API để lấy lại tất cả các lớp
-    setClassData(data.result); // Cập nhật lại dữ liệu lớp
+    setData(data.result); // Cập nhật lại dữ liệu lớp
 };
 //Update bảng mà không cần reload
   // Show form Add New class - Start
@@ -119,7 +102,7 @@ function ManageClass() {
   // Filter data based on selected filters
   const filteredData = data.filter(item => {
     return (
-      (!filters.major || item.major === filters.major) &&
+      (!filters.majorName || item.majorName === filters.majorName) &&
       (!filters.classId || item.classId === filters.classId) &&
       (!filters.subjectId || item.subjectId === filters.subjectId) &&
       (!filters.semesterId || item.semesterId === filters.semesterId)
@@ -170,19 +153,20 @@ function ManageClass() {
       </div>
 
       {/* Filter Section */}
-      <div className="flex w-auto h-12 mt-5">
+      <p className="ml-4 mt-5">Tìm kiếm</p>
+      <div className="flex w-auto h-12">
         <div className="flex">
           {/* Select Chuyên ngành */}
           <select
             name="major"
-            value={filters.major}
+            value={filters.majorName}
             onChange={handleFilterChange}
             className="max-w-sm mx-auto ml-3 h-12 w-[230px] border border-black rounded-xl"
           >
             <option value="">Chuyên ngành</option>
-            {majors.map((major, index) => (
-              <option key={index} value={major}>
-                {major}
+            {majors.map((majorName, index) => (
+              <option key={index} value={majorName}>
+                {majorName}
               </option>
             ))}
           </select>
@@ -231,17 +215,7 @@ function ManageClass() {
               </option>
             ))}
           </select>
-          
 
-          <div className="flex ml-2 rounded-full transition-all duration-300 hover:scale-95">
-            <button
-              type="button"
-              className="border border-black rounded-xl w-[130px] bg-primaryBlue text-white font-600"
-            >
-              <i className="fa fa-search mr-2" aria-hidden="true"></i>
-              Tìm kiếm
-            </button>
-          </div>
         </div>
         <div className="flex ml-auto rounded-full transition-all duration-300 hover:scale-95 mr-6 mt-2 md:mt-0">
                     <button
@@ -332,7 +306,7 @@ function ManageClass() {
               </th>
               <th
                 className="p-4 font-semibold cursor-pointer hover:bg-primaryBlue text-white text-center align-middle bg-secondaryBlue "
-                onClick={() => handleSort("major")}
+                onClick={() => handleSort("majorName")}
               >
                 <div className="flex items-center justify-between">
                   <p className="m-auto">Chuyên ngành</p>
@@ -416,14 +390,14 @@ function ManageClass() {
                 <td className="p-4 text-center align-middle">
                   {item.semesterId}
                 </td>
-                <td className="p-4 text-center align-middle">{item.major}</td>
+                <td className="p-4 text-center align-middle">{item.majorName}</td>
                 <td className="p-4 text-center align-middle">{item.term}</td>
                 <td className="p-4 text-center align-middle">
-                  {item.status === "0"
+                  {item.status === 0
                     ? "Chưa bắt đầu"
-                    : item.status === "1"
+                    : item.status === 1
                     ? "Đang diễn ra"
-                    : item.status === "2"
+                    : item.status === 2
                     ? "Đã kết thúc"
                     : "Không xác định"}
                 </td>
@@ -480,7 +454,7 @@ function ManageClass() {
             {/* Show Form Update Class - Start */}
             {showUpdateForm && (
                 <>
-                    <FormUpdateClass classToUpdate={classToUpdate} onSemesterUpdated={handleClassReload} />
+                    <FormUpdateClass classToUpdate={classToUpdate} onClassUpdated={handleClassReload} />
                 </>
             )}
             {/* Show Form Update Class - End */}
