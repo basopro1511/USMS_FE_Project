@@ -6,9 +6,9 @@ function StudentDetail() {
   const [studentData, setStudentData] = useState(null);
 
   useEffect(() => {
-    // Gọi API để lấy thông tin sinh viên
+    // Gọi API từ Ocelot Gateway
     axios
-      .get("https://localhost:7179/api/User/CE170288")
+      .get("https://localhost:7067/api/User/CE170288") // Địa chỉ API qua Ocelot
       .then((response) => {
         if (response.data.isSuccess) {
           setStudentData(response.data.result);
