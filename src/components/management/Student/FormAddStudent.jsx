@@ -1,23 +1,28 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
+import { AddStudent } from "../../../services/studentService";
 
 function FormAddStudent({ onStudentAdded }) {
     const [errorMessage, setErrorMessage] = useState("");
     const [successMessage, setSuccessMessage] = useState("");
     const [showAlert, setShowAlert] = useState(false);
+    const [selectedImage, setSelectedImage] = useState(null); // Quản lý ảnh đã chọn
+    const fileInputRef = useRef(null);
+
     const [newStudent, setNewStudent] = useState({
-        studentId: "",
-        major: "",
+        majorId: "",
         firstName: "",
         middleName: "",
         lastName: "",
-        email: "",
+        personalEmail: "",
         phoneNumber: "",
         dateOfBirth: "",
-        status: "",
+        address: "",
+        userAvartar: "",
+        passwordHash: "",
     });
 
     const [isFormVisible, setIsFormVisible] = useState(true);
-    const [avatar, setAvatar] = useState(null);
+    const [userAvartar, setuserAvartar] = useState(null);
 
     const handleCancel = () => {
         setIsFormVisible(false);
@@ -26,11 +31,8 @@ function FormAddStudent({ onStudentAdded }) {
     const handleAddStudent = async (e) => {
         e.preventDefault();
         try {
-            const response = {
-                isSuccess: true,
-                message: "Thêm thành công",
-                student: newStudent,
-            };
+            const updatedStudent = { ...newStudent, userAvartar }; // Cập nhật avatar vào newStudent
+            const response = await AddStudent(updatedStudent); // Gọi API thêm sinh viên
             if (response.isSuccess) {
                 setShowAlert("success");
                 setSuccessMessage(response.message);
@@ -46,14 +48,25 @@ function FormAddStudent({ onStudentAdded }) {
             console.error("Error adding student:", error);
         }
     };
+    
 
-    const handleAvatarChange = (e) => {
+    const handleuserAvartarChange = (e) => {
         const file = e.target.files[0];
-        if (file) {
+        if (file && file.type.startsWith("image/") && file.size <= 10 * 1024 * 1024) { // Limit file size to 10MB
             const reader = new FileReader();
-            reader.onload = () => setAvatar(reader.result);
+            reader.onload = () => setuserAvartar(reader.result);
             reader.readAsDataURL(file);
+        } else {
+            setShowAlert("error");
+            setErrorMessage("Please upload a valid image file (max size: 10MB)");
         }
+    };
+
+
+    const majorIdMapping = {
+        "IT": "Information Technology",
+        "BA": "Business Administration",
+        "MT": "Media Technology",
     };
 
     return (
@@ -90,69 +103,33 @@ function FormAddStudent({ onStudentAdded }) {
                             </p>
                             <form onSubmit={handleAddStudent}>
                                 <div className="flex items-start gap-8 my-6">
-                                    {/* Avatar Section */}
+                                    {/* Avartar Section */}
                                     <div className="relative">
                                         <img
-                                            src={avatar || "https://via.placeholder.com/150"}
-                                            alt="Avatar"
-                                            className="w-[180px] h-[220px] object-cover border rounded-md"
+                                            src={userAvartar || "https://via.placeholder.com/150"}
+                                            alt="userAvartar"
+                                            className="w-[180px] h-[220px] object-cover rounded-md"
                                         />
-                                        <label
-                                            htmlFor="avatar"
-                                            className="block mt-2 text-center text-blue-500 cursor-pointer"
-                                        >
-                                            Upload
-                                        </label>
                                         <input
                                             type="file"
                                             accept="image/*"
-                                            id="avatar"
+                                            id="userAvartar"
                                             className="hidden"
-                                            onChange={handleAvatarChange}
+                                            onChange={handleuserAvartarChange}
+                                            ref={fileInputRef}
                                         />
+                                        <button
+                                            type="button"
+                                            onClick={() => fileInputRef.current.click()} // Trigger click via ref
+                                            className="w-full bg-[#2B559B] text-white font-bold text-sm rounded-md mt-2 py-2"
+                                        >
+                                            Upload
+                                        </button>
                                     </div>
 
                                     {/* Input Section */}
                                     <div className="flex-1 grid gap-4">
-                                        {/* First Row: Student ID and Major */}
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <div>
-                                                <label className="block text-sm font-medium mb-1">
-                                                    Mã số sinh viên:
-                                                </label>
-                                                <input
-                                                    type="text"
-                                                    required
-                                                    className="w-full border rounded-md px-3 py-2"
-                                                    placeholder="Nhập mã số sinh viên"
-                                                    onChange={(e) =>
-                                                        setNewStudent({
-                                                            ...newStudent,
-                                                            studentId: e.target.value,
-                                                        })
-                                                    }
-                                                />
-                                            </div>
-                                            <div>
-                                                <label className="block text-sm font-medium mb-1">
-                                                    Chuyên ngành:
-                                                </label>
-                                                <input
-                                                    type="text"
-                                                    required
-                                                    className="w-full border rounded-md px-3 py-2"
-                                                    placeholder="Nhập chuyên ngành"
-                                                    onChange={(e) =>
-                                                        setNewStudent({
-                                                            ...newStudent,
-                                                            major: e.target.value,
-                                                        })
-                                                    }
-                                                />
-                                            </div>
-                                        </div>
-
-                                        {/* Second Row: Name Fields */}
+                                        {/* First Row: Name */}
                                         <div className="grid grid-cols-3 gap-4">
                                             <div>
                                                 <label className="block text-sm font-medium mb-1">
@@ -207,20 +184,48 @@ function FormAddStudent({ onStudentAdded }) {
                                             </div>
                                         </div>
 
-                                        {/* Third Row: Email */}
+                                        {/* Second Row: majorId */}
                                         <div>
                                             <label className="block text-sm font-medium mb-1">
-                                                Gmail:
+                                                Chuyên ngành:
                                             </label>
-                                            <input
-                                                type="email"
-                                                required
+                                            <select
+                                                value={newStudent.majorId} 
                                                 className="w-full border rounded-md px-3 py-2"
-                                                placeholder="Nhập email"
                                                 onChange={(e) =>
                                                     setNewStudent({
                                                         ...newStudent,
-                                                        email: e.target.value,
+                                                        majorId: e.target.value, // Cập nhật giá trị majorId trong state
+                                                    })
+                                                }
+                                            >
+                                                <option value="" disabled hidden>
+                                                    Chọn chuyên ngành
+                                                </option>
+                                                {Object.entries(majorIdMapping).map(([key, value]) => (
+                                                    <option key={key} value={key}>
+                                                        {value}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
+
+
+
+                                        {/* Third Row: Email */}
+                                        <div>
+                                            <label className="block text-sm font-medium mb-1">
+                                                Email cá nhân:
+                                            </label>
+                                            <input
+                                                type="personalEmail"
+                                                required
+                                                className="w-full border rounded-md px-3 py-2"
+                                                placeholder="Nhập email cá nhân"
+                                                onChange={(e) =>
+                                                    setNewStudent({
+                                                        ...newStudent,
+                                                        personalEmail: e.target.value,
                                                     })
                                                 }
                                             />
@@ -263,20 +268,37 @@ function FormAddStudent({ onStudentAdded }) {
                                             />
                                         </div>
 
-                                        {/* Fifth Row: Status*/}
                                         <div>
                                             <label className="block text-sm font-medium mb-1">
-                                                Trạng thái:
+                                                Mật Khẩu:
                                             </label>
                                             <input
                                                 type="text"
                                                 required
                                                 className="w-full border rounded-md px-3 py-2"
-                                                placeholder="Nhập trạng thái"
+                                                placeholder="Nhập mật khẩu"
                                                 onChange={(e) =>
                                                     setNewStudent({
                                                         ...newStudent,
-                                                        status: e.target.value,
+                                                        passwordHash: e.target.value,
+                                                    })
+                                                }
+                                            />
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-sm font-medium mb-1">
+                                                Địa chỉ:
+                                            </label>
+                                            <input
+                                                type="text"
+                                                required
+                                                className="w-full border rounded-md px-3 py-2"
+                                                placeholder="Nhập địa chỉ"
+                                                onChange={(e) =>
+                                                    setNewStudent({
+                                                        ...newStudent,
+                                                        address: e.target.value,
                                                     })
                                                 }
                                             />
