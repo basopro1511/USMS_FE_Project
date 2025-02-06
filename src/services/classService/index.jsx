@@ -33,6 +33,17 @@ export const UpdateClass = async (roomData) => {
     }
 }
 
+//Get all Rooms in Database 
+export const getClassesIdByMajorId = async (id) => {
+    try {
+        const response = await request.get(`/ClassSubject/ClassIdsByMajorId/${id}`)
+        console.log(response.data)
+        return response.data
+    } catch (error) {
+        console.log(error);
+    }
+}
+
 // // Change the status of a room
 // export const changeRoomStatus = async (id, status) => {
 //     try {

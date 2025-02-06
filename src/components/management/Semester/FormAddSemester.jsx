@@ -68,7 +68,6 @@ function FormAddSemester({ onSemesterAdded }) {
         }
     } catch (error) {
         setShowAlert("error");
-        setErrorMessage(response.message);
         setTimeout(() => setShowAlert(false), 3000); // Ẩn thông báo sau 3 giây
         console.error("Error adding semester:", error);
     }

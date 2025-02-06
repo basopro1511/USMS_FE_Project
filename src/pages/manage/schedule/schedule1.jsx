@@ -2,15 +2,14 @@ import { useState, useEffect } from "react";
 import { getMajors } from "../../../services/majorService";
 import { getSlots } from "../../../services/slotService";
 import { getScheduleForStaff } from "../../../services/scheduleService";
-import { getClassesIdByMajorId } from "../../../services/classService";
 
 function ManageSchedule() {
   //#region State & Error
-  const [loading, setLoading] = useState(true); // Trạng thái tải dữ liệu
-  const [error, setError] = useState(null); // Lưu lỗi khi fetch dữ liệu
-  const [selectedWeek, setSelectedWeek] = useState(1); // Số thứ tự của tuần được chọn
-
-  // State cho dữ liệu filter (majorId, classId, term, startDay, endDay)
+  const [loading, setLoading] = useState(true); // State hiển thị trạng thái tải dữ liệu
+  const [error, setError] = useState(null); // State lưu lỗi khi fetch dữ liệu
+  const [selectedWeek, setSelectedWeek] = useState(1); // Lưu tuần được chọn (theo số thứ tự)
+  
+  // State cho dữ liệu filter (bao gồm: majorId, classId, term, startDay, endDay)
   const [filterData, setFilterData] = useState({
     majorId: "",
     classId: "",
@@ -18,25 +17,22 @@ function ManageSchedule() {
     startDay: "",
     endDay: "",
   });
-
-  // Các state lưu dữ liệu từ API
+  
+  // Các state lưu dữ liệu nhận về từ API
   const [scheduleData, setScheduleData] = useState([]);
   const [majorData, setMajorData] = useState([]);
   const [slotData, setSlotData] = useState([]);
-  const [classIdsData, setClassIdsData] = useState([]);
-
-  // State cho giá trị của select "Thời gian" (JSON string: { startDate, endDate })
+  
+  // State dùng cho select "Thời gian", lưu dưới dạng JSON string { startDate, endDate }
   const [selectedWeekOption, setSelectedWeekOption] = useState("");
-
-  // State cho ngày đầu tuần hiện tại (dùng để tính toán thời gian hiển thị)
+  
+  // State dùng cho ngày đầu tuần hiện tại (để tính toán các ngày trong tuần)
   const [currentWeek, setCurrentWeek] = useState(new Date());
   //#endregion
 
   //#region Fetch Data từ API
-
-  // --- Fetch lịch theo filter ---
+  // --- Fetch lịch theo bộ lọc ---
   useEffect(() => {
-    // Nếu đủ thông tin để fetch (chọn đầy đủ major, class, term, startDay, endDay)
     if (
       filterData.majorId &&
       filterData.classId &&
@@ -44,10 +40,6 @@ function ManageSchedule() {
       filterData.startDay &&
       filterData.endDay
     ) {
-      // Đặt loading về true và reset error mỗi khi fetch dữ liệu mới
-      setLoading(true);
-      setError(null);
-
       const fetchScheduleData = async () => {
         try {
           const scheduleRes = await getScheduleForStaff(
@@ -57,17 +49,13 @@ function ManageSchedule() {
             filterData.startDay,
             filterData.endDay
           );
-
-          if (scheduleRes && scheduleRes.result && scheduleRes.result.length > 0) {
+          if (scheduleRes && scheduleRes.result) {
             setScheduleData(scheduleRes.result);
-            setError(null); // xoá lỗi cũ nếu có
           } else {
-            setScheduleData([]);
             setError("Không tìm thấy dữ liệu lịch theo bộ lọc");
           }
-        } catch (err) {
-          console.error("Error fetching schedules:", err);
-          setScheduleData([]);
+        } catch (error) {
+          console.error("Error fetching schedules:", error);
           setError("Có lỗi xảy ra khi tải lịch.");
         } finally {
           setLoading(false);
@@ -87,17 +75,14 @@ function ManageSchedule() {
   useEffect(() => {
     const fetchMajorData = async () => {
       try {
-        setError(null); // reset error trước khi fetch majors
         const majorRes = await getMajors();
         if (majorRes && majorRes.result) {
           setMajorData(majorRes.result);
         } else {
-          setMajorData([]);
           setError("Không tìm thấy dữ liệu chuyên ngành");
         }
       } catch (err) {
         console.error("Error fetching majors:", err);
-        setMajorData([]);
         setError("Có lỗi xảy ra khi tải dữ liệu chuyên ngành");
       }
     };
@@ -108,62 +93,25 @@ function ManageSchedule() {
   useEffect(() => {
     const fetchSlotData = async () => {
       try {
-        setError(null); // reset error trước khi fetch slots
         const slotRes = await getSlots();
         if (slotRes && slotRes.result) {
           setSlotData(slotRes.result);
         } else {
-          setSlotData([]);
           setError("Không tìm thấy dữ liệu slot");
         }
       } catch (err) {
         console.error("Error fetching slots:", err);
-        setSlotData([]);
         setError("Có lỗi xảy ra khi tải dữ liệu slot");
       }
     };
     fetchSlotData();
   }, []);
-
-  //--- Fetch dữ liệu ClassId bởi Major Id
-  useEffect(() => {
-    const fetchClassIds = async () => {
-      // Nếu chưa chọn majorId thì clear
-      if (!filterData.majorId) {
-        setClassIdsData([]);
-        return;
-      }
-      try {
-        setError(null);
-        const classIdsRes = await getClassesIdByMajorId(filterData.majorId);
-        if (classIdsRes && classIdsRes.result) {
-          setClassIdsData(classIdsRes.result);
-        } else {
-          setClassIdsData([]);
-          setError("Không tìm thấy dữ liệu lớp cho chuyên ngành này");
-        }
-      } catch (err) {
-        console.error("Error fetching class IDs:", err);
-        setClassIdsData([]);
-        setError("Có lỗi xảy ra khi tải danh sách lớp.");
-      }
-    };
-
-    fetchClassIds();
-  }, [filterData.majorId]);
   //#endregion
 
   //#region Xử lý Filter Input
-  // Khi thay đổi input filter (majorId, classId, term, ...)
+  // Hàm xử lý thay đổi các input của filter (majorId, classId, term)
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    // Nếu thay đổi majorId (hoặc có thể các trường quan trọng khác), reset dữ liệu lịch và lỗi
-    if (name === "majorId") {
-      setScheduleData([]);
-      setError(null);
-      setLoading(true);
-    }
-
     setFilterData({
       ...filterData,
       [name]: value,
@@ -172,7 +120,7 @@ function ManageSchedule() {
   //#endregion
 
   //#region Time Calculator & Xử lý Thời gian
-  // Lấy ngày đầu tuần của 1 ngày (giả sử tuần bắt đầu từ thứ 2)
+  // Hàm trả về ngày đầu tuần của một ngày cho trước (giả sử tuần bắt đầu từ thứ 2)
   const getStartOfWeek = (date) => {
     const currentDate = new Date(date);
     const day = currentDate.getDay(); // 0: CN, 1: Thứ 2,...
@@ -180,7 +128,7 @@ function ManageSchedule() {
     return new Date(currentDate.setDate(diff));
   };
 
-  // Tính danh sách các tuần trong năm (giả sử 52 tuần)
+  // Hàm tính danh sách các tuần trong năm (52 tuần)
   const getWeeksOfYear = (year) => {
     const weeks = [];
     const startDate = new Date(year, 0, 1);
@@ -201,7 +149,7 @@ function ManageSchedule() {
 
   const weeksOfYear = getWeeksOfYear(new Date().getFullYear());
 
-  // Lấy danh sách 7 ngày của tuần hiện tại
+  // Hàm trả về danh sách 7 ngày của tuần hiện tại
   const getWeekDates = () => {
     const startOfWeek = getStartOfWeek(currentWeek);
     return Array.from({ length: 7 }, (_, i) => {
@@ -211,14 +159,14 @@ function ManageSchedule() {
     });
   };
 
-  // Hàm format ngày (dd/mm)
+  // Hàm format ngày tháng dd/mm để hiển thị trong bảng
   const formatDate = (date) => {
     const day = date.getDate().toString().padStart(2, "0");
     const month = (date.getMonth() + 1).toString().padStart(2, "0");
     return `${day}/${month}`;
   };
 
-  // Hàm format ngày (dd/mm/yyyy) dùng cho select filter
+  // Hàm format ngày tháng dd/mm/yyyy để hiển thị trong select filter
   const formatDateFilter = (date) => {
     const year = date.getFullYear();
     const day = date.getDate().toString().padStart(2, "0");
@@ -228,7 +176,7 @@ function ManageSchedule() {
 
   const weekDates = getWeekDates();
 
-  // Đồng bộ currentWeek với filterData và selectedWeekOption
+  // useEffect này dùng để đồng bộ currentWeek với filterData và selectedWeekOption
   useEffect(() => {
     const matchingWeek = weeksOfYear.find(
       (week) =>
@@ -248,10 +196,9 @@ function ManageSchedule() {
         endDay: matchingWeek.endDate.toISOString().split("T")[0],
       }));
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentWeek]);
 
-  // Chuyển sang "Tuần trước"
+  // Xử lý chuyển sang "Tuần trước"
   const handlePreviousWeek = () => {
     setCurrentWeek((prev) => {
       const newDate = new Date(prev);
@@ -260,6 +207,7 @@ function ManageSchedule() {
       const endOfWeek = new Date(startOfWeek);
       endOfWeek.setDate(startOfWeek.getDate() + 6);
 
+      // Cập nhật filterData và selectedWeekOption
       setFilterData((prevFilter) => ({
         ...prevFilter,
         startDay: startOfWeek.toISOString().split("T")[0],
@@ -275,7 +223,7 @@ function ManageSchedule() {
     });
   };
 
-  // Chuyển sang "Tuần sau"
+  // Xử lý chuyển sang "Tuần sau"
   const handleNextWeek = () => {
     setCurrentWeek((prev) => {
       const newDate = new Date(prev);
@@ -299,7 +247,7 @@ function ManageSchedule() {
     });
   };
 
-  // Khi người dùng chọn tuần từ select "Thời gian"
+  // Xử lý khi người dùng chọn tuần từ select "Thời gian"
   const handleWeekChange = (e) => {
     const selectedWeekObj = JSON.parse(e.target.value);
     const matchingWeek = weeksOfYear.find(
@@ -320,7 +268,7 @@ function ManageSchedule() {
   //#endregion
 
   //#region Render Lịch (TimeTable)
-  // Render các ô lịch cho 1 ngày và slot cụ thể
+  // Hàm render ô lịch cho một slot và một ngày cụ thể
   const renderCellForDay = (day, slotId) => {
     const daySchedules = scheduleData.filter((schedule) => {
       const scheduleDate = new Date(schedule.date);
@@ -331,7 +279,9 @@ function ManageSchedule() {
     if (daySchedules.length > 0) {
       return daySchedules.map((schedule) => {
         const formatTime = (timeStr) => (timeStr ? timeStr.slice(0, 5) : "N/A");
-        const slotInfo = slotData.find((item) => item.slotId === schedule.slotId);
+        const slotInfo = slotData.find(
+          (item) => item.slotId === schedule.slotId
+        );
         const startTime = slotInfo ? formatTime(slotInfo.startTime) : "N/A";
         const endTime = slotInfo ? formatTime(slotInfo.endTime) : "N/A";
 
@@ -394,7 +344,7 @@ function ManageSchedule() {
     return null;
   };
 
-  // Render các dòng (dựa theo slot, giả sử có 5 slot)
+  // Hàm render các dòng của bảng theo slot (giả sử có 5 slot)
   const renderTableRows = () => {
     if (loading) {
       return (
@@ -433,7 +383,7 @@ function ManageSchedule() {
       return (
         <tr key={slotId}>
           <td
-            className={`border-t border-l border-black font-bold text-center${extraClass}`}
+            className={`border-t border-l border-black font-bold text-center ${extraClass}`}
           >
             Slot {slotId}
           </td>
@@ -488,11 +438,7 @@ function ManageSchedule() {
             <option value="" disabled>
               Lớp
             </option>
-            {classIdsData.map((classId) => (
-              <option key={classId} value={classId}>
-                {classId}
-              </option>
-            ))}
+            <option value="SE1702">SE1702</option>
           </select>
 
           {/* Select kì học */}
@@ -533,10 +479,21 @@ function ManageSchedule() {
                   endDate: week.endDate.toISOString().split("T")[0],
                 })}
               >
-                {formatDateFilter(week.startDate)} - {formatDateFilter(week.endDate)}
+                {formatDateFilter(week.startDate)} -{" "}
+                {formatDateFilter(week.endDate)}
               </option>
             ))}
           </select>
+
+          <div className="flex ml-2 rounded-full transition-all duration-300 hover:scale-95">
+            <button
+              type="button"
+              className="border border-black rounded-xl w-[130px] bg-primaryBlue text-white font-600"
+            >
+              <i className="fa fa-search mr-2" aria-hidden="true"></i>
+              Tìm kiếm
+            </button>
+          </div>
         </div>
 
         <div className="flex rounded-full transition-all duration-300 hover:scale-95 ml-auto mr-4">
@@ -613,4 +570,5 @@ function ManageSchedule() {
   );
   //#endregion
 }
+
 export default ManageSchedule;
