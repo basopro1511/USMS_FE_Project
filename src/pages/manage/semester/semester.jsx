@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import  { useState, useEffect } from "react";
 import FormUpdateSemester from "../../../components/management/Semester/FormUpdateSemester";
 import FormAddSemester from "../../../components/management/Semester/FormAddSemester";
 import FormDetailSemester from "../../../components/management/Semester/FormDetailSemester";
