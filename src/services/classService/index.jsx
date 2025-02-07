@@ -4,7 +4,6 @@ import request from "../../utils/baseURL";
 export const getClasses = async () => {
     try {
         const response = await request.get("ClassSubject")
-        console.log(response.data)
         return response.data
     } catch (error) {
         console.log(error);
@@ -15,7 +14,6 @@ export const getClasses = async () => {
 export const AddClass = async (roomData) => {
     try {
         const response = await request.post("ClassSubject", roomData)
-        console.log(response.data)
         return response.data
     } catch (error) {
         console.log(error);
@@ -26,18 +24,26 @@ export const AddClass = async (roomData) => {
 export const UpdateClass = async (roomData) => {
     try {
         const response = await request.put("ClassSubject", roomData)
-        console.log(response.data)
         return response.data
     } catch (error) {
         console.log(error);
     }
 }
 
-//Get all Rooms in Database 
+//Get all Classes by major in Database 
 export const getClassesIdByMajorId = async (id) => {
     try {
         const response = await request.get(`/ClassSubject/ClassIdsByMajorId/${id}`)
-        console.log(response.data)
+        return response.data
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+//Get all Classes by classId in Database 
+export const getClassesIdByClassId = async (id) => {
+    try {
+        const response = await request.get(`/ClassSubject/classId/${id}`)
         return response.data
     } catch (error) {
         console.log(error);

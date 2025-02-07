@@ -3,13 +3,18 @@ import { getMajors } from "../../../services/majorService";
 import { getSlots } from "../../../services/slotService";
 import { getScheduleForStaff } from "../../../services/scheduleService";
 import { getClassesIdByMajorId } from "../../../services/classService";
+import FormAddSchedule from "../../../components/management/Schedule/FormAddSchedule";
 
 function ManageSchedule() {
   //#region State & Error
   const [loading, setLoading] = useState(true); // Trạng thái tải dữ liệu
   const [error, setError] = useState(null); // Lưu lỗi khi fetch dữ liệu
-  const [selectedWeek, setSelectedWeek] = useState(1); // Số thứ tự của tuần được chọn
+  const [, setSelectedWeek] = useState(1); // Số thứ tự của tuần được chọn
 
+  const [showAddForm, setAddForm] = useState(false); // Dùng để hiển thị form
+  const toggleShowForm = () => {
+      setAddForm(!showAddForm);
+  };
   // State cho dữ liệu filter (majorId, classId, term, startDay, endDay)
   const [filterData, setFilterData] = useState({
     majorId: "",
@@ -30,6 +35,9 @@ function ManageSchedule() {
 
   // State cho ngày đầu tuần hiện tại (dùng để tính toán thời gian hiển thị)
   const [currentWeek, setCurrentWeek] = useState(new Date());
+
+  const [selectedClassId, setSelectedClassId] = useState(""); // 🔹 Thêm state lưu ClassId
+
   //#endregion
 
   //#region Fetch Data từ API
@@ -82,6 +90,18 @@ function ManageSchedule() {
     filterData.startDay,
     filterData.endDay,
   ]);
+
+    //Update bảng mà không cần reload
+      const handleReload = async () => {
+          const data = await getScheduleForStaff(   filterData.majorId,
+            filterData.classId,
+            filterData.term,
+            filterData.startDay,
+            filterData.endDay); // Gọi API để lấy lại tất cả các kì
+            setScheduleData(data.result); // Cập nhật lại dữ liệu kì
+      };
+      //Update bảng mà không cần reload
+
 
   // --- Fetch dữ liệu chuyên ngành ---
   useEffect(() => {
@@ -168,6 +188,11 @@ function ManageSchedule() {
       ...filterData,
       [name]: value,
     });
+  };
+
+  // Khi chọn class từ dropdown
+  const handleClassChange = (event) => {
+    setSelectedClassId(event.target.value);
   };
   //#endregion
 
@@ -483,7 +508,10 @@ function ManageSchedule() {
             className="max-w-sm mx-auto ml-3 h-12 w-[168px] border border-black rounded-xl"
             name="classId"
             value={filterData.classId}
-            onChange={handleInputChange}
+            onChange={(e) => {
+              handleInputChange(e);
+              handleClassChange(e);
+            }}            
           >
             <option value="" disabled>
               Lớp
@@ -543,6 +571,7 @@ function ManageSchedule() {
           <button
             type="button"
             className="border border-white rounded-xl w-[130px] bg-secondaryGreen hover:bg-primaryGreen text-white font-semibold"
+            onClick={toggleShowForm}
           >
             <i className="fa fa-plus mr-2" aria-hidden="true"></i>
             Thêm TKB
@@ -584,6 +613,7 @@ function ManageSchedule() {
           <tbody>{renderTableRows()}</tbody>
         </table>
         {/* --- End Bảng thời khóa biểu --- */}
+        {showAddForm && <FormAddSchedule  selectedClassId={selectedClassId} onAdded={handleReload} />}
 
         {/* --- Phân trang --- */}
         <div className="flex mt-5 mb-5">

@@ -63,7 +63,7 @@ function ManageSemester() {
     });
 
     const [availableSemesters, setAvailableSemesters] = useState([]);
-    const [availableStatuses, setAvailableStatuses] = useState([
+    const [availableStatuses] = useState([
         { id: 1, label: "Đang diễn ra" },
         { id: 0, label: "Đã kết thúc" },
         { id: 2, label: "Chưa bắt đầu" }
@@ -377,6 +377,7 @@ function ManageSemester() {
             {/* Show Form Add New Semester - Start */}
             {showAddForm && <FormAddSemester onSemesterAdded={handleSemesterReload} />}
             {/* Show Form Add New Semester - End */}
+            
             {/* Show Form Update Semester - Start */}
             {showUpdateForm && (
                 <>
