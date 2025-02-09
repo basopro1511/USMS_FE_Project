@@ -1,57 +1,62 @@
 import request from "../../utils/baseURL";
 
-//Get all Semesters in Database 
+//#region Get Schedule
+// Get all Semesters in Database
 export const getSchedule = async () => {
     try {
-        const response = await request.get("Schedule")
-        console.log(response.data)
-        return response.data
+        const response = await request.get("Schedule");
+        console.log(response.data);
     } catch (error) {
         console.log(error);
     }
-}
+};
+//#endregion
 
-//Add New Semester
+//#region Add Schedule
+// Add New Schedule
 export const AddSchedule = async (ScheduleData) => {
     try {
-        const response = await request.post("Schedule", ScheduleData)
-        console.log(response.data)
-        return response.data
+        const response = await request.post("Schedule", ScheduleData);
+        return response.data;
     } catch (error) {
         console.log(error);
     }
-}
+};
+//#endregion
 
-//Get all Semesters in Database 
+//#region Update Schedule
+// Update Schedule
+export const UpdateSchedule = async (ScheduleData) => {
+    try {
+        const response = await request.put("Schedule", ScheduleData);
+        console.log(response.data);
+        return response.data;
+    } catch (error) {
+        console.log(error);
+    }
+};
+//#endregion
+
+//#region Delete Schedule
+// Delete Schedule by ID
+export const DeleteSchedule = async (id) => {
+    try {
+        const response = await request.delete(`Schedule/${id}`);
+        return response.data;
+    } catch (error) {
+        console.log(error);
+    }
+};
+//#endregion
+
+//#region Get Schedule for Staff
+// Get all Semesters in Database
 export const getScheduleForStaff = async (majorId, classId, term, startDay, endDay) => {
     try {
-        const response = await request.get(`/Schedule/${majorId}/${classId}/${term}/${startDay}/${endDay}`)
-        console.log(response.data)
-        return response.data
+        const response = await request.get(`/Schedule/${majorId}/${classId}/${term}/${startDay}/${endDay}`);
+        return response.data;
     } catch (error) {
         console.log(error);
     }
-}
-// //Update Semester
-// export const UpdateSemester = async (SemesterData) => {
-//     try {
-//         const response = await request.put("Semester", SemesterData)
-//         console.log(response.data)
-//         return response.data
-//     } catch (error) {
-//         console.log(error);
-//     }
-// }
-
-// // Change the status of a Semester
-// export const changeSemesterStatus = async (id, status) => {
-//     try {
-//         // Construct the URL with id and status
-//         const response = await request.get(`/Semester/ChangeStatus/${id}/${status}`);
-//         console.log(response.data);
-//         return response.data;
-//     } catch (error) {
-//         console.log(error);
-//     }
-// }
-
+};
+//#endregion
