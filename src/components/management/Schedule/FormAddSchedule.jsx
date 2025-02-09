@@ -127,11 +127,11 @@ function FormAddSchedule({ selectedClassId,onAdded }) {
               <div>
                 {showAlert === "error" ? (
                   <span>
-                    <strong>Error:</strong> {errorMessage}
+                    <strong>Thất bại:</strong> {errorMessage}
                   </span>
                 ) : (
                   <span>
-                    <strong>Success:</strong> {successMessage}
+                    <strong>Thành công:</strong> {successMessage}
                   </span>
                 )}
               </div>
