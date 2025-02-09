@@ -1,20 +1,19 @@
 import { useState, useEffect } from "react";
 import { getMajors } from "../../../services/majorService";
 import { getSlots } from "../../../services/slotService";
-import { getScheduleForStaff } from "../../../services/scheduleService";
+import {
+  getScheduleForStaff,
+} from "../../../services/scheduleService";
 import { getClassesIdByMajorId } from "../../../services/classService";
 import FormAddSchedule from "../../../components/management/Schedule/FormAddSchedule";
+import FormUpdateSchedule from "../../../components/management/Schedule/FormUpdateSchedule";
+import PopUpDeleteSchedule from "../../../components/management/Schedule/PopUpRemoveSchedule";
 
 function ManageSchedule() {
   //#region State & Error
   const [loading, setLoading] = useState(true); // Trạng thái tải dữ liệu
-  const [error, setError] = useState(null); // Lưu lỗi khi fetch dữ liệu
   const [, setSelectedWeek] = useState(1); // Số thứ tự của tuần được chọn
 
-  const [showAddForm, setAddForm] = useState(false); // Dùng để hiển thị form
-  const toggleShowForm = () => {
-      setAddForm(!showAddForm);
-  };
   // State cho dữ liệu filter (majorId, classId, term, startDay, endDay)
   const [filterData, setFilterData] = useState({
     majorId: "",
@@ -32,11 +31,27 @@ function ManageSchedule() {
 
   // State cho giá trị của select "Thời gian" (JSON string: { startDate, endDate })
   const [selectedWeekOption, setSelectedWeekOption] = useState("");
-
   // State cho ngày đầu tuần hiện tại (dùng để tính toán thời gian hiển thị)
   const [currentWeek, setCurrentWeek] = useState(new Date());
+  // Thêm state lưu ClassId
+  const [selectedClassId, setSelectedClassId] = useState("");
+  const [dataToUpdate, setDataUpdate] = useState(null);
+  // State để lưu ID của lịch cần xóa
+  const [deleteId, setDeleteId] = useState(null);
+  const [showDeletePopup, setShowDeletePopup] = useState(false);
+  //#endregion
 
-  const [selectedClassId, setSelectedClassId] = useState(""); // 🔹 Thêm state lưu ClassId
+  //#region State ẩn & hiện form
+
+  const [showAddForm, setAddForm] = useState(false); // Dùng để hiển thị form
+  const toggleShowForm = () => {
+    setAddForm(!showAddForm);
+  };
+  const [showUpdateForm, setUpdateForm] = useState(false); // Dùng để hiển thị form
+  const toggleShowUpdateForm = (data) => {
+    setDataUpdate(data);
+    setUpdateForm(!showUpdateForm);
+  };
 
   //#endregion
 
@@ -54,8 +69,6 @@ function ManageSchedule() {
     ) {
       // Đặt loading về true và reset error mỗi khi fetch dữ liệu mới
       setLoading(true);
-      setError(null);
-
       const fetchScheduleData = async () => {
         try {
           const scheduleRes = await getScheduleForStaff(
@@ -66,17 +79,18 @@ function ManageSchedule() {
             filterData.endDay
           );
 
-          if (scheduleRes && scheduleRes.result && scheduleRes.result.length > 0) {
+          if (
+            scheduleRes &&
+            scheduleRes.result &&
+            scheduleRes.result.length > 0
+          ) {
             setScheduleData(scheduleRes.result);
-            setError(null); // xoá lỗi cũ nếu có
           } else {
             setScheduleData([]);
-            setError("Không tìm thấy dữ liệu lịch theo bộ lọc");
           }
         } catch (err) {
           console.error("Error fetching schedules:", err);
           setScheduleData([]);
-          setError("Có lỗi xảy ra khi tải lịch.");
         } finally {
           setLoading(false);
         }
@@ -91,34 +105,32 @@ function ManageSchedule() {
     filterData.endDay,
   ]);
 
-    //Update bảng mà không cần reload
-      const handleReload = async () => {
-          const data = await getScheduleForStaff(   filterData.majorId,
-            filterData.classId,
-            filterData.term,
-            filterData.startDay,
-            filterData.endDay); // Gọi API để lấy lại tất cả các kì
-            setScheduleData(data.result); // Cập nhật lại dữ liệu kì
-      };
-      //Update bảng mà không cần reload
-
+  //Update bảng mà không cần reload
+  const handleReload = async () => {
+    const data = await getScheduleForStaff(
+      filterData.majorId,
+      filterData.classId,
+      filterData.term,
+      filterData.startDay,
+      filterData.endDay
+    ); // Gọi API để lấy lại tất cả các kì
+    setScheduleData(data.result); // Cập nhật lại dữ liệu kì
+  };
+  //Update bảng mà không cần reload
 
   // --- Fetch dữ liệu chuyên ngành ---
   useEffect(() => {
     const fetchMajorData = async () => {
       try {
-        setError(null); // reset error trước khi fetch majors
         const majorRes = await getMajors();
         if (majorRes && majorRes.result) {
           setMajorData(majorRes.result);
         } else {
           setMajorData([]);
-          setError("Không tìm thấy dữ liệu chuyên ngành");
         }
       } catch (err) {
         console.error("Error fetching majors:", err);
         setMajorData([]);
-        setError("Có lỗi xảy ra khi tải dữ liệu chuyên ngành");
       }
     };
     fetchMajorData();
@@ -128,18 +140,15 @@ function ManageSchedule() {
   useEffect(() => {
     const fetchSlotData = async () => {
       try {
-        setError(null); // reset error trước khi fetch slots
         const slotRes = await getSlots();
         if (slotRes && slotRes.result) {
           setSlotData(slotRes.result);
         } else {
           setSlotData([]);
-          setError("Không tìm thấy dữ liệu slot");
         }
       } catch (err) {
         console.error("Error fetching slots:", err);
         setSlotData([]);
-        setError("Có lỗi xảy ra khi tải dữ liệu slot");
       }
     };
     fetchSlotData();
@@ -154,23 +163,34 @@ function ManageSchedule() {
         return;
       }
       try {
-        setError(null);
         const classIdsRes = await getClassesIdByMajorId(filterData.majorId);
         if (classIdsRes && classIdsRes.result) {
           setClassIdsData(classIdsRes.result);
         } else {
           setClassIdsData([]);
-          setError("Không tìm thấy dữ liệu lớp cho chuyên ngành này");
         }
       } catch (err) {
         console.error("Error fetching class IDs:", err);
         setClassIdsData([]);
-        setError("Có lỗi xảy ra khi tải danh sách lớp.");
       }
     };
-
     fetchClassIds();
   }, [filterData.majorId]);
+
+  // Fetch lại danh sách sau khi xóa mà không cần reload
+  const handleDeleteSuccess = (id) => {
+    setScheduleData((prev) =>
+      prev.filter((item) => item.classScheduleId !== id)
+    );
+    setShowDeletePopup(false);
+  };
+
+  // Khi bấm nút xóa, mở popup xác nhận
+  const handleDeleteSchedule = (id) => {
+    setDeleteId(id);
+    setShowDeletePopup(true);
+  };
+
   //#endregion
 
   //#region Xử lý Filter Input
@@ -180,10 +200,8 @@ function ManageSchedule() {
     // Nếu thay đổi majorId (hoặc có thể các trường quan trọng khác), reset dữ liệu lịch và lỗi
     if (name === "majorId") {
       setScheduleData([]);
-      setError(null);
       setLoading(true);
     }
-
     setFilterData({
       ...filterData,
       [name]: value,
@@ -356,7 +374,9 @@ function ManageSchedule() {
     if (daySchedules.length > 0) {
       return daySchedules.map((schedule) => {
         const formatTime = (timeStr) => (timeStr ? timeStr.slice(0, 5) : "N/A");
-        const slotInfo = slotData.find((item) => item.slotId === schedule.slotId);
+        const slotInfo = slotData.find(
+          (item) => item.slotId === schedule.slotId
+        );
         const startTime = slotInfo ? formatTime(slotInfo.startTime) : "N/A";
         const endTime = slotInfo ? formatTime(slotInfo.endTime) : "N/A";
 
@@ -392,6 +412,7 @@ function ManageSchedule() {
                   <button
                     type="button"
                     className="border border-white w-[70px] h-[30px] bg-btnBlue text-white font-bold rounded-full transition-all duration-300 hover:scale-95"
+                    onClick={() => toggleShowUpdateForm(schedule)}
                   >
                     <i
                       className="fa fa-pencil-square w-13 h-21 text-black m-auto"
@@ -403,6 +424,9 @@ function ManageSchedule() {
                   <button
                     type="button"
                     className="border border-white w-[70px] h-[30px] bg-red-600 text-white font-bold rounded-full transition-all duration-300 hover:scale-95"
+                    onClick={() =>
+                      handleDeleteSchedule(schedule.classScheduleId)
+                    }
                   >
                     <i
                       className="fa fa-trash w-13 h-21 text-black m-auto"
@@ -426,16 +450,6 @@ function ManageSchedule() {
         <tr>
           <td colSpan="8" className="text-center">
             Đang tải dữ liệu...
-          </td>
-        </tr>
-      );
-    }
-
-    if (error) {
-      return (
-        <tr>
-          <td colSpan="8" className="text-center text-red-500">
-            {error}
           </td>
         </tr>
       );
@@ -478,168 +492,195 @@ function ManageSchedule() {
 
   //#region Render Giao diện (UI)
   return (
-    <div className="border border-white mt-4 w-[1600px] h-auto bg-white rounded-2xl mb-5">
-      <div className="flex">
-        <p className="m-auto text-3xl font-bold mt-8">Thời Khóa Biểu</p>
-      </div>
-
-      {/* --- Filter --- */}
-      <div className="flex w-auto h-12 mt-5">
+    <>
+    
+      <div className="border border-white mt-4 w-[1600px] h-auto bg-white rounded-2xl mb-5">
         <div className="flex">
-          {/* Select chuyên ngành */}
-          <select
-            className="max-w-sm mx-auto ml-3 h-12 w-[230px] border border-black rounded-xl"
-            name="majorId"
-            value={filterData.majorId}
-            onChange={handleInputChange}
-          >
-            <option value="" disabled>
-              Chọn chuyên ngành
-            </option>
-            {majorData.map((major) => (
-              <option key={major.majorId} value={major.majorId}>
-                {major.majorName}
-              </option>
-            ))}
-          </select>
-
-          {/* Select lớp */}
-          <select
-            className="max-w-sm mx-auto ml-3 h-12 w-[168px] border border-black rounded-xl"
-            name="classId"
-            value={filterData.classId}
-            onChange={(e) => {
-              handleInputChange(e);
-              handleClassChange(e);
-            }}            
-          >
-            <option value="" disabled>
-              Lớp
-            </option>
-            {classIdsData.map((classId) => (
-              <option key={classId} value={classId}>
-                {classId}
-              </option>
-            ))}
-          </select>
-
-          {/* Select kì học */}
-          <select
-            className="max-w-sm mx-auto ml-3 h-12 w-[168px] border border-black rounded-xl"
-            name="term"
-            value={filterData.term}
-            onChange={handleInputChange}
-          >
-            <option value="" disabled>
-              Kì học
-            </option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-            <option value="6">6</option>
-            <option value="7">7</option>
-            <option value="8">8</option>
-            <option value="9">9</option>
-          </select>
-
-          {/* Select Thời gian */}
-          <select
-            className="max-w-sm mx-auto ml-3 h-12 w-[230px] border border-black rounded-xl"
-            value={selectedWeekOption}
-            onChange={handleWeekChange}
-          >
-            <option value="" disabled>
-              Thời gian
-            </option>
-            {weeksOfYear.map((week) => (
-              <option
-                key={week.weekNumber}
-                value={JSON.stringify({
-                  startDate: week.startDate.toISOString().split("T")[0],
-                  endDate: week.endDate.toISOString().split("T")[0],
-                })}
-              >
-                {formatDateFilter(week.startDate)} - {formatDateFilter(week.endDate)}
-              </option>
-            ))}
-          </select>
+          <p className="m-auto text-3xl font-bold mt-8">Thời Khóa Biểu</p>
         </div>
 
-        <div className="flex rounded-full transition-all duration-300 hover:scale-95 ml-auto mr-4">
-          <button
-            type="button"
-            className="border border-white rounded-xl w-[130px] bg-secondaryGreen hover:bg-primaryGreen text-white font-semibold"
-            onClick={toggleShowForm}
-          >
-            <i className="fa fa-plus mr-2" aria-hidden="true"></i>
-            Thêm TKB
-          </button>
-        </div>
-      </div>
-      {/* --- End Filter --- */}
+        {/* --- Filter --- */}
+        <div className="flex w-auto h-12 mt-5">
+          <div className="flex">
+            {/* Select chuyên ngành */}
+            <select
+              className="max-w-sm mx-auto ml-3 h-12 w-[230px] border border-black rounded-xl"
+              name="majorId"
+              value={filterData.majorId}
+              onChange={handleInputChange}
+            >
+              <option value="" disabled>
+                Chọn chuyên ngành
+              </option>
+              {majorData.map((major) => (
+                <option key={major.majorId} value={major.majorId}>
+                  {major.majorName}
+                </option>
+              ))}
+            </select>
 
-      {/* --- Bảng thời khóa biểu --- */}
-      <div className="ml-3 mr-3 mt-5 h-auto">
-        <table className="w-[1570px] border rounded-2xl border-separate border-spacing-0 border-b-black border-r-black">
-          <thead>
-            <tr className="bg-secondaryBlue text-white rounded-xl">
-              <th className="border-t border-l border-black rounded-tl-xl">
-                Slot
-              </th>
-              {weekDates.map((date, index) => {
-                let dayLabel;
-                let extraClass = "";
-                if (index + 2 > 7) {
-                  dayLabel = "Chủ Nhật";
-                  extraClass = "border-r rounded-tr-xl";
-                } else {
-                  dayLabel = `Thứ ${index + 2}`;
-                }
-                return (
-                  <th
-                    key={index}
-                    className={`border-t border-l border-black ${extraClass}`}
-                  >
-                    {dayLabel}
-                    <br />
-                    {formatDate(date)}
-                  </th>
-                );
-              })}
-            </tr>
-          </thead>
-          <tbody>{renderTableRows()}</tbody>
-        </table>
-        {/* --- End Bảng thời khóa biểu --- */}
-        {showAddForm && <FormAddSchedule  selectedClassId={selectedClassId} onAdded={handleReload} />}
+            {/* Select lớp */}
+            <select
+              className="max-w-sm mx-auto ml-3 h-12 w-[168px] border border-black rounded-xl"
+              name="classId"
+              value={filterData.classId}
+              onChange={(e) => {
+                handleInputChange(e);
+                handleClassChange(e);
+              }}
+            >
+              <option value="" disabled>
+                Lớp
+              </option>
+              {classIdsData.map((classId) => (
+                <option key={classId} value={classId}>
+                  {classId}
+                </option>
+              ))}
+            </select>
 
-        {/* --- Phân trang --- */}
-        <div className="flex mt-5 mb-5">
-          <button
-            onClick={handlePreviousWeek}
-            type="button"
-            className="rounded-2xl transition-all duration-300 hover:bg-quaternarty hover:scale-95 border border-white w-[130px] h-[40px] bg-[#3c6470] text-white font-semibold ml-auto mr-4 flex items-center justify-center"
-          >
-            <span className="font-bold text-xl">&lt;</span> Tuần Trước
-          </button>
+            {/* Select kì học */}
+            <select
+              className="max-w-sm mx-auto ml-3 h-12 w-[168px] border border-black rounded-xl"
+              name="term"
+              value={filterData.term}
+              onChange={handleInputChange}
+            >
+              <option value="" disabled>
+                Kì học
+              </option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="6">6</option>
+              <option value="7">7</option>
+              <option value="8">8</option>
+              <option value="9">9</option>
+            </select>
 
-          <div className="border-2 border-black rounded-xl w-[220px] h-[40px] bg-primaryGray flex items-center justify-center">
-            {formatDate(weekDates[0])} Đến {formatDate(weekDates[6])}
+            {/* Select Thời gian */}
+            <select
+              className="max-w-sm mx-auto ml-3 h-12 w-[230px] border border-black rounded-xl"
+              value={selectedWeekOption}
+              onChange={handleWeekChange}
+            >
+              <option value="" disabled>
+                Thời gian
+              </option>
+              {weeksOfYear.map((week) => (
+                <option
+                  key={week.weekNumber}
+                  value={JSON.stringify({
+                    startDate: week.startDate.toISOString().split("T")[0],
+                    endDate: week.endDate.toISOString().split("T")[0],
+                  })}
+                >
+                  {formatDateFilter(week.startDate)} -{" "}
+                  {formatDateFilter(week.endDate)}
+                </option>
+              ))}
+            </select>
           </div>
 
-          <button
-            onClick={handleNextWeek}
-            type="button"
-            className="rounded-2xl transition-all duration-300 hover:bg-quaternarty hover:scale-95 border border-white w-[130px] h-[40px] bg-[#3c6470] text-white font-semibold ml-4 mr-auto flex items-center justify-center"
-          >
-            Tuần Sau <span className="font-bold text-xl">&gt;</span>
-          </button>
+          <div className="flex rounded-full transition-all duration-300 hover:scale-95 ml-auto mr-4">
+            <button
+              type="button"
+              className="border border-white rounded-xl w-[130px] bg-secondaryGreen hover:bg-primaryGreen text-white font-semibold"
+              onClick={toggleShowForm}
+            >
+              <i className="fa fa-plus mr-2" aria-hidden="true"></i>
+              Thêm TKB
+            </button>
+          </div>
         </div>
-        {/* --- End Phân trang --- */}
+        {/* --- End Filter --- */}
+
+        {/* --- Bảng thời khóa biểu --- */}
+        <div className="ml-3 mr-3 mt-5 h-auto">
+          <table className="w-[1570px] border rounded-2xl border-separate border-spacing-0 border-b-black border-r-black">
+            <thead>
+              <tr className="bg-secondaryBlue text-white rounded-xl">
+                <th className="border-t border-l border-black rounded-tl-xl">
+                  Slot
+                </th>
+                {weekDates.map((date, index) => {
+                  let dayLabel;
+                  let extraClass = "";
+                  if (index + 2 > 7) {
+                    dayLabel = "Chủ Nhật";
+                    extraClass = "border-r rounded-tr-xl";
+                  } else {
+                    dayLabel = `Thứ ${index + 2}`;
+                  }
+                  return (
+                    <th
+                      key={index}
+                      className={`border-t border-l border-black ${extraClass}`}
+                    >
+                      {dayLabel}
+                      <br />
+                      {formatDate(date)}
+                    </th>
+                  );
+                })}
+              </tr>
+            </thead>
+            <tbody>{renderTableRows()}</tbody>
+          </table>
+          {/* --- End Bảng thời khóa biểu --- */}
+
+          {/* Ẩn & hiện form start */}
+          {showAddForm && (
+            <FormAddSchedule
+              selectedClassId={selectedClassId}
+              onAdded={handleReload}
+            />
+          )}
+
+          {showUpdateForm && (
+            <FormUpdateSchedule
+              selectedClassId={selectedClassId}
+              dataToUpdate={dataToUpdate}
+              onAdded={handleReload}
+            />
+          )}
+          {showDeletePopup && (
+            <PopUpDeleteSchedule
+            scheduleId={deleteId}
+            onDeleted={handleDeleteSuccess}
+            onCancel={() => setShowDeletePopup(false)}
+          />
+          )}
+          {/* Ẩn & hiện form end */}
+
+          {/* --- Phân trang --- */}
+          <div className="flex mt-5 mb-5">
+            <button
+              onClick={handlePreviousWeek}
+              type="button"
+              className="rounded-2xl transition-all duration-300 hover:bg-quaternarty hover:scale-95 border border-white w-[130px] h-[40px] bg-[#3c6470] text-white font-semibold ml-auto mr-4 flex items-center justify-center"
+            >
+              <span className="font-bold text-xl">&lt;</span> Tuần Trước
+            </button>
+
+            <div className="border-2 border-black rounded-xl w-[220px] h-[40px] bg-primaryGray flex items-center justify-center">
+              {formatDate(weekDates[0])} Đến {formatDate(weekDates[6])}
+            </div>
+
+            <button
+              onClick={handleNextWeek}
+              type="button"
+              className="rounded-2xl transition-all duration-300 hover:bg-quaternarty hover:scale-95 border border-white w-[130px] h-[40px] bg-[#3c6470] text-white font-semibold ml-4 mr-auto flex items-center justify-center"
+            >
+              Tuần Sau <span className="font-bold text-xl">&gt;</span>
+            </button>
+          </div>
+          {/* --- End Phân trang --- */}
+        </div>
       </div>
-    </div>
+    </>
   );
   //#endregion
 }
