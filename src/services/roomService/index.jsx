@@ -45,3 +45,15 @@ export const changeRoomStatus = async (id, status) => {
     }
 }
 
+// Change the status of a room
+export const GetAvailableRoom = async (date, slotId) => {
+    try {
+        // Construct the URL with id and status
+        const response = await request.get(`/Room/AvailableRooms/${date}/${slotId}`);
+        console.log(response.data);
+        return response.data;
+    } catch (error) {
+        console.log(error);
+    }
+}
+

@@ -1,139 +1,241 @@
-import React, { useState } from "react";
-import { postSchedule } from "../../../services/scheduleService";
+import { useEffect, useState } from "react";
+import { getClassesIdByClassId } from "../../../services/classService";
+import { GetAvailableRoom } from "../../../services/roomService";
+import { AddSchedule } from "../../../services/scheduleService";
 
-function AddScheduleForm({ onClose }) {
-  // State lưu dữ liệu form
-  const [formData, setFormData] = useState({
-    classSubjectId: "",
+// eslint-disable-next-line react/prop-types
+function FormAddSchedule({ selectedClassId,onAdded }) {
+  //#region State & Error
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+  const [showAlert, setShowAlert] = useState(false); // Alert for success or failure notification
+  const [isFormVisible, setIsFormVisible] = useState(true); // State to control form visibility
+
+  // Dữ liệu cho form
+  const [classSubjects, setClassSubjects] = useState([]); // dropdown Lớp-Môn
+  const [rooms, setRooms] = useState([]); // dropdown phòng (nếu fetch)
+
+  // Dữ liệu schedule
+  const [newSchedule, setNewSchedule] = useState({
+    classSubjectId: 0,
     date: "",
-    slotId: "",
+    slotId: 0,
     roomId: "",
-    // Thêm các field khác nếu ClassScheduleDTO yêu cầu
+    slotNoInSubject: 0
   });
 
-  // State thông báo
-  const [message, setMessage] = useState("");
-  const [error, setError] = useState("");
+  //#endregion
 
-  // Khi người dùng nhập / chọn field
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+  //#region Fetch API
+  const handleCancel = () => {
+    setIsFormVisible(false); // Hide form when cancel is clicked
   };
 
-  // Khi bấm nút "Thêm"
+  //#region  lấy danh sách lớp
+  useEffect(() => {
+    const fetchClassSubject = async () => {
+      const classSubjects = await getClassesIdByClassId(selectedClassId); //Lấy ra list  trong database
+      setClassSubjects(classSubjects.result);
+    };
+    fetchClassSubject();
+  }, []);
+  //#endregion
+
+  //#region lấy danh sách phòng khả dụng
+  useEffect(() => {
+    if (newSchedule.date && newSchedule.slotId) {
+      const fetchAvailableRooms = async () => {
+        try {
+          const rooms = await GetAvailableRoom(
+            newSchedule.date,
+            newSchedule.slotId
+          );
+          setRooms(rooms.result);
+        } catch (error) {
+          console.error("Error fetching subjects:", error);
+        }
+      };
+      fetchAvailableRooms();
+    }
+  }, [newSchedule.date, newSchedule.slotId]);
+  //#endregion
+
+  //#region handle input change
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    
+    setNewSchedule((prev) => ({
+      ...prev,
+      [name]: 
+        name === "classSubjectId" || name === "slotId" || name === "slotNoInSubject"
+          ? Number(value)  // Chuyển đổi thành number
+          : value
+    }));
+  };
+  //#endregion
+
+  //#endregion
+
+  //#region Xử lý Submit Form để thêm lịch học
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setMessage("");
-    setError("");
-
-    // Gọi API thêm mới
-    const response = await postSchedule(formData);
-    if (response) {
-      if (response.isSuccess) {
-        setMessage(response.message || "Thêm thời khóa biểu thành công!");
-        // Reset form
-        setFormData({
-          classSubjectId: "",
-          date: "",
-          slotId: "",
-          roomId: "",
-        });
+    setErrorMessage("");
+    setSuccessMessage("");
+    try {
+      const response = await AddSchedule(newSchedule);
+      if (response && response.isSuccess) {
+        setSuccessMessage(response.message);
+        setShowAlert("success");
+        onAdded(response.schdule);
+        setTimeout(() => setShowAlert(false), 3000); // Ẩn thông báo sau 3 giây
+         setIsFormVisible(false); // Ẩn form
       } else {
-        setError(response.message || "Có lỗi xảy ra khi thêm TKB!");
+        setErrorMessage(response.message);
+        setShowAlert("error");
       }
-    } else {
-      setError("Không thể kết nối tới máy chủ!");
+    } catch (error) {
+      setErrorMessage("Lỗi hệ thống, vui lòng thử lại!");
+      setShowAlert("error");
+      console.error("Error adding schedule:", error);
     }
   };
-
-  // Nút "Đóng" form
-  const handleClose = () => {
-    onClose(); // gọi hàm cha truyền xuống
-  };
+  //#endregion
 
   return (
-    <div className="p-4 mt-4 border border-gray-400 rounded bg-white">
-      <h3 className="text-xl font-bold mb-2">Thêm Thời Khóa Biểu</h3>
+    <>
+      {/* Notification Start */}
+      <>
+        {showAlert && (
+          <div
+            className={`fixed top-5 right-0 z-50 ${
+              showAlert === "error"
+                ? "animate-slide-in text-red-800 bg-red-50 border-red-300 mr-4"
+                : "animate-slide-in text-green-800 bg-green-50 border-green-300 mr-4"
+            } border rounded-lg p-4`}
+          >
+            <div className="flex items-center">
+              <svg
+                className="flex-shrink-0 inline w-4 h-4 me-3"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 1 1 1 1v4h1a1 1 0 0 1 0 2Z" />
+              </svg>
+              <span className="sr-only">Info</span>
+              <div>
+                {showAlert === "error" ? (
+                  <span>
+                    <strong>Thất bại:</strong> {errorMessage}
+                  </span>
+                ) : (
+                  <span>
+                    <strong>Thành công:</strong> {successMessage}
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+      </>
+      {/* Notification End */}
 
-      {message && <div className="text-green-600 mb-2">{message}</div>}
-      {error && <div className="text-red-600 mb-2">{error}</div>}
+      {/* Form Start */}
+      <>
+        {isFormVisible && ( // Show form if isFormVisible is true
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+            <div className="bg-white border w-full max-w-[700px] h-auto rounded-2xl items-center text-center shadow-xl">
+              <div>
+                <p className="font-bold text-3xl sm:text-4xl md:text-5xl mt-8 text-secondaryBlue">
+                  Thêm lịch học
+                </p>
+                <form onSubmit={handleSubmit}>
+                  <p className="text-left ml-[100px] text-xl mt-5">
+                    Mã lớp - Môn học:
+                  </p>
+                  <select
+                    type="text"
+                    required
+                    placeholder="Mã kỳ học"
+                    className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl mb-3 px-4"
+                    name="classSubjectId"
+                    value={newSchedule.classSubjectId}
+                    onChange={handleInputChange}
+                  >
+                        <option value="">-- Chọn Lớp-Môn --</option>
+                  {classSubjects.map((cs) => (
+                    <option key={cs.classSubjectId} value={cs.classSubjectId}>
+                      {cs.classId} - {cs.subjectId}
+                    </option>
+                  ))}
+                  </select>
+                  <p className="text-left ml-[100px] text-xl ">Ngày:</p>
+                  <input
+                    type="date"
+                    required
+                    className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl mb-3 px-4"
+                    name="date"
+                    value={newSchedule.date}
+                    onChange={handleInputChange}
+                  />
+                  <p className="text-left ml-[100px] text-xl ">Slot:</p>
+                  <select
+                    required
+                    name="slotId"
+                    value={newSchedule.slotId}
+                    onChange={handleInputChange}
+                    className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl mb-3 px-4"
+                    // onChange={(e) =>
+                    //     setNewSemester({ ...newSemester, endDate: e.target.value })
+                    // }
+                  >
+                    <option value="">-- Chọn Slot --</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                  </select>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {/* ClassSubjectId */}
-        <div>
-          <label className="block font-medium">ClassSubjectId</label>
-          <input
-            type="number"
-            name="classSubjectId"
-            value={formData.classSubjectId}
-            onChange={handleChange}
-            className="border rounded p-1 w-full"
-            placeholder="VD: 101"
-            required
-          />
-        </div>
+                  <p className="text-left ml-[100px] text-xl ">Phòng:</p>
+                  <select
+                    required
+                    name="roomId"
+                    className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl mb-3 px-4"
+                    onChange={handleInputChange}
+                  >
+                    <option value="">-- Chọn Phòng --</option>
+                    {rooms.map((r) => (
+                      <option key={r.roomId} value={r.roomId}>
+                        {r.roomId} - {r.location}
+                      </option>
+                    ))}
+                  </select>
 
-        {/* Date */}
-        <div>
-          <label className="block font-medium">Ngày học</label>
-          <input
-            type="date"
-            name="date"
-            value={formData.date}
-            onChange={handleChange}
-            className="border rounded p-1 w-full"
-            required
-          />
-        </div>
-
-        {/* SlotId */}
-        <div>
-          <label className="block font-medium">Slot</label>
-          <input
-            type="number"
-            name="slotId"
-            value={formData.slotId}
-            onChange={handleChange}
-            className="border rounded p-1 w-full"
-            placeholder="VD: 1"
-            required
-          />
-        </div>
-
-        {/* RoomId */}
-        <div>
-          <label className="block font-medium">Phòng học</label>
-          <input
-            type="text"
-            name="roomId"
-            value={formData.roomId}
-            onChange={handleChange}
-            className="border rounded p-1 w-full"
-            placeholder="VD: D203"
-            required
-          />
-        </div>
-
-        {/* Nút thêm */}
-        <button
-          type="submit"
-          className="bg-blue-500 text-white py-1 px-4 rounded hover:bg-blue-600"
-        >
-          Thêm
-        </button>
-
-        {/* Nút đóng */}
-        <button
-          type="button"
-          onClick={handleClose}
-          className="ml-2 bg-gray-300 py-1 px-4 rounded hover:bg-gray-400"
-        >
-          Đóng
-        </button>
-      </form>
-    </div>
+                  <div className="flex flex-wrap justify-center gap-4">
+                    <button
+                      type="submit"
+                      className="w-full max-w-[200px] h-[50px] sm:h-[64px] border rounded-3xl bg-secondaryBlue text-white font-bold text-lg sm:text-2xl transition-all hover:scale-105 hover:bg-primaryBlue"
+                    >
+                      Thêm
+                    </button>
+                    <button
+                      type="button" // Use type="button" to prevent form submission
+                      className="w-full max-w-[200px] h-[50px] sm:h-[64px] border rounded-3xl bg-red-500 text-white font-bold text-lg sm:text-2xl transition-all hover:scale-105 hover:bg-red-700 mb-8"
+                      onClick={handleCancel} // Hide form when cancel is clicked
+                    >
+                      Hủy
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        )}
+      </>
+    </>
   );
 }
 
-export default AddScheduleForm;
+export default FormAddSchedule;
