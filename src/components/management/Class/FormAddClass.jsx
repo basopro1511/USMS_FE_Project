@@ -41,7 +41,7 @@ function FormAddClass({ onClassAdded }) {
     };
     fetchSemesterData();
   }, []);
-  //Fetch Data Major - End
+  //Fetch Data Semester - End
 
   // Fetch Data Subjcet - Start
   const [subjectData, setSubjectData] = useState([]);

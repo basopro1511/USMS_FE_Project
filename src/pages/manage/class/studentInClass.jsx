@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from "react";
+import  { useState, useEffect } from "react";
 import FormAddStudentInClass from "../../../components/management/StudentInClass/FormAddStudentInClass";
 import PopUpRemoveStudentInClass from "../../../components/management/StudentInClass/PopUpRemoveStudentInClass";
 function StudentInClass() {
-  const [studentData, setStudentData] = useState([
+  const [studentData,] = useState([
     {
       studentId: "ThangNT",
       lastName: "Nguyễn",
