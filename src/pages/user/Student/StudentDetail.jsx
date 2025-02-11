@@ -1,24 +1,16 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+import { useEffect, useState } from "react";
 import AvatarSquare from "../../../assets/Imgs/avatar_square.jpg";
+import { GetUserByID } from "../../../services/userService";
 
 function StudentDetail() {
   const [studentData, setStudentData] = useState(null);
 
   useEffect(() => {
-    // Gọi API từ Ocelot Gateway
-    axios
-      .get("https://localhost:7067/api/User/CE170288") // Địa chỉ API qua Ocelot
-      .then((response) => {
-        if (response.data.isSuccess) {
-          setStudentData(response.data.result);
-        } else {
-          console.error("Error fetching student data:", response.data.message);
-        }
-      })
-      .catch((error) => {
-        console.error("API error:", error);
-      });
+     const fetchUserData = async () => {
+       const data = await GetUserByID("CT170292"); //Lấy ra data của user trong database
+       setStudentData(data.result);
+     };
+     fetchUserData();
   }, []);
 
   // Xử lý trường hợp chưa có dữ liệu
@@ -37,7 +29,7 @@ function StudentDetail() {
           <div className="flex flex-col items-center ml-auto mr-12 text-left">
             <img
               className="w-[180px] h-[220px] rounded mb-5"
-              src={studentData.userAvatar || AvatarSquare}
+              src={studentData.userAvartar || AvatarSquare}
               alt="Avatar"
             />
             <p>Current Term No: 8</p>
@@ -153,7 +145,7 @@ function StudentDetail() {
                 <input
                   type="text"
                   className="w-full border px-4 py-2 mt-1 rounded-md"
-                  value="Chưa có thông tin" // Thêm giá trị khi API hỗ trợ
+                  value={studentData.address}
                   readOnly
                 />
               </div>

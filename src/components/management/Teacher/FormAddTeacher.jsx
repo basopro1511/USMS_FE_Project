@@ -1,5 +1,7 @@
+/* eslint-disable react/prop-types */
 import { useState, useRef } from "react";
 
+// eslint-disable-next-line no-unused-vars
 function FormAddTeacher({ onTeacherAdded }) {
     const [newTeacher, setNewTeacher] = useState({
         teacherId: "",

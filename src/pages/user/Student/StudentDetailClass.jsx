@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 function StudentDetailClass() {
-    const [studentData, setStudentData] = useState([
+    const [studentData] = useState([
         { sTT: "1", studentId: "CE160815", userAvatar: "https://i.pinimg.com/736x/c2/b1/36/c2b1367627ae11fc45f6e1d51d9efd13.jpg", mSSV: "CE160815", lastName: "Nguyễn", middleName: "Toàn", firstName: "Thắng" },
         { sTT: "2", studentId: "CE160816", userAvatar: "https://i.pinimg.com/736x/c2/b1/36/c2b1367627ae11fc45f6e1d51d9efd13.jpg", mSSV: "CE160815", lastName: "Nguyễn", middleName: "Toàn", firstName: "Thắng" },
         { sTT: "3", studentId: "CE160817", userAvatar: "https://i.pinimg.com/736x/c2/b1/36/c2b1367627ae11fc45f6e1d51d9efd13.jpg", mSSV: "CE160815", lastName: "Nguyễn", middleName: "Toàn", firstName: "Thắng" },
