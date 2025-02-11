@@ -1,20 +1,45 @@
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 import AvatarSquare from "../../../assets/Imgs/avatar_square.jpg";
 
 function StudentDetail() {
+  const [studentData, setStudentData] = useState(null);
+
+  useEffect(() => {
+    // Gọi API từ Ocelot Gateway
+    axios
+      .get("https://localhost:7067/api/User/CE170288") // Địa chỉ API qua Ocelot
+      .then((response) => {
+        if (response.data.isSuccess) {
+          setStudentData(response.data.result);
+        } else {
+          console.error("Error fetching student data:", response.data.message);
+        }
+      })
+      .catch((error) => {
+        console.error("API error:", error);
+      });
+  }, []);
+
+  // Xử lý trường hợp chưa có dữ liệu
+  if (!studentData) {
+    return <div>Loading...</div>;
+  }
+
   return (
-    <div className="w-full  mt-4 mx-auto">
+    <div className="w-full mt-4 mx-auto">
       <div className="text-center">
         <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-800">
           Thông tin học sinh
         </h1>
-        <div className="flex flex-col md:flex-row mt-6 ">
+        <div className="flex flex-col md:flex-row mt-6">
           {/* Avatar Start */}
-          <div className="flex flex-col items-center ml-auto mr-12 text-left ">
+          <div className="flex flex-col items-center ml-auto mr-12 text-left">
             <img
               className="w-[180px] h-[220px] rounded mb-5"
-              src={AvatarSquare}
-              alt="Default avatar"
-            ></img>
+              src={studentData.userAvatar || AvatarSquare}
+              alt="Avatar"
+            />
             <p>Current Term No: 8</p>
           </div>
           {/* Avatar End */}
@@ -28,6 +53,8 @@ function StudentDetail() {
                   <input
                     type="text"
                     className="w-full border px-4 py-2 mt-1 rounded-md"
+                    value={studentData.firstName}
+                    readOnly
                   />
                 </div>
                 <div className="flex-1">
@@ -35,6 +62,8 @@ function StudentDetail() {
                   <input
                     type="text"
                     className="w-full border px-4 py-2 mt-1 rounded-md"
+                    value={studentData.middleName}
+                    readOnly
                   />
                 </div>
               </div>
@@ -43,6 +72,8 @@ function StudentDetail() {
                 <input
                   type="text"
                   className="w-full border px-4 py-2 mt-1 rounded-md"
+                  value={studentData.email}
+                  readOnly
                 />
               </div>
               <div className="mb-4">
@@ -50,6 +81,8 @@ function StudentDetail() {
                 <input
                   type="text"
                   className="w-full border px-4 py-2 mt-1 rounded-md"
+                  value={studentData.majorName}
+                  readOnly
                 />
               </div>
               <div className="mb-4">
@@ -57,6 +90,8 @@ function StudentDetail() {
                 <input
                   type="text"
                   className="w-full border px-4 py-2 mt-1 rounded-md"
+                  value={studentData.phoneNumber}
+                  readOnly
                 />
               </div>
             </div>
@@ -64,34 +99,42 @@ function StudentDetail() {
 
             {/* Right Side Start */}
             <div className="w-full md:w-[490px] text-left text-gray-600 text-sm font-medium md:ml-8">
-              <div className="mb-4">
-                <div className="flex flex-col md:flex-row mb-4">
-                  <div className="flex-1 md:mr-4">
-                    <label>Tên</label>
-                    <input
-                      type="text"
-                      className="w-full border px-4 py-2 mt-1 rounded-md"
-                    />
-                  </div>
-                  <div className="flex-1 md:mr-4">
-                    <label>Mã số sinh viên</label>
-                    <input
-                      type="text"
-                      className="w-full border px-4 py-2 mt-1 rounded-md"
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <label>Giới tính</label>
-                    <input
-                      type="text"
-                      className="w-full border px-4 py-2 mt-1 rounded-md"
-                    />
-                  </div>
+              <div className="flex flex-col md:flex-row mb-4">
+                <div className="flex-1 md:mr-4">
+                  <label>Tên</label>
+                  <input
+                    type="text"
+                    className="w-full border px-4 py-2 mt-1 rounded-md"
+                    value={studentData.lastName}
+                    readOnly
+                  />
                 </div>
+                <div className="flex-1 md:mr-4">
+                  <label>Mã số sinh viên</label>
+                  <input
+                    type="text"
+                    className="w-full border px-4 py-2 mt-1 rounded-md"
+                    value={studentData.userId}
+                    readOnly
+                  />
+                </div>
+                <div className="flex-1">
+                  <label>Giới tính</label>
+                  <input
+                    type="text"
+                    className="w-full border px-4 py-2 mt-1 rounded-md"
+                    value="Nam" // Tùy chỉnh nếu API trả về gender
+                    readOnly
+                  />
+                </div>
+              </div>
+              <div className="mb-4">
                 <label>Email cá nhân</label>
                 <input
                   type="text"
                   className="w-full border px-4 py-2 mt-1 rounded-md"
+                  value={studentData.personalEmail}
+                  readOnly
                 />
               </div>
               <div className="mb-4">
@@ -99,6 +142,10 @@ function StudentDetail() {
                 <input
                   type="text"
                   className="w-full border px-4 py-2 mt-1 rounded-md"
+                  value={new Date(studentData.dateOfBirth).toLocaleDateString(
+                    "vi-VN"
+                  )}
+                  readOnly
                 />
               </div>
               <div className="mb-4">
@@ -106,6 +153,8 @@ function StudentDetail() {
                 <input
                   type="text"
                   className="w-full border px-4 py-2 mt-1 rounded-md"
+                  value="Chưa có thông tin" // Thêm giá trị khi API hỗ trợ
+                  readOnly
                 />
               </div>
             </div>
@@ -116,4 +165,5 @@ function StudentDetail() {
     </div>
   );
 }
+
 export default StudentDetail;
