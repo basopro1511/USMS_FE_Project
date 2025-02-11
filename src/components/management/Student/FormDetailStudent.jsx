@@ -12,12 +12,17 @@ function FormDetailStudent({ studentDetail, onStudentDetailUpdated }) {
         phone: "",
         dateOfBirth: "",
         startYear: "",
-        userAvatar: "",
+        userAvartar: "",
         status: "",
     });
     const [selectedImage, setSelectedImage] = useState(null);
     const fileInputRef = useRef(null);
-
+    const statusMapping = {
+        "0": "Vô hiệu hóa",
+        "1": "Đang học tiếp",
+        "2": "Đang tạm hoãn",
+        "3": "Đã tốt nghiệp",
+    };
     useEffect(() => {
         if (studentDetail) {
             setStudentData(studentDetail);
@@ -64,7 +69,7 @@ function FormDetailStudent({ studentDetail, onStudentDetailUpdated }) {
                                 {/* Avatar Section */}
                                 <div className="mb-4">
                                     <img
-                                        src={selectedImage || studentData.userAvatar || "/default-avatar.png"}
+                                        src={selectedImage || studentData.userAvartar || "/default-avatar.png"}
                                         alt="Avatar Preview"
                                         className="w-[180px] h-[220px] object-cover rounded-md"
                                     />
@@ -87,7 +92,7 @@ function FormDetailStudent({ studentDetail, onStudentDetailUpdated }) {
                                             <input
                                                 readOnly
                                                 type="text"
-                                                value={studentData.studentId}
+                                                value={studentData.userId}
                                                 className="w-full border rounded-md px-3 py-2"
                                             />
                                         </div>
@@ -140,7 +145,7 @@ function FormDetailStudent({ studentDetail, onStudentDetailUpdated }) {
                                     </div>
 
                                     <div>
-                                        <label className="block text-sm font-medium mb-1">Gmail:</label>
+                                        <label className="block text-sm font-medium mb-1">Email:</label>
                                         <input
                                             readOnly
                                             type="email"
@@ -148,13 +153,21 @@ function FormDetailStudent({ studentDetail, onStudentDetailUpdated }) {
                                             className="w-full border rounded-md px-3 py-2"
                                         />
                                     </div>
-
+                                    <div>
+                                        <label className="block text-sm font-medium mb-1">Email cá nhân:</label>
+                                        <input
+                                            readOnly
+                                            type="email"
+                                            value={studentData.personalEmail}
+                                            className="w-full border rounded-md px-3 py-2"
+                                        />
+                                    </div>
                                     <div>
                                         <label className="block text-sm font-medium mb-1">Số điện thoại:</label>
                                         <input
                                             readOnly
                                             type="text"
-                                            value={studentData.phone}
+                                            value={studentData.phoneNumber}
                                             className="w-full border rounded-md px-3 py-2"
                                         />
                                     </div>
@@ -174,7 +187,7 @@ function FormDetailStudent({ studentDetail, onStudentDetailUpdated }) {
                                         <input
                                             readOnly
                                             type="text"
-                                            value={studentData.startYear}
+                                            value={studentData.term}
                                             className="w-full border rounded-md px-3 py-2"
                                         />
                                     </div>
@@ -183,8 +196,19 @@ function FormDetailStudent({ studentDetail, onStudentDetailUpdated }) {
                                         <input
                                             readOnly
                                             type="text"
-                                            value={studentData.status}
+                                            value={statusMapping[studentData.status]}
                                             className="w-full border rounded-md px-3 py-2"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium mb-1">Địa chỉ:</label>
+                                        <input
+                                            type="text"
+                                            readOnly
+                                            value={studentData.address}
+                                            className="w-full border rounded-md px-3 py-2"
+                                            placeholder="Nhập địa chỉ"
+                                            onChange={(e) => handleInputChange("address", e.target.value)}
                                         />
                                     </div>
                                 </div>
