@@ -7,7 +7,7 @@ function StudentDetail() {
 
   useEffect(() => {
      const fetchUserData = async () => {
-       const data = await GetUserByID("CT170292"); //Lấy ra data của user trong database
+       const data = await GetUserByID("SE0001"); //Lấy ra data của user  trong database
        setStudentData(data.result);
      };
      fetchUserData();

@@ -50,7 +50,7 @@ const AppRoutes = () => {
 
     //Manange Zone //
     { path: "/manageClass", component: ManageClass, layout: ManageLayout },
-    { path: "/studentInClass", component: StudentInClass, layout: ManageLayout },
+    { path: "/studentInClass/:classSubjectId/:classId", component: StudentInClass, layout: ManageLayout },
     { path: "/manageSchedule", component: ManageSchedule, layout: ManageLayout },
     { path: "/manageRoom", component: ManageRoom, layout: ManageLayout },
     { path: "/manageSemester", component: ManageSemester, layout: ManageLayout },

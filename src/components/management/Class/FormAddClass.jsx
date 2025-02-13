@@ -79,7 +79,6 @@ function FormAddClass({ onClassAdded }) {
     e.preventDefault();
     try {
       const response = await AddClass(formData);
-      console.log(formData);
       if (response.isSuccess) {
         setShowAlert("success");
         setSuccessMessage(response.message);

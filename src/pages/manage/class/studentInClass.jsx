@@ -1,76 +1,33 @@
 import  { useState, useEffect } from "react";
 import FormAddStudentInClass from "../../../components/management/StudentInClass/FormAddStudentInClass";
 import PopUpRemoveStudentInClass from "../../../components/management/StudentInClass/PopUpRemoveStudentInClass";
-function StudentInClass() {
-  const [studentData,] = useState([
-    {
-      studentId: "ThangNT",
-      lastName: "Nguyễn",
-      middleName: "Toàn",
-      firstName: "Thắng",
-      phoneNumber: "0123123123",
-      email: "ThangNT23912@gmail.com",
-      major: "Kỹ thuật phần mềm",
-      dateOfBirth: "2002-04-01",
-      createdAt: "2020-01-01",
-      updatedAt: "2020-01-01",
-      personalEmail: "Ex@email.com",
-      userAvatar:
-        "https://i.pinimg.com/736x/c2/b1/36/c2b1367627ae11fc45f6e1d51d9efd13.jpg",
-    },
-    {
-      studentId: "ThangNT266",
-      lastName: "Nguyễn",
-      middleName: "Toàn",
-      firstName: "Thắng2",
-      phoneNumber: "0123123124",
-      email: "ThangNT239@gmail.com",
-      major: "Kỹ thuật phần mềm",
-      dateOfBirth: "2002-04-01",
-      createdAt: "2020-01-01",
-      updatedAt: "2020-01-01",
-      personalEmail: "Ex@email.com",
-      userAvatar:
-        "https://i.pinimg.com/736x/c2/b1/36/c2b1367627ae11fc45f6e1d51d9efd13.jpg",
-    },
-     {
-      studentId: "ThangNT8888",
-      lastName: "Nguyễn",
-      middleName: "Toàn",
-      firstName: "Thắng",
-      phoneNumber: "0123123123",
-      email: "ThangNT23912@gmail.com",
-      major: "Kỹ thuật phần mềm",
-      dateOfBirth: "2002-04-01",
-      createdAt: "2020-01-01",
-      updatedAt: "2020-01-01",
-      personalEmail: "Ex@email.com",
-      userAvatar:
-        "https://i.pinimg.com/736x/c2/b1/36/c2b1367627ae11fc45f6e1d51d9efd13.jpg",
-    },
-    {
-      studentId: "ThangNT2888",
-      lastName: "Nguyễn",
-      middleName: "Toàn",
-      firstName: "Thắng2",
-      phoneNumber: "0123123124",
-      email: "ThangNT239@gmail.com",
-      major: "Kỹ thuật phần mềm",
-      dateOfBirth: "2002-04-01",
-      createdAt: "2020-01-01",
-      updatedAt: "2020-01-01",
-      personalEmail: "Ex@email.com",
-      userAvatar:
-        "https://i.pinimg.com/736x/c2/b1/36/c2b1367627ae11fc45f6e1d51d9efd13.jpg",
-    },
-  ]);
+import { GetStudentDataByClassId } from "../../../services/studentInClassService";
+import { useParams } from "react-router-dom";
 
-  // Fetch Data Student - Start
-  // const handleStudentReload = async () => {
-  //   const data = await getStudents(); // Call API to fetch students
-  //   setStudentData(data.result); // Update student data
-  // };
-  // Fetch Data Student - End
+function StudentInClass() {
+  const [studentData, setStudentData] = useState([]);
+  const { classSubjectId , classId} = useParams(); // Lấy classId, classSubjectId từ URL
+  
+  //#region Fetch Data
+  useEffect(() => {
+    const fetchDataStudent = async () => {
+      try {
+        if (!classSubjectId) return; // Nếu không có classId thì không gọi API
+        const studentData = await GetStudentDataByClassId(classSubjectId);
+        console.log(studentData);
+        if (studentData && studentData.result) {
+          setStudentData(studentData.result);
+        } else {
+          setStudentData([]);
+        }
+      } catch (err) {
+        console.error("Error fetching students:", err);
+        setStudentData([]);
+      }
+    };
+    fetchDataStudent();
+  }, [classSubjectId]); // Thêm classId vào dependency để re-fetch khi nó thay đổi
+  //#endregion
 
   // Add Student Form visibility toggle
   const [showAddForm, setAddForm] = useState(false);
@@ -154,7 +111,7 @@ function StudentInClass() {
   return (
     <div className="border mt-4 h-auto pb-7 w-[1600px] bg-white rounded-2xl">
       <div className="flex justify-center">
-        <p className="mt-8 text-3xl font-bold">Sinh viên trong lớp</p>
+        <p className="mt-8 text-3xl font-bold">Sinh viên trong lớp <span className="text-red-600">{classId}</span></p>
       </div>
       <p className="ml-4 mt-5">Tìm kiếm: </p>
       {/* Filter Section */}
@@ -215,7 +172,7 @@ function StudentInClass() {
                 </th>
               <th
                 className="p-4 font-semibold cursor-pointer transition-all hover:bg-primaryBlue text-white text-center align-middle bg-secondaryBlue "
-                onClick={() => handleSort("studentId")}
+                onClick={() => handleSort("userId")}
               >
                   <div className="flex items-center justify-between">
                     <p className="m-auto transition-all hover:scale-105">
@@ -338,6 +295,31 @@ function StudentInClass() {
                   </svg>
                 </div>
               </th>
+              <th
+                className="p-4 font-semibold cursor-pointer transition-all hover:bg-primaryBlue text-white text-center align-middle bg-secondaryBlue "
+                onClick={() => handleSort("term")}
+              >
+                <div className="flex items-center justify-between">
+                  <p className="m-auto transition-all hover:scale-105">
+                    Kỳ học
+                  </p>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth="2"
+                    stroke="currentColor"
+                    aria-hidden="true"
+                    className="w-4 h-4"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9"
+                    />
+                  </svg>
+                </div>
+              </th>
               <th className="p-4 font-semibold text-white text-center align-middle bg-secondaryBlue">
                 <span>Thao tác</span>
               </th>
@@ -350,17 +332,18 @@ function StudentInClass() {
                 className="hover:bg-gray-50 even:bg-gray-50"
               >
                 <td className="p-4 border-b text-center">{index + 1}</td>
-                <td className="p-4 border-b text-center">{student.studentId}</td>
+                <td className="p-4 border-b text-center">{student.userId}</td>
                 <td className="p-4 border-b text-center">
                   {student.lastName+ " " + student.middleName + " " + student.firstName}
                 </td>
                 <td className="p-4 border-b text-center">{student.email}</td>
                 <td className="p-4 border-b text-center">{student.phoneNumber}</td>
-                <td className="p-4 border-b text-center">{student.major}</td>
+                <td className="p-4 border-b text-center">{student.majorName}</td>
+                <td className="p-4 border-b text-center">{student.term}</td>
                 <td className="p-4 border-b text-center">
                   <button
-                    onClick={toggleShowDeletePopup}
-                    type="button"
+  onClick={() => toggleShowDeletePopup(student.studentClassId)} 
+  type="button"
                     className="border border-white w-[45px] h-[35px] bg-red-600 text-white font-bold rounded-[10px] transition-all duration-300  hover:scale-95"
                   >
                     <i
@@ -402,7 +385,7 @@ function StudentInClass() {
       {/* Phân trang - end */}
 
       {/* Add Student Form */}
-      {showAddForm && <FormAddStudentInClass onClose={toggleShowForm} />}
+      {showAddForm && <FormAddStudentInClass onClose={toggleShowForm} classSubjectIdParam={classSubjectId} />}
       {showDeletePopup && <PopUpRemoveStudentInClass onClose={toggleShowDeletePopup}/>}
     </div>
   );

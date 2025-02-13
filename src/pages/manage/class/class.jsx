@@ -215,21 +215,19 @@ function ManageClass() {
               </option>
             ))}
           </select>
-
         </div>
         <div className="flex ml-auto rounded-full transition-all duration-300 hover:scale-95 mr-6 mt-2 md:mt-0">
-                    <button
-                        type="button"
-                        className="border border-white rounded-xl w-full md:w-[130px] bg-secondaryGreen hover:bg-primaryGreen text-white font-semibold"
-                        onClick={toggleShowForm}
-                    >
-                        <i className="fa fa-plus mr-2" aria-hidden="true"></i>
-                        Thêm lớp học
-                    </button>
-                </div>
+          <button
+            type="button"
+            className="border border-white rounded-xl w-full md:w-[130px] bg-secondaryGreen hover:bg-primaryGreen text-white font-semibold"
+            onClick={toggleShowForm}
+          >
+            <i className="fa fa-plus mr-2" aria-hidden="true"></i>
+            Thêm lớp học
+          </button>
+        </div>
       </div>
 
-     
       {/* table - Start */}
       <div className="w-[1565px] ml-3 relative flex flex-col mt-4 bg-white shadow-md rounded-2xl border border-gray overflow-hidden">
         <table className="w-full text-left table-auto bg-white">
@@ -240,7 +238,9 @@ function ManageClass() {
                 onClick={() => handleSort("classId")}
               >
                 <div className="flex items-center justify-between">
-                  <p className="m-auto transition-all hover:scale-105">Mã lớp</p>
+                  <p className="m-auto transition-all hover:scale-105">
+                    Mã lớp
+                  </p>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
@@ -390,7 +390,9 @@ function ManageClass() {
                 <td className="p-4 text-center align-middle">
                   {item.semesterId}
                 </td>
-                <td className="p-4 text-center align-middle">{item.majorName}</td>
+                <td className="p-4 text-center align-middle">
+                  {item.majorName}
+                </td>
                 <td className="p-4 text-center align-middle">{item.term}</td>
                 <td className="p-4 text-center align-middle">
                   {item.status === 0
@@ -402,17 +404,17 @@ function ManageClass() {
                     : "Không xác định"}
                 </td>
                 <td className="p-4 text-center align-middle">
-                  <button className="w-8 h-8 ml-auto mr-2 bg-primaryBlue text-white rounded-xl shadow-md hover:bg-blue-700 transition-all hover:scale-125"
-                                    onClick={() => handleUpdateClick(item)}
-
+                  <button
+                    className="w-8 h-8 ml-auto mr-2 bg-primaryBlue text-white rounded-xl shadow-md hover:bg-blue-700 transition-all hover:scale-125"
+                    onClick={() => handleUpdateClick(item)}
                   >
-                  <i className="fa-solid fa-pen-fancy"></i>
+                    <i className="fa-solid fa-pen-fancy"></i>
                   </button>
                   {/* Button 2 */}
-                  <Link to={"/studentInClass"}>
-                  <button className="w-8 h-8 mr-auto bg-green-600 text-white rounded-xl shadow-md hover:bg-green-700 transition-all  hover:scale-125">
-                  <i className="fa-regular fa-address-card"></i>
-                  </button>
+                  <Link to={`/studentInClass/${item.classSubjectId}/${item.classId}`}>
+                    <button className="w-8 h-8 mr-auto bg-green-600 text-white rounded-xl shadow-md hover:bg-green-700 transition-all hover:scale-125">
+                      <i className="fa-regular fa-address-card"></i>
+                    </button>
                   </Link>
                 </td>
               </tr>
@@ -448,16 +450,19 @@ function ManageClass() {
         </button>
       </div>
       {/* Phân trang - end */}
-        {/* Show Form Add New Class - Start */}
-        {showAddForm && <FormAddClass onClassAdded={handleClassReload} />}
-            {/* Show Form Add New Class - End */}
-            {/* Show Form Update Class - Start */}
-            {showUpdateForm && (
-                <>
-                    <FormUpdateClass classToUpdate={classToUpdate} onClassUpdated={handleClassReload} />
-                </>
-            )}
-            {/* Show Form Update Class - End */}
+      {/* Show Form Add New Class - Start */}
+      {showAddForm && <FormAddClass onClassAdded={handleClassReload} />}
+      {/* Show Form Add New Class - End */}
+      {/* Show Form Update Class - Start */}
+      {showUpdateForm && (
+        <>
+          <FormUpdateClass
+            classToUpdate={classToUpdate}
+            onClassUpdated={handleClassReload}
+          />
+        </>
+      )}
+      {/* Show Form Update Class - End */}
     </div>
   );
 }

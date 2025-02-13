@@ -39,6 +39,12 @@ function HeaderManage() {
             <p className="text-lg italic">Quản lý kỳ học</p>
           </>
         )}
+           {isActive("/manageStudent") && (
+          <>
+            <i className="fas fa-user-graduate w-4 h-4"></i>
+            <p className="text-lg italic">Quản lý sinh viên</p>
+            </>
+        )} 
         {isActive("/manageTeacher") && (
           <>
             <i className="fas fa-chalkboard-teacher w-4 h-4"></i>
