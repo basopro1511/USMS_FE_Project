@@ -1,210 +1,251 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AddSubject } from "../../../services/subjectService";
+import { getMajors } from "../../../services/majorService";
 
 function FormAddSubject({ onSubjectAdded }) {
-    const [errorMessage, setErrorMessage] = useState("");
-    const [successMessage, setSuccessMessage] = useState("");
-    const [showAlert, setShowAlert] = useState(false);
-    const [newSubject, setNewSubject] = useState({
-        subjectId: "",
-        subjectName: "",
-        majorId: "",
-        numberOfSlot: 0,
-        description: "",
-        status: 0,
-        createAt: new Date().toISOString(),
-        updateAt: new Date().toISOString(),
-    });
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+  const [showAlert, setShowAlert] = useState(false);
+  const [newSubject, setNewSubject] = useState({
+    subjectId: "",
+    subjectName: "",
+    majorId: "",
+    numberOfSlot: 0,
+    description: "",
+    status: 0,
+    createAt: new Date().toISOString(),
+    updateAt: new Date().toISOString(),
+  });
 
-    const [isFormVisible, setIsFormVisible] = useState(true); // State để điều khiển việc hiển thị form
-    const handleCancel = () => {
-        setIsFormVisible(false); // Ẩn form khi nhấn nút hủy
-    };
-    const [availableStatuses] = useState([
-        { id: 1, label: "Đang diễn ra" },
-        { id: 2, label: "Đã kết thúc" },
-        { id: 0, label: "Chưa bắt đầu" },
-    ]);
-    const handleAddSubject = async (e) => {
-        e.preventDefault();
-    
-        try {
-            const response = await AddSubject(newSubject);
-            console.log(newSubject);
-            if (response.isSuccess) {
-                setShowAlert("success");
-                setSuccessMessage(response.message);
-                onSubjectAdded(response.subject);
-                setTimeout(() => setShowAlert(false), 3000);
-                setIsFormVisible(false);
-            } else {
-                handleError(response.message);
-            }
-        } catch (error) {
-            handleServerError(error);
-        }
-    };
-    
-    const handleError = (message) => {
-        setShowAlert("error");
-        setErrorMessage(message);
+  const [isFormVisible, setIsFormVisible] = useState(true); // State để điều khiển việc hiển thị form
+  const handleCancel = () => {
+    setIsFormVisible(false); // Ẩn form khi nhấn nút hủy
+  };
+  const [availableStatuses] = useState([
+    { id: 1, label: "Đang diễn ra" },
+    { id: 2, label: "Đã kết thúc" },
+    { id: 0, label: "Chưa bắt đầu" },
+  ]);
+  const handleAddSubject = async (e) => {
+    e.preventDefault();
+
+    try {
+      const response = await AddSubject(newSubject);
+      console.log(newSubject);
+      if (response.isSuccess) {
+        setShowAlert("success");
+        setSuccessMessage(response.message);
+        onSubjectAdded(response.subject);
         setTimeout(() => setShowAlert(false), 3000);
-    };
-    
-    const handleServerError = (error) => {
-        if (error.response && error.response.status === 400) {
-            const { data } = error.response;
-            const validationErrors = data.errors || {};
-            const errorMessage =
-                Object.values(validationErrors).flat()[0] || // Lấy thông báo lỗi đầu tiên
-                data.message ||
-                "Có lỗi xảy ra.";
-    
-            handleError(errorMessage);
-        } else {
-            console.error("Error adding subject:", error);
-            handleError("Có lỗi không xác định xảy ra!");
-        }
-    };
-    
-    
+        setIsFormVisible(false);
+      } else {
+        handleError(response.message);
+      }
+    } catch (error) {
+      handleServerError(error);
+    }
+  };
 
+  const handleError = (message) => {
+    setShowAlert("error");
+    setErrorMessage(message);
+    setTimeout(() => setShowAlert(false), 3000);
+  };
 
-    return (
-        <>
-            {showAlert && (
-                <div
-                    className={`fixed top-5 right-0 z-50 ${showAlert === "error"
-                        ? "animate-slide-in text-red-800 bg-red-50 border-red-300 mr-4"
-                        : "animate-slide-in text-green-800 bg-green-50 border-green-300 mr-4"
-                        } border rounded-lg p-4`}
+  const handleServerError = (error) => {
+    if (error.response && error.response.status === 400) {
+      const { data } = error.response;
+      const validationErrors = data.errors || {};
+      const errorMessage =
+        Object.values(validationErrors).flat()[0] || // Lấy thông báo lỗi đầu tiên
+        data.message ||
+        "Có lỗi xảy ra.";
+
+      handleError(errorMessage);
+    } else {
+      console.error("Error adding subject:", error);
+      handleError("Có lỗi không xác định xảy ra!");
+    }
+  };
+  //#region Fetch Data Major - Start
+  const [majorData, setMajorData] = useState([]);
+  useEffect(() => {
+    const fetchMajorData = async () => {
+      const majorData = await getMajors(); //Lấy ra list room rtong database
+      setMajorData(majorData.result);
+    };
+    fetchMajorData();
+  }, []);
+  //#endregion
+  return (
+    <>
+      {showAlert && (
+        <div
+          className={`fixed top-5 right-0 z-50 ${
+            showAlert === "error"
+              ? "animate-slide-in text-red-800 bg-red-50 border-red-300 mr-4"
+              : "animate-slide-in text-green-800 bg-green-50 border-green-300 mr-4"
+          } border rounded-lg p-4`}
+        >
+          <div className="flex items-center">
+            <svg
+              className="flex-shrink-0 inline w-4 h-4 me-3"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 1 1 1 1v4h1a1 1 0 0 1 0 2Z" />
+            </svg>
+            <span className="sr-only">Info</span>
+            <div>
+              {showAlert === "error" ? (
+                <span>
+                  <strong>Lỗi:</strong> {errorMessage}
+                </span>
+              ) : (
+                <span>
+                  <strong>Thành Công:</strong> {successMessage}
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isFormVisible && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+          <div className="bg-white border w-full max-w-[700px] h-auto rounded-2xl items-center text-center shadow-xl">
+            <h2 className="font-bold text-3xl sm:text-4xl md:text-5xl mt-8 text-secondaryBlue">
+              Thêm môn học
+            </h2>
+            <form onSubmit={handleAddSubject}>
+              <p
+                htmlFor="subjectId"
+                className="text-left ml-[100px] text-xl mt-5"
+              >
+                Mã số môn học:
+              </p>
+              <input
+                type="text"
+                id="subjectId"
+                name="subjectId"
+                placeholder="Nhập mã môn học"
+                className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl mb-3 px-4"
+                required
+                onChange={(e) =>
+                  setNewSubject({ ...newSubject, subjectId: e.target.value })
+                }
+              />
+              <p htmlFor="subjectName" className="text-left ml-[100px] text-xl">
+                Tên môn học:
+              </p>
+              <input
+                type="text"
+                id="subjectName"
+                name="subjectName"
+                placeholder="Nhập tên môn học"
+                className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl mb-3 px-4"
+                required
+                onChange={(e) =>
+                  setNewSubject({
+                    ...newSubject,
+                    subjectName: e.target.value,
+                  })
+                }
+              />
+              <p htmlFor="majorId" className="text-left ml-[100px] text-xl">
+                Chuyên ngành:
+              </p>
+              <select
+                id="majorId"
+                name="majorId"
+                className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl mb-3 px-4"
+                required
+                onChange={(e) =>
+                  setNewSubject({ ...newSubject, majorId: e.target.value })
+                }
+              >
+                <option value="" disabled selected>
+                  Chọn chuyên ngành
+                </option>
+                {majorData.map((major) => (
+                  <option key={major.majorId} value={major.majorId}>
+                    {major.majorName}
+                  </option>
+                ))}
+              </select>
+              <p
+                htmlFor="numberOfSlot"
+                className="text-left ml-[100px] text-xl"
+              >
+                Số buổi học:
+              </p>
+              <input
+                type="number"
+                id="numberOfSlot"
+                name="numberOfSlot"
+                placeholder="Nhập số buổi học"
+                className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl mb-3 px-4"
+                required
+                onChange={(e) =>
+                  setNewSubject({
+                    ...newSubject,
+                    numberOfSlot: e.target.value,
+                  })
+                }
+              />
+              <p htmlFor="term" className="text-left ml-[100px] text-xl">
+                Kỳ Học:
+              </p>
+              <input
+                type="number"
+                id="term"
+                name="term"
+                placeholder="Nhập kì học"
+                className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl mb-3 px-4"
+                required
+                onChange={(e) =>
+                  setNewSubject({ ...newSubject, term: e.target.value })
+                }
+              />
+              <p htmlFor="description" className="text-left ml-[100px] text-xl">
+                Mô tả:
+              </p>
+              <textarea
+                id="description"
+                name="description"
+                placeholder="Nhập mô tả"
+                rows="4"
+                className="w-full max-w-[500px] h-[100px] text-black border border-black rounded-xl mb-3 px-4 py-1"
+                onChange={(e) =>
+                  setNewSubject({
+                    ...newSubject,
+                    description: e.target.value,
+                  })
+                }
+              ></textarea>
+              <div className="flex flex-wrap justify-center gap-4">
+                <button
+                  type="submit"
+                  className="w-full max-w-[200px] h-[50px] sm:h-[64px] border rounded-3xl bg-secondaryBlue text-white font-bold text-lg sm:text-2xl transition-all hover:scale-105 hover:bg-primaryBlue"
                 >
-                    <div className="flex items-center">
-                        <svg
-                            className="flex-shrink-0 inline w-4 h-4 me-3"
-                            aria-hidden="true"
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                        >
-                            <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 1 1 1 1v4h1a1 1 0 0 1 0 2Z" />
-                        </svg>
-                        <span className="sr-only">Info</span>
-                        <div>
-                            {showAlert === "error" ? (
-                                <span>
-                                    <strong>Lỗi:</strong> {errorMessage}
-                                </span>
-                            ) : (
-                                <span>
-                                    <strong>Thành Công:</strong> {successMessage}
-                                </span>
-                            )}
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {isFormVisible && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
-                    <div className="bg-white border w-full max-w-[700px] h-auto rounded-2xl items-center text-center shadow-xl">
-                        <h2 className="font-bold text-3xl sm:text-4xl md:text-5xl mt-8 text-secondaryBlue">Thêm môn học</h2>
-                        <form onSubmit={handleAddSubject}>
-                            <p htmlFor="subjectId" className="text-left ml-[100px] text-xl mt-5">Mã số môn học:</p>
-                            <input
-                                type="text"
-                                id="subjectId"
-                                name="subjectId"
-                                placeholder="Nhập mã môn học"
-                                className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl mb-3 px-4"
-                                required
-                                onChange={(e) =>
-                                    setNewSubject({ ...newSubject, subjectId: e.target.value })
-                                }
-                            />
-                            <p htmlFor="subjectName" className="text-left ml-[100px] text-xl">Tên môn học:</p>
-                            <input
-                                type="text"
-                                id="subjectName"
-                                name="subjectName"
-                                placeholder="Nhập tên môn học"
-                                className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl mb-3 px-4"
-                                required
-                                onChange={(e) =>
-                                    setNewSubject({ ...newSubject, subjectName: e.target.value })
-                                }
-                            />
-                            <p htmlFor="majorId" className="text-left ml-[100px] text-xl">Chuyên ngành:</p>
-                            <select
-                                id="majorId"
-                                name="majorId"
-                                className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl mb-3 px-4"
-                                required
-                                onChange={(e) =>
-                                    setNewSubject({ ...newSubject, majorId: e.target.value })
-                                }
-                            >
-                                <option value="">Chọn chuyên ngành</option>
-                                <option value="IT">Công nghệ thông tin</option>
-                                <option value="CS">Quản trị kinh doanh</option>
-                                <option value="CA">Ngôn ngữ Anh</option>
-                            </select>
-                            <p htmlFor="numberOfSlot" className="text-left ml-[100px] text-xl">Số buổi học:</p>
-                            <input
-                                type="number"
-                                id="numberOfSlot"
-                                name="numberOfSlot"
-                                placeholder="Nhập số buổi học"
-                                className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl mb-3 px-4"
-                                required
-                                onChange={(e) =>
-                                    setNewSubject({ ...newSubject, numberOfSlot: e.target.value })
-                                }
-                            />
-                            <p htmlFor="term" className="text-left ml-[100px] text-xl">Kỳ Học:</p>
-                            <input
-                                type="number"
-                                id="term"
-                                name="term"
-                                placeholder="Nhập kì học"
-                                className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl mb-3 px-4"
-                                required
-                                onChange={(e) =>
-                                    setNewSubject({ ...newSubject, term: e.target.value })
-                                }
-                            />
-                            <p htmlFor="description" className="text-left ml-[100px] text-xl">Mô tả:</p>
-                            <textarea
-                                id="description"
-                                name="description"
-                                placeholder="Nhập mô tả"
-                                rows="4"
-                                className="w-full max-w-[500px] h-[100px] text-black border border-black rounded-xl mb-3 px-4 py-1"
-                                onChange={(e) =>
-                                    setNewSubject({ ...newSubject, description: e.target.value })
-                                }
-                            ></textarea>
-                            <div className="flex flex-wrap justify-center gap-4">
-                                <button
-                                    type="submit"
-                                    className="w-full max-w-[200px] h-[50px] sm:h-[64px] border rounded-3xl bg-secondaryBlue text-white font-bold text-lg sm:text-2xl transition-all hover:scale-105 hover:bg-primaryBlue"
-                                >
-                                    Thêm
-                                </button>
-                                <button
-                                    type="button" // Use type="button" to prevent form submission
-                                    className="w-full max-w-[200px] h-[50px] sm:h-[64px] border rounded-3xl bg-red-500 text-white font-bold text-lg sm:text-2xl transition-all hover:scale-105 hover:bg-red-700 mb-8"
-                                    onClick={handleCancel} // Hide form when cancel is clicked
-                                >
-                                    Hủy
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            )}
-        </>
-    );
+                  Thêm
+                </button>
+                <button
+                  type="button" // Use type="button" to prevent form submission
+                  className="w-full max-w-[200px] h-[50px] sm:h-[64px] border rounded-3xl bg-red-500 text-white font-bold text-lg sm:text-2xl transition-all hover:scale-105 hover:bg-red-700 mb-8"
+                  onClick={handleCancel} // Hide form when cancel is clicked
+                >
+                  Hủy
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </>
+  );
 }
 
 export default FormAddSubject;

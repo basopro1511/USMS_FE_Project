@@ -137,7 +137,18 @@ function FormUpdateClass({ classToUpdate, onClassUpdated }) {
                             Cập nhật lớp học
                         </p>
                         <form onSubmit={handleSubmit}>
-              <p className="text-left ml-[100px] text-xl mt-5">
+                                {/* Mã số lớp học */}
+              <p className="text-left ml-[100px] text-xl mt-5">Mã lớp học:</p>
+              <input
+              readOnly
+                name="classId"
+                type="text"
+                value={classData.classId}
+                onChange={handleInputChange}
+                required
+                className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl px-4"
+              />
+              <p className="text-left ml-[100px] text-xl ">
                 Chọn chuyên ngành:
               </p>
               <select
@@ -195,17 +206,6 @@ function FormUpdateClass({ classToUpdate, onClassUpdated }) {
                   </option>
                 ))}
               </select>
-
-              {/* Mã số lớp học */}
-              <p className="text-left ml-[100px] text-xl ">Mã lớp học:</p>
-              <input
-                name="classId"
-                type="text"
-                value={classData.classId}
-                onChange={handleInputChange}
-                required
-                className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl px-4"
-              />
 
               {/* Mã kỳ học */}
               <p className="text-left ml-[100px] text-xl">Kỳ học:</p>

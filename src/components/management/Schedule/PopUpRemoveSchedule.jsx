@@ -3,11 +3,14 @@ import { DeleteSchedule } from "../../../services/scheduleService";
 
 // eslint-disable-next-line react/prop-types
 function PopUpDeleteSchedule({ scheduleId, onDeleted }) {
+  //#region State & Error
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [showAlert, setShowAlert] = useState(false); // Alert for success or failure notification
   const [isFormVisible, setIsFormVisible] = useState(true);
-
+  //#endregion
+  
+  //#region Handle function
   //  Xử lý khi nhấn "Hủy"
   const handleCancel = () => {
     setIsFormVisible(false);
@@ -28,7 +31,7 @@ function PopUpDeleteSchedule({ scheduleId, onDeleted }) {
           setShowAlert(false);
           onDeleted(scheduleId);
         }, 2000);
-        setIsFormVisible(false); // ✅ Ẩn popup sau 3 giây
+        setIsFormVisible(false);
       } else {
         setErrorMessage(response.message);
         setShowAlert("error");
@@ -40,6 +43,7 @@ function PopUpDeleteSchedule({ scheduleId, onDeleted }) {
       setTimeout(() => setShowAlert(false), 3000);
     }
   };
+  //#endregion
 
   return (
     <>

@@ -1,63 +1,113 @@
 import { useState } from "react";
+import { DeleteStudentInClass } from "../../../services/studentInClassService";
 
-function PopUpRemoveStudentInClass({ onStudentRemove, student }) {
-    const [isFormVisible, setIsFormVisible] = useState(true); // State để điều khiển việc hiển thị form
-    const [alertType, setAlertType] = useState(null); // State để quản lý loại thông báo
-    const [message, setMessage] = useState(""); // State để quản lý thông báo
+// eslint-disable-next-line react/prop-types
+function PopUpRemoveStudentInClass({ studentClassId, onDeleted }) {
 
-    const handleCancel = () => {
-        setIsFormVisible(false); // Ẩn form khi nhấn nút hủy
-    };
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+  const [showAlert, setShowAlert] = useState(false); // Alert for success or failure notification
+  const [isFormVisible, setIsFormVisible] = useState(true);
 
-    const handleDeleteClick = () => {
-        try {
-            // Lưu thông tin sinh viên cần xóa và gọi callback
-            if (onStudentRemove) {
-                onStudentRemove(student);
-            }
-            // Hiển thị thông báo thành công
-            setAlertType("success");
-            setMessage("Xóa sinh viên thành công.");
-        } catch (error) {
-            // Hiển thị lỗi nếu có vấn đề xảy ra
-            setAlertType("error");
-            setMessage("Đã xảy ra lỗi khi xóa sinh viên.");
-        } finally {
-            // Ẩn form
-            setIsFormVisible(false);
-        }
-    };
+  //  Xử lý khi nhấn "Hủy"
+  const handleCancel = () => {
+    setIsFormVisible(false);
+  };
 
-    return (
-        <>
-            {isFormVisible && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
-                    <div className="bg-white border w-full max-w-[500px] h-[150px] rounded-2xl items-center text-center shadow-xl">
-                        <p className="mt-8">Bạn có chắc muốn xóa sinh viên khỏi lớp?</p>
-                        <div className="flex justify-center space-x-4 mt-4 mb-4">
+  //  Xử lý khi nhấn "Xóa"
+  const handleDeleteClick = async () => {
+    setErrorMessage("");
+    setSuccessMessage("");
+    setShowAlert(false);
+    try {
+      const response = await DeleteStudentInClass(studentClassId);
+      if (response.isSuccess) {
+        setShowAlert("success");
+        setSuccessMessage(response.message);
+        setTimeout(() => {
+          setShowAlert(false);
+          onDeleted(studentClassId);
+        }, 1500);
+        setIsFormVisible(false); 
+      } else {
+        setErrorMessage(response.message);
+        setShowAlert("error");
+        setTimeout(() => setShowAlert(false), 3000);
+      }
+    } catch (error) {
+      setErrorMessage(error);
+      setShowAlert("error");
+      setTimeout(() => setShowAlert(false), 3000);
+    }
+  };
 
-                            <button
-                                type="button"
-                                className="w-full max-w-[150px] h-[50px] border rounded-3xl bg-red-500 text-white font-bold text-lg transition-all hover:scale-105 hover:bg-red-700"
-                                onClick={handleDeleteClick}
-                            >
-                                Xóa
-                            </button>
-                            <button
-                                type="button"
-                                className="w-full max-w-[150px] h-[50px] border rounded-3xl bg-secondaryBlue text-white font-bold text-lg transition-all hover:scale-105 hover:bg-primaryBlue"
-                                onClick={handleCancel}
-                            >
-                                Hủy
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
+  return (
+    <>
+      {isFormVisible && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+          <div className="bg-white border w-full max-w-[500px] h-auto rounded-2xl items-center text-center shadow-xl">
+            <p className="mt-8 font-semibold text-lg">
+              Bạn có chắc muốn xóa sinh viên này?
+            </p>
+            <div className="flex justify-center space-x-4 mt-4 mb-4">
+              <button
+                type="button"
+                className="w-full max-w-[150px] h-[50px] border rounded-3xl bg-red-500 text-white font-bold text-lg transition-all hover:scale-105 hover:bg-red-700"
+                onClick={handleDeleteClick}
+              >
+                Xóa
+              </button>
+              <button
+                type="button"
+                className="w-full max-w-[150px] h-[50px] border rounded-3xl bg-secondaryBlue text-white font-bold text-lg transition-all hover:scale-105 hover:bg-primaryBlue"
+                onClick={handleCancel}
+              >
+                Hủy
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
-            
-        </>
-    );
+      {/* Notification Start */}
+      <>
+        {showAlert && (
+          <div
+            className={`fixed top-5 right-0 z-50 ${
+              showAlert === "error"
+                ? "animate-slide-in text-red-800 bg-red-50 border-red-300 mr-4"
+                : "animate-slide-in text-green-800 bg-green-50 border-green-300 mr-4"
+            } border rounded-lg p-4`}
+          >
+            <div className="flex items-center">
+              <svg
+                className="flex-shrink-0 inline w-4 h-4 me-3"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 1 1 1 1v4h1a1 1 0 0 1 0 2Z" />
+              </svg>
+              <span className="sr-only">Info</span>
+              <div>
+                {showAlert === "error" ? (
+                  <span>
+                    <strong>Thất bại:</strong> {errorMessage}
+                  </span>
+                ) : (
+                  <span>
+                    <strong>Thành công:</strong> {successMessage}
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+      </>
+      {/* Notification End */}
+    </>
+  );
 }
 
 export default PopUpRemoveStudentInClass;

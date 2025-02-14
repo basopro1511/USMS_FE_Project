@@ -20,6 +20,15 @@ export const AddStudent = async (StudentData) => {
     }
 }
 
+export const GetStudentById = async (id) => {
+    try {
+        const response = await request.get(`/Student/${id}`)
+        return response.data
+    } catch (error) {
+        console.log(error);
+    }
+}
+
 //Update Student
 export const UpdateStudent = async (StudentData) => {
     const userId = StudentData.userId
