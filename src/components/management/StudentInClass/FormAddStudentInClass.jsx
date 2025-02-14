@@ -25,43 +25,55 @@ function FormAddStudentInClass({ onStudentAdded, classSubjectIdParam }) {
   });
 
   const [filter, setFilters] = useState({
-    studentId: "",
-    major: "",
+    userId: "",
+    majorName: "",
     term: "",
   });
   //#endregion
 
   //#region Fetch Data
   useEffect(() => {
-    const fetchStudentData = async () => {
-      try {
-        if (!classSubjectIdParam) {
-          console.error("Lỗi: classSubjectIdParam không hợp lệ!");
-          return; // Không gọi API nếu param chưa có
-        }
-        const data = await getAvailableStudent(classSubjectIdParam);
-        if (!data || !data.result) {
-          console.warn("API trả về dữ liệu không hợp lệ");
-          setStudentData([]); // Đảm bảo không gây lỗi khi render
-          return;
-        }
-        setStudentData(data.result);
-      } catch (error) {
-        console.error("Lỗi khi fetch dữ liệu sinh viên:", error);
-        setStudentData([]); // Đảm bảo không làm trang trắng
-      }
-    };
     fetchStudentData();
   }, [classSubjectIdParam]); // Re-fetch khi classSubjectIdParam thay đổi
+  const fetchStudentData = async () => {
+    try {
+      if (!classSubjectIdParam) {
+        console.error("Lỗi: classSubjectIdParam không hợp lệ!");
+        return;
+      }
+      const data = await getAvailableStudent(classSubjectIdParam);
+      if (!data || !data.result) {
+        setStudentData([]);
+        return;
+      }
+      setStudentData(data.result);
+    } catch (error) {
+      console.error("Lỗi khi fetch dữ liệu sinh viên:", error);
+      setStudentData([]);
+    }
+  };
+  //Update bảng mà không cần reload
+  const handleAddStudentReload = async () => {
+    try {
+      const data = await getAvailableStudent(classSubjectIdParam);
+      if (data && data.result) {
+        setStudentData(data.result);
+      }
+    } catch (error) {
+      console.error("Lỗi khi reload danh sách sinh viên:", error);
+    }
+  };
   //#endregion
 
   //#region Filtering & Sorting
   useEffect(() => {
     const filteredData = studentData.filter(
       (item) =>
-        (!filter.major || item.major === filter.major) &&
-        (!filter.term || item.term === parseInt(filter.term)) &&
-        (!filter.userId || item.userId.toLowerCase().includes(filter.userId))
+        (!filter.userId || item.userId.includes(filter.userId)) &&
+        (!filter.studentName ||
+          (item.firstName + " " + item.middleName + " " + item.lastName)
+            .toLowerCase()
+            .includes(filter.studentName.toLowerCase()))
     );
     setFilteredStudents(filteredData);
   }, [filter, studentData]);
@@ -121,6 +133,7 @@ function FormAddStudentInClass({ onStudentAdded, classSubjectIdParam }) {
     setIsFormVisible(false);
   };
 
+  //#region Add Single Student To Class
   const handleAddStudent = async (userId) => {
     try {
       const studentData = {
@@ -132,8 +145,9 @@ function FormAddStudentInClass({ onStudentAdded, classSubjectIdParam }) {
       if (response.isSuccess) {
         setShowAlert("success");
         setSuccessMessage(response.message);
-        onStudentAdded(response.data);
         setTimeout(() => setShowAlert(false), 3000);
+        onStudentAdded(response.data);
+        handleAddStudentReload();
       } else {
         setShowAlert("error");
         setErrorMessage(response.message);
@@ -143,9 +157,12 @@ function FormAddStudentInClass({ onStudentAdded, classSubjectIdParam }) {
       console.error("Error adding student:", error);
     }
   };
+  //#endregion
 
   //#region Thêm nhiều sinh viên cùng lúc
-  const handleAddMultipleStudents = async () => {
+  const handleAddMultipleStudents = async (event) => {
+    event.preventDefault();
+
     try {
       if (selectedStudents.length === 0) {
         setShowAlert("error");
@@ -153,7 +170,6 @@ function FormAddStudentInClass({ onStudentAdded, classSubjectIdParam }) {
         setTimeout(() => setShowAlert(false), 3000);
         return;
       }
-
       // Tạo danh sách sinh viên để gửi lên server
       const studentsData = selectedStudents.map((userId) => ({
         studentClassId: 0,
@@ -161,19 +177,21 @@ function FormAddStudentInClass({ onStudentAdded, classSubjectIdParam }) {
         studentId: userId,
       }));
 
-      // Gọi API để thêm nhiều sinh viên
       const response = await AddMultipleStudentToClass(studentsData);
 
       if (response.isSuccess) {
         setShowAlert("success");
         setSuccessMessage(response.message);
         setTimeout(() => setShowAlert(false), 3000);
-
-        // Cập nhật danh sách sau khi thêm thành công
-        setStudentData((prev) =>
-          prev.filter((student) => !selectedStudents.includes(student.userId))
-        );
+        onStudentAdded(response.data);
         setSelectedStudents([]);
+        // Gọi lại danh sách sinh viên còn lại sau khi thêm
+        setTimeout(async () => {
+          const updatedData = await getAvailableStudent(classSubjectIdParam);
+          if (updatedData && updatedData.result) {
+            setStudentData(updatedData.result);
+          }
+        }, 500); // Chờ 500ms để API xử lý
       } else {
         setShowAlert("error");
         setErrorMessage(response.message);
@@ -181,11 +199,14 @@ function FormAddStudentInClass({ onStudentAdded, classSubjectIdParam }) {
       }
     } catch (error) {
       console.error("Lỗi khi thêm nhiều sinh viên:", error);
+      setTimeout(() => setShowAlert(false), 3000);
     }
   };
   //#endregion
 
   //#endregion
+
+  //#region Render UI
   return (
     <>
       {alertType && (
@@ -234,7 +255,7 @@ function FormAddStudentInClass({ onStudentAdded, classSubjectIdParam }) {
                 <div className="flex w-full md:w-auto md:mb-0">
                   <select
                     name="majorName"
-                    // value={filter.majorName}
+                    value={filter.majorName}
                     onChange={handleFilterChange}
                     className="max-w-sm mx-auto ml-3 h-12 w-full md:w-[230px] border border-black rounded-xl"
                   >
@@ -252,7 +273,7 @@ function FormAddStudentInClass({ onStudentAdded, classSubjectIdParam }) {
 
                   <select
                     name="term"
-                    // value={filter.term}
+                    value={filter.term}
                     onChange={handleFilterChange}
                     className="max-w-sm mx-auto ml-3 h-12 w-full md:w-[168px] border border-black rounded-xl"
                   >
@@ -270,9 +291,18 @@ function FormAddStudentInClass({ onStudentAdded, classSubjectIdParam }) {
                     type="text"
                     name="userId"
                     placeholder="Mã số sinh viên"
-                    // value={filter.userId}
+                    value={filter.userId}
                     onChange={handleFilterChange}
                     className="max-w-sm mx-auto ml-3 h-12 w-full md:w-[150px] border border-black rounded-xl px-3"
+                  />
+                  {/* Search Full Name */}
+                  <input
+                    type="text"
+                    name="studentName"
+                    value={filter.studentName}
+                    onChange={handleFilterChange}
+                    className="max-w-sm mx-auto ml-3 h-12 px-3 w-full md:w-[230px] border border-black rounded-xl"
+                    placeholder="Tìm theo Tên sinh viên"
                   />
                 </div>
               </div>
@@ -580,6 +610,7 @@ function FormAddStudentInClass({ onStudentAdded, classSubjectIdParam }) {
       )}
     </>
   );
+  //#endregion
 }
 
 export default FormAddStudentInClass;

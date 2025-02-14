@@ -1,13 +1,24 @@
-import  { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import FormAddStudentInClass from "../../../components/management/StudentInClass/FormAddStudentInClass";
 import PopUpRemoveStudentInClass from "../../../components/management/StudentInClass/PopUpRemoveStudentInClass";
 import { GetStudentDataByClassId } from "../../../services/studentInClassService";
 import { useParams } from "react-router-dom";
 
 function StudentInClass() {
+  //#region State & error
   const [studentData, setStudentData] = useState([]);
-  const { classSubjectId , classId} = useParams(); // Lấy classId, classSubjectId từ URL
+  const { classSubjectId, classId } = useParams(); // Lấy classId, classSubjectId từ URL
+  // State để lưu ID của lịch cần xóa
+  const [deleteId, setDeleteId] = useState(null);
+  const [showDeletePopup, setShowDeletePopup] = useState(false);
+  //#endregion
   
+  //#region  Show &  Hide Form
+  const [showAddForm, setAddForm] = useState(false);
+  const toggleShowForm = () => setAddForm(!showAddForm);
+
+  //#endregion
+
   //#region Fetch Data
   useEffect(() => {
     const fetchDataStudent = async () => {
@@ -27,23 +38,31 @@ function StudentInClass() {
     };
     fetchDataStudent();
   }, [classSubjectId]); // Thêm classId vào dependency để re-fetch khi nó thay đổi
+
+  //Update bảng mà không cần reload
+  const handleReloadPage = async () => {
+    const data = await GetStudentDataByClassId(classSubjectId); // Gọi API để lấy lại tất cả các lớp
+    setStudentData(data.result); // Cập nhật lại dữ liệu lớp
+  };
+
+  // Fetch lại danh sách sau khi xóa mà không cần reload
+  const handleDeleteSuccess = (id) => {
+    setStudentData((prev) => prev.filter((item) => item.studentClassId !== id));
+    setShowDeletePopup(false);
+  };
+
+  // Khi bấm nút xóa, mở popup xác nhận
+  const handleDeleteStudent = (id) => {
+    setDeleteId(id);
+    setShowDeletePopup(true);
+  };
+
   //#endregion
 
-  // Add Student Form visibility toggle
-  const [showAddForm, setAddForm] = useState(false);
-  const toggleShowForm = () => setAddForm(!showAddForm);
-  // Delete Student
-
-  // const [studentToDelete, setStudentToDelete] = useState(null);
-  // const handleDeleteClick = (student) => {
-  //   setStudentToDelete(student);
-  //   toggleShowDeletePopup();
-  // };
- const [showDeletePopup, setDeletePopup] = useState(false);
- const toggleShowDeletePopup =() => setDeletePopup(!showDeletePopup);
+  //#region Filter, Sort, Paging
   // Filter settings
   const [filters, setFilters] = useState({
-    studentId: "",
+    userId: "",
     studentName: "",
   });
 
@@ -59,16 +78,14 @@ function StudentInClass() {
     const filteredData = studentData.filter(
       (item) =>
         // Kiểm tra theo studentId nếu có
-        (!filters.studentId || item.studentId.includes(filters.studentId)) &&
+        (!filters.userId || item.userId.includes(filters.userId)) &&
         // Kiểm tra theo họ và tên
         (!filters.studentName ||
-          (item.firstName +
-            " " +
-            item.middleName +
-            " " +
-            item.lastName).toLowerCase().includes(filters.studentName.toLowerCase())) &&
+          (item.firstName + " " + item.middleName + " " + item.lastName)
+            .toLowerCase()
+            .includes(filters.studentName.toLowerCase())) &&
         // Kiểm tra theo chuyên ngành nếu có
-        (!filters.major || item.major === filters.major)
+        (!filters.majorName || item.majorName === filters.majorName)
     );
     setFilteredStudents(filteredData);
   }, [filters, studentData]);
@@ -82,9 +99,7 @@ function StudentInClass() {
 
   const handleSort = (key) => {
     const direction =
-      sortConfig.key === key && sortConfig.direction === "asc"
-        ? "desc"
-        : "asc";
+      sortConfig.key === key && sortConfig.direction === "asc" ? "desc" : "asc";
     setSortConfig({ key, direction });
   };
 
@@ -107,24 +122,37 @@ function StudentInClass() {
       setCurrentPage(newPage);
     }
   };
+  //#endregion
 
+  //#region Render UI
   return (
     <div className="border mt-4 h-auto pb-7 w-[1600px] bg-white rounded-2xl">
       <div className="flex justify-center">
-        <p className="mt-8 text-3xl font-bold">Sinh viên trong lớp <span className="text-red-600">{classId}</span></p>
+        <p className="mt-8 text-3xl font-bold">
+          Sinh viên trong lớp <span className="text-red-600">{classId}</span>
+        </p>
       </div>
       <p className="ml-4 mt-5">Tìm kiếm: </p>
       {/* Filter Section */}
       <div className="flex w-full h-12 flex-wrap md:flex-nowrap">
         <div className="flex w-full md:w-auto md:mb-0">
-          {/* Select Student Code */}
+          {/* Search User ID */}
           <input
             type="text"
-            name="studentId"
-            value={filters.studentId}
+            name="userId"
+            value={filters.userId}
             onChange={handleFilterChange}
             className="max-w-sm mx-auto ml-3 h-12 px-3 w-full md:w-[230px] border border-black rounded-xl"
-            placeholder="Mã sinh viên"
+            placeholder="Tìm kiếm theo Mã sinh viên"
+          />
+          {/* Search Full Name */}
+          <input
+            type="text"
+            name="studentName"
+            value={filters.studentName}
+            onChange={handleFilterChange}
+            className="max-w-sm mx-auto ml-3 h-12 px-3 w-full md:w-[230px] border border-black rounded-xl"
+            placeholder="Tìm theo Tên sinh viên"
           />
         </div>
         {/* Button Container */}
@@ -145,56 +173,54 @@ function StudentInClass() {
         <table className="min-w-full text-left table-auto bg-white">
           <thead className="bg-gray-100">
             <tr>
-            <th
-                  className="p-4 font-semibold cursor-pointer transition-all hover:bg-primaryBlue text-white text-center align-middle bg-secondaryBlue "
-                  onClick={() => handleSort("teacherId")}
-                >
-                  <div className="flex items-center justify-between">
-                    <p className="m-auto transition-all hover:scale-105">
-                      STT
-                    </p>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      strokeWidth="2"
-                      stroke="currentColor"
-                      aria-hidden="true"
-                      className="w-4 h-4"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9"
-                      />
-                    </svg>
-                  </div>
-                </th>
+              <th
+                className="p-4 font-semibold cursor-pointer transition-all hover:bg-primaryBlue text-white text-center align-middle bg-secondaryBlue "
+                onClick={() => handleSort("teacherId")}
+              >
+                <div className="flex items-center justify-between">
+                  <p className="m-auto transition-all hover:scale-105">STT</p>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth="2"
+                    stroke="currentColor"
+                    aria-hidden="true"
+                    className="w-4 h-4"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9"
+                    />
+                  </svg>
+                </div>
+              </th>
               <th
                 className="p-4 font-semibold cursor-pointer transition-all hover:bg-primaryBlue text-white text-center align-middle bg-secondaryBlue "
                 onClick={() => handleSort("userId")}
               >
-                  <div className="flex items-center justify-between">
-                    <p className="m-auto transition-all hover:scale-105">
-                      Mã sinh viên
-                    </p>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      strokeWidth="2"
-                      stroke="currentColor"
-                      aria-hidden="true"
-                      className="w-4 h-4"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9"
-                      />
-                    </svg>
-                  </div>
-                </th>
+                <div className="flex items-center justify-between">
+                  <p className="m-auto transition-all hover:scale-105">
+                    Mã sinh viên
+                  </p>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth="2"
+                    stroke="currentColor"
+                    aria-hidden="true"
+                    className="w-4 h-4"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9"
+                    />
+                  </svg>
+                </div>
+              </th>
               <th
                 className="p-4 font-semibold cursor-pointer transition-all hover:bg-primaryBlue text-white text-center align-middle bg-secondaryBlue "
                 onClick={() => handleSort("firstName")}
@@ -225,9 +251,7 @@ function StudentInClass() {
                 onClick={() => handleSort("email")}
               >
                 <div className="flex items-center justify-between">
-                  <p className="m-auto transition-all hover:scale-105">
-                    Email
-                  </p>
+                  <p className="m-auto transition-all hover:scale-105">Email</p>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
@@ -250,9 +274,7 @@ function StudentInClass() {
                 onClick={() => handleSort("phoneNumber")}
               >
                 <div className="flex items-center justify-between">
-                  <p className="m-auto transition-all hover:scale-105">
-                    SĐT
-                  </p>
+                  <p className="m-auto transition-all hover:scale-105">SĐT</p>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
@@ -334,16 +356,24 @@ function StudentInClass() {
                 <td className="p-4 border-b text-center">{index + 1}</td>
                 <td className="p-4 border-b text-center">{student.userId}</td>
                 <td className="p-4 border-b text-center">
-                  {student.lastName+ " " + student.middleName + " " + student.firstName}
+                  {student.lastName +
+                    " " +
+                    student.middleName +
+                    " " +
+                    student.firstName}
                 </td>
                 <td className="p-4 border-b text-center">{student.email}</td>
-                <td className="p-4 border-b text-center">{student.phoneNumber}</td>
-                <td className="p-4 border-b text-center">{student.majorName}</td>
+                <td className="p-4 border-b text-center">
+                  {student.phoneNumber}
+                </td>
+                <td className="p-4 border-b text-center">
+                  {student.majorName}
+                </td>
                 <td className="p-4 border-b text-center">{student.term}</td>
                 <td className="p-4 border-b text-center">
                   <button
-  onClick={() => toggleShowDeletePopup(student.studentClassId)} 
-  type="button"
+                    onClick={() => handleDeleteStudent(student.studentClassId)}
+                    type="button"
                     className="border border-white w-[45px] h-[35px] bg-red-600 text-white font-bold rounded-[10px] transition-all duration-300  hover:scale-95"
                   >
                     <i
@@ -385,10 +415,23 @@ function StudentInClass() {
       {/* Phân trang - end */}
 
       {/* Add Student Form */}
-      {showAddForm && <FormAddStudentInClass onClose={toggleShowForm} classSubjectIdParam={classSubjectId} />}
-      {showDeletePopup && <PopUpRemoveStudentInClass onClose={toggleShowDeletePopup}/>}
+      {showAddForm && (
+        <FormAddStudentInClass
+          onClose={toggleShowForm}
+          classSubjectIdParam={classSubjectId}
+          onStudentAdded={handleReloadPage}
+        />
+      )}
+      {showDeletePopup && (
+        <PopUpRemoveStudentInClass
+          studentClassId={deleteId}
+          onDeleted={handleDeleteSuccess}
+          onCancel={() => setShowDeletePopup(false)}
+        />
+      )}
     </div>
   );
+  //#endregion
 }
 
 export default StudentInClass;

@@ -4,21 +4,9 @@ import FormAddClass from "../../../components/management/Class/FormAddClass";
 import FormUpdateClass from "../../../components/management/Class/FormUpdateClass";
 import { getClasses } from "../../../services/classService";
 function ManageClass() {
-  // const [data1,setClassData] = useState([
-  //   { id: "1",  classId: "SE1702", subjectId: "PRM392", semesterId: "FA24", major: "Information Technology", term: "9", status: "1",startDate: "2024-01-02", endDate: "2025-04-29", },
-  // ]);
 
-      // Fetch Data Slot - Start
-        const [data, setData] = useState([]);
-        useEffect(() => {
-          const fetchRoomData = async () => {
-            const data = await getClasses(); //Lấy ra list room rtong database
-            setData(data.result);
-          };
-          fetchRoomData();
-        }, []);
-      //Fetch Data Room - End
-
+  //#region State Error
+  const [data, setData] = useState([]);
   const [filters, setFilters] = useState({
     majorName: "",
     classId: "",
@@ -30,77 +18,75 @@ function ManageClass() {
   const [availableSubjects, setAvailableSubjects] = useState([]);
   const [availableSemesters, setAvailableSemesters] = useState([]);
 
+  //#endregion
+
+  //#region Fetch Data
+
+  // Fetch Data Slot - Start
+  useEffect(() => {
+    const fetchRoomData = async () => {
+      const data = await getClasses(); //Lấy ra list room rtong database
+      setData(data.result);
+    };
+    fetchRoomData();
+  }, []);
+  //Fetch Data Room - End
+
+  //#endregion
+
+  //#region Filter, Paging, Sort
   // Get all unique values for major, classId, subjectId, and semesterId
-  const majors = Array.from(new Set(data.map(item => item.majorName)));
+  const majors = Array.from(new Set(data.map((item) => item.majorName)));
 
   useEffect(() => {
     // Bước 1: Lọc theo major (nếu có filter major)
-    let filteredSubjects = data.filter(item => filters.majorName ? item.majorName === filters.majorName : true);
-  
+    let filteredSubjects = data.filter((item) =>
+      filters.majorName ? item.majorName === filters.majorName : true
+    );
+
     // Bước 2: Lọc subjectId duy nhất từ filteredSubjects
-    filteredSubjects = Array.from(new Set(filteredSubjects.map(item => item.subjectId)))
-      .map(subjectId => filteredSubjects.find(item => item.subjectId === subjectId));
+    filteredSubjects = Array.from(
+      new Set(filteredSubjects.map((item) => item.subjectId))
+    ).map((subjectId) =>
+      filteredSubjects.find((item) => item.subjectId === subjectId)
+    );
     setAvailableSubjects(filteredSubjects);
-  
+
     // Bước 3: Lọc các lớp (classes) theo subjectId nếu có filter subjectId
     let filteredClasses = filteredSubjects;
     if (filters.subjectId) {
-      filteredClasses = filteredSubjects.filter(item => item.subjectId === filters.subjectId);
+      filteredClasses = filteredSubjects.filter(
+        (item) => item.subjectId === filters.subjectId
+      );
     }
-    
+
     // Bước 4: Lọc classId duy nhất từ filteredClasses
-    filteredClasses = Array.from(new Set(filteredClasses.map(item => item.classId)))
-      .map(classId => filteredClasses.find(item => item.classId === classId));
+    filteredClasses = Array.from(
+      new Set(filteredClasses.map((item) => item.classId))
+    ).map((classId) =>
+      filteredClasses.find((item) => item.classId === classId)
+    );
     setAvailableClasses(filteredClasses);
-  
+
     // Bước 5: Lọc semesterId duy nhất từ filteredClasses (theo classId hoặc subjectId nếu có filter)
     let filteredSemesters = filteredClasses;
     if (filters.subjectId) {
-      filteredSemesters = filteredClasses.filter(item => item.subjectId === filters.subjectId);
+      filteredSemesters = filteredClasses.filter(
+        (item) => item.subjectId === filters.subjectId
+      );
     }
     if (filters.classId) {
-      filteredSemesters = filteredSemesters.filter(item => item.classId === filters.classId);
+      filteredSemesters = filteredSemesters.filter(
+        (item) => item.classId === filters.classId
+      );
     }
-    setAvailableSemesters(Array.from(new Set(filteredSemesters.map(item => item.semesterId))));
-  
+    setAvailableSemesters(
+      Array.from(new Set(filteredSemesters.map((item) => item.semesterId)))
+    );
   }, [filters, data]);
 
-   //Update bảng mà không cần reload
-   const handleClassReload = async () => {
-    const data = await getClasses(); // Gọi API để lấy lại tất cả các lớp
-    setData(data.result); // Cập nhật lại dữ liệu lớp
-};
-//Update bảng mà không cần reload
-  // Show form Add New class - Start
-      const [showAddForm, setAddForm] = useState(false); // Dùng để hiển thị form
-      const toggleShowForm = () => {
-          setAddForm(!showAddForm);
-      };
-      // Show form Add New class - End
-  
-      //Lấy Data gắn qua form Update
-      const [classToUpdate, setClassToUpdate] = useState(null);
-      const handleUpdateClick = (classItem) => {
-          setClassToUpdate(classItem);
-          toggleShowUpdateForm(); // Show form update
-      };
-  
-      // Show form Update semester - Start
-      const [showUpdateForm, setUpdateForm] = useState(false);
-      const toggleShowUpdateForm = () => {
-          setUpdateForm(!showUpdateForm);
-      };
-      // Show form Update semester - End
-    
-  
-  // Handle filter changes
-  const handleFilterChange = (e) => {
-    const { name, value } = e.target;
-    setFilters((prev) => ({ ...prev, [name]: value }));
-  };
-
   // Filter data based on selected filters
-  const filteredData = data.filter(item => {
+  const filteredData = data.filter((item) => {
     return (
       (!filters.majorName || item.majorName === filters.majorName) &&
       (!filters.classId || item.classId === filters.classId) &&
@@ -110,42 +96,79 @@ function ManageClass() {
   });
 
   const [sortConfig, setSortConfig] = useState({
-      key: "classId",
-      direction: "asc",
-    }); // Sort state
-    const [currentPage, setCurrentPage] = useState(1); // Track current page
-    const pageSize = 9; // Items per page
-  
-    // Handle sorting logic
-    const handleSort = (key) => {
-      const direction =
-        sortConfig.key === key && sortConfig.direction === "asc" ? "desc" : "asc";
-      setSortConfig({ key, direction });
-    };
-  
-    // Sort data based on current sort config
-    const sortedData = [...filteredData].sort((a, b) => {
-      if (a[sortConfig.key] < b[sortConfig.key]) {
-        return sortConfig.direction === "asc" ? -1 : 1;
-      }
-      if (a[sortConfig.key] > b[sortConfig.key]) {
-        return sortConfig.direction === "asc" ? 1 : -1;
-      }
-      return 0;
-    });
-  
-    // Calculate which items to show based on current page
-    const indexOfLastItem = currentPage * pageSize;
-    const indexOfFirstItem = indexOfLastItem - pageSize;
-    const currentData = sortedData.slice(indexOfFirstItem, indexOfLastItem);
-  
-    const handlePageChange = (newPage) => {
-      if (newPage >= 1 && newPage <= Math.ceil(sortedData.length / pageSize)) {
-        setCurrentPage(newPage);
-      }
-    };
-  
+    key: "classId",
+    direction: "asc",
+  }); // Sort state
+  const [currentPage, setCurrentPage] = useState(1); // Track current page
+  const pageSize = 9; // Items per page
 
+  // Handle sorting logic
+  const handleSort = (key) => {
+    const direction =
+      sortConfig.key === key && sortConfig.direction === "asc" ? "desc" : "asc";
+    setSortConfig({ key, direction });
+  };
+
+  // Sort data based on current sort config
+  const sortedData = [...filteredData].sort((a, b) => {
+    if (a[sortConfig.key] < b[sortConfig.key]) {
+      return sortConfig.direction === "asc" ? -1 : 1;
+    }
+    if (a[sortConfig.key] > b[sortConfig.key]) {
+      return sortConfig.direction === "asc" ? 1 : -1;
+    }
+    return 0;
+  });
+
+  // Calculate which items to show based on current page
+  const indexOfLastItem = currentPage * pageSize;
+  const indexOfFirstItem = indexOfLastItem - pageSize;
+  const currentData = sortedData.slice(indexOfFirstItem, indexOfLastItem);
+
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= Math.ceil(sortedData.length / pageSize)) {
+      setCurrentPage(newPage);
+    }
+  };
+
+  //#endregion
+
+  //#region Show & Hide from, Handle Reload
+  //Update bảng mà không cần reload
+  const handleClassReload = async () => {
+    const data = await getClasses(); // Gọi API để lấy lại tất cả các lớp
+    setData(data.result); // Cập nhật lại dữ liệu lớp
+  };
+  //Update bảng mà không cần reload
+  // Show form Add New class - Start
+  const [showAddForm, setAddForm] = useState(false); // Dùng để hiển thị form
+  const toggleShowForm = () => {
+    setAddForm(!showAddForm);
+  };
+  // Show form Add New class - End
+
+  //Lấy Data gắn qua form Update
+  const [classToUpdate, setClassToUpdate] = useState(null);
+  const handleUpdateClick = (classItem) => {
+    setClassToUpdate(classItem);
+    toggleShowUpdateForm(); // Show form update
+  };
+
+  // Show form Update semester - Start
+  const [showUpdateForm, setUpdateForm] = useState(false);
+  const toggleShowUpdateForm = () => {
+    setUpdateForm(!showUpdateForm);
+  };
+  // Show form Update semester - End
+
+  // Handle filter changes
+  const handleFilterChange = (e) => {
+    const { name, value } = e.target;
+    setFilters((prev) => ({ ...prev, [name]: value }));
+  };
+  //#endregion
+
+  //#region Render UI
   return (
     <div className="border mt-4 h-auto pb-7 w-[1600px] bg-white rounded-2xl">
       <div className="flex justify-center">
@@ -352,6 +375,29 @@ function ManageClass() {
               </th>
               <th
                 className="p-4 font-semibold cursor-pointer hover:bg-primaryBlue text-white text-center align-middle bg-secondaryBlue "
+                onClick={() => handleSort("numberOfStudentInClasss")}
+              >
+                <div className="flex items-center justify-between">
+                  <p className="m-auto">Sĩ số</p>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth="2"
+                    stroke="currentColor"
+                    aria-hidden="true"
+                    className="w-4 h-4"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9"
+                    />
+                  </svg>
+                </div>
+              </th>
+              <th
+                className="p-4 font-semibold cursor-pointer hover:bg-primaryBlue text-white text-center align-middle bg-secondaryBlue "
                 onClick={() => handleSort("status")}
               >
                 <div className="flex items-center justify-between">
@@ -394,6 +440,7 @@ function ManageClass() {
                   {item.majorName}
                 </td>
                 <td className="p-4 text-center align-middle">{item.term}</td>
+                <td className="p-4 text-center align-middle">{item.numberOfStudentInClasss}/40</td>
                 <td className="p-4 text-center align-middle">
                   {item.status === 0
                     ? "Chưa bắt đầu"
@@ -411,7 +458,9 @@ function ManageClass() {
                     <i className="fa-solid fa-pen-fancy"></i>
                   </button>
                   {/* Button 2 */}
-                  <Link to={`/studentInClass/${item.classSubjectId}/${item.classId}`}>
+                  <Link
+                    to={`/studentInClass/${item.classSubjectId}/${item.classId}`}
+                  >
                     <button className="w-8 h-8 mr-auto bg-green-600 text-white rounded-xl shadow-md hover:bg-green-700 transition-all hover:scale-125">
                       <i className="fa-regular fa-address-card"></i>
                     </button>
@@ -465,6 +514,7 @@ function ManageClass() {
       {/* Show Form Update Class - End */}
     </div>
   );
+  //#endregion
 }
 
 export default ManageClass;

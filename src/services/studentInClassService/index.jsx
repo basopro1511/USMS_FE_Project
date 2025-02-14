@@ -28,18 +28,19 @@ export const getAvailableStudent = async (id) => {
         console.log(error);
     }
 }
+//#region Delete Student In Class
 export const DeleteStudentInClass = async (id) => {
     try {
-        const response = await request.delete("StudentInClass", id)
+        const response = await request.delete(`/StudentInClass/${id}`);
         return response.data;
     } catch (error) {
         console.log(error);
     }
 };
-
+//#endregion
 export const AddMultipleStudentToClass = async (data) => {
     try {
-        const response = await request.post("/StudentInClass/AddMultipleStudents", data);
+        const response = await request.post("StudentInClass/AddMutipleStudents", data);
         return response.data;
     } catch (error) {
         console.error("Error adding multiple students to class:", error);

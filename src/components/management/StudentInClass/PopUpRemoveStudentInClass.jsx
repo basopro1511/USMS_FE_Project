@@ -1,49 +1,75 @@
-/* eslint-disable react/prop-types */
 import { useState } from "react";
 import { DeleteStudentInClass } from "../../../services/studentInClassService";
 
-function PopUpRemoveStudentInClass({ onStudentRemove, student }) {
-    const [errorMessage, setErrorMessage] = useState("");
-    const [successMessage, setSuccessMessage] = useState("");
-    const [showAlert, setShowAlert] = useState(false); // Alert for success or failure notification
-    const [isFormVisible, setIsFormVisible] = useState(true);
-  
-    const handleCancel = () => {
-        setIsFormVisible(false); // Ẩn form khi nhấn nút hủy
-    };
+// eslint-disable-next-line react/prop-types
+function PopUpRemoveStudentInClass({ studentClassId, onDeleted }) {
 
-    //  Xử lý khi nhấn "Xóa"
-     const handleDeleteClick = async () => {
-       setErrorMessage("");
-       setSuccessMessage("");
-       setShowAlert(false);
-   
-       try {
-         const response = await DeleteStudentInClass(student.studentClassId);
-         console.log(student);
-         if (response.isSuccess) {
-           setSuccessMessage(response.message);
-           setShowAlert("success");
-           setTimeout(() => {
-             setShowAlert(false);
-             onStudentRemove(student.studentClassId);
-           }, 2000);
-           setIsFormVisible(false); 
-         } else {
-           setErrorMessage(response.message);
-           setShowAlert("error");
-           setTimeout(() => setShowAlert(false), 3000);
-         }
-       } catch (error) {
-         setErrorMessage(error);
-         setShowAlert("error");
-         setTimeout(() => setShowAlert(false), 3000);
-       }
-     };
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+  const [showAlert, setShowAlert] = useState(false); // Alert for success or failure notification
+  const [isFormVisible, setIsFormVisible] = useState(true);
 
-    return (
-        <>
-          {/* Notification Start */}
+  //  Xử lý khi nhấn "Hủy"
+  const handleCancel = () => {
+    setIsFormVisible(false);
+  };
+
+  //  Xử lý khi nhấn "Xóa"
+  const handleDeleteClick = async () => {
+    setErrorMessage("");
+    setSuccessMessage("");
+    setShowAlert(false);
+    try {
+      const response = await DeleteStudentInClass(studentClassId);
+      if (response.isSuccess) {
+        setShowAlert("success");
+        setSuccessMessage(response.message);
+        setTimeout(() => {
+          setShowAlert(false);
+          onDeleted(studentClassId);
+        }, 1500);
+        setIsFormVisible(false); 
+      } else {
+        setErrorMessage(response.message);
+        setShowAlert("error");
+        setTimeout(() => setShowAlert(false), 3000);
+      }
+    } catch (error) {
+      setErrorMessage(error);
+      setShowAlert("error");
+      setTimeout(() => setShowAlert(false), 3000);
+    }
+  };
+
+  return (
+    <>
+      {isFormVisible && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+          <div className="bg-white border w-full max-w-[500px] h-auto rounded-2xl items-center text-center shadow-xl">
+            <p className="mt-8 font-semibold text-lg">
+              Bạn có chắc muốn xóa sinh viên này?
+            </p>
+            <div className="flex justify-center space-x-4 mt-4 mb-4">
+              <button
+                type="button"
+                className="w-full max-w-[150px] h-[50px] border rounded-3xl bg-red-500 text-white font-bold text-lg transition-all hover:scale-105 hover:bg-red-700"
+                onClick={handleDeleteClick}
+              >
+                Xóa
+              </button>
+              <button
+                type="button"
+                className="w-full max-w-[150px] h-[50px] border rounded-3xl bg-secondaryBlue text-white font-bold text-lg transition-all hover:scale-105 hover:bg-primaryBlue"
+                onClick={handleCancel}
+              >
+                Hủy
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Notification Start */}
       <>
         {showAlert && (
           <div
@@ -80,34 +106,8 @@ function PopUpRemoveStudentInClass({ onStudentRemove, student }) {
         )}
       </>
       {/* Notification End */}
-            {isFormVisible && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
-                    <div className="bg-white border w-full max-w-[500px] h-[150px] rounded-2xl items-center text-center shadow-xl">
-                        <p className="mt-8">Bạn có chắc muốn xóa sinh viên khỏi lớp?</p>
-                        <div className="flex justify-center space-x-4 mt-4 mb-4">
-
-                            <button
-                                type="button"
-                                className="w-full max-w-[150px] h-[50px] border rounded-3xl bg-red-500 text-white font-bold text-lg transition-all hover:scale-105 hover:bg-red-700"
-                                onClick={handleDeleteClick}
-                            >
-                                Xóa
-                            </button>
-                            <button
-                                type="button"
-                                className="w-full max-w-[150px] h-[50px] border rounded-3xl bg-secondaryBlue text-white font-bold text-lg transition-all hover:scale-105 hover:bg-primaryBlue"
-                                onClick={handleCancel}
-                            >
-                                Hủy
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            
-        </>
-    );
+    </>
+  );
 }
 
 export default PopUpRemoveStudentInClass;
