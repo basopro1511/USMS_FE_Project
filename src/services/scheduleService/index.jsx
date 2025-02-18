@@ -60,3 +60,14 @@ export const getScheduleForStaff = async (majorId, classId, term, startDay, endD
     }
 };
 //#endregion
+
+//#region Get ScheduleDetails
+export const getScheduleDetails = async (scheduleId) => {
+    try {
+        const response = await request.get(`/Schedule/ScheduleDetails/${scheduleId}`);
+        return response.data;
+    } catch (error) {
+        console.log(error);
+    }
+};
+//#endregion
