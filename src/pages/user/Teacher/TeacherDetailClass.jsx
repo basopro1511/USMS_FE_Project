@@ -1,57 +1,112 @@
-import { useState } from "react";
-function TeacherDetailClass() {
-    const [studentData, setStudentData] = useState([
-        { sTT: "1", studentId: "ThangNT", userAvatar: "https://i.pinimg.com/736x/c2/b1/36/c2b1367627ae11fc45f6e1d51d9efd13.jpg", mSSV: "CE160815", lastName: "Nguyễn", middleName: "Toàn", firstName: "Thắng" },
-        { sTT: "2", studentId: "ThangNT", userAvatar: "https://i.pinimg.com/736x/c2/b1/36/c2b1367627ae11fc45f6e1d51d9efd13.jpg", mSSV: "CE160815", lastName: "Nguyễn", middleName: "Toàn", firstName: "Thắng" },
-        { sTT: "3", studentId: "ThangNT", userAvatar: "https://i.pinimg.com/736x/c2/b1/36/c2b1367627ae11fc45f6e1d51d9efd13.jpg", mSSV: "CE160815", lastName: "Nguyễn", middleName: "Toàn", firstName: "Thắng" },
-        { sTT: "4", studentId: "ThangNT", userAvatar: "https://i.pinimg.com/736x/c2/b1/36/c2b1367627ae11fc45f6e1d51d9efd13.jpg", mSSV: "CE160815", lastName: "Nguyễn", middleName: "Toàn", firstName: "Thắng" },
-        { sTT: "5", studentId: "ThangNT", userAvatar: "https://i.pinimg.com/736x/c2/b1/36/c2b1367627ae11fc45f6e1d51d9efd13.jpg", mSSV: "CE160815", lastName: "Nguyễn", middleName: "Toàn", firstName: "Thắng" },
-        { sTT: "6", studentId: "ThangNT", userAvatar: "https://i.pinimg.com/736x/c2/b1/36/c2b1367627ae11fc45f6e1d51d9efd13.jpg", mSSV: "CE160815", lastName: "Nguyễn", middleName: "Toàn", firstName: "Thắng" },
-        { sTT: "7", studentId: "ThangNT", userAvatar: "https://i.pinimg.com/736x/c2/b1/36/c2b1367627ae11fc45f6e1d51d9efd13.jpg", mSSV: "CE160815", lastName: "Nguyễn", middleName: "Toàn", firstName: "Thắng" },
-    ]);
+import PropTypes from "prop-types";
+import { useState, useEffect } from "react";
+import { GetStudentDataByClassId } from "../../../services/studentInClassService";
 
-    return (
-        <div>
-            {/* Tiêu đề */}
-            <div className="flex justify-center">
-                <p className="mt-8 text-3xl font-bold">
-                    Xem chi tiết lớp học
-                </p>
-            </div>
-            {/* Bảng hiển thị */}
-            <div className="w-full sm:w-[90%] lg:w-[1570px] mx-auto overflow-x-auto relative flex flex-col mb-4 mt-4 bg-white shadow-md rounded-2xl border border-gray">
-                <table className="min-w-full text-left table-auto bg-white">
-                    <thead className="bg-gray-100">
-                        <tr>
-                            <th className="p-4 font-semibold text-white text-center align-middle bg-secondaryBlue">STT</th>
-                            <th className="p-4 font-semibold text-white text-center align-middle bg-secondaryBlue">Hình ảnh</th>
-                            <th className="p-4 font-semibold text-white text-center align-middle bg-secondaryBlue">MSSV</th>
-                            <th className="p-4 font-semibold text-white text-center align-middle bg-secondaryBlue">Họ</th>
-                            <th className="p-4 font-semibold text-white text-center align-middle bg-secondaryBlue">Tên đệm</th>
-                            <th className="p-4 font-semibold text-white text-center align-middle bg-secondaryBlue">Tên</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {studentData.map((student, index) => (
-                            <tr key={index} className="hover:bg-gray-50 even:bg-gray-50">
-                                <td className="p-4 text-center align-middle">{student.sTT}</td>
-                                <td className="p-4 text-center align-middle">
-                                    <img
-                                        src={student.userAvatar}
-                                        alt="Student Avatar"
-                                        className="w-16 h-16 mx-auto"
-                                    />
-                                </td>
-                                <td className="p-4 text-center align-middle">{student.mSSV}</td>
-                                <td className="p-4 text-center align-middle">{student.lastName}</td>
-                                <td className="p-4 text-center align-middle">{student.middleName}</td>
-                                <td className="p-4 text-center align-middle">{student.firstName}</td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    );
+function TeacherDetailClass({ classSubjectId }) {
+  const [studentData, setStudentData] = useState([]);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchStudentDetailClass = async () => {
+      try {
+        setError(null);
+        setLoading(true);
+        setStudentData([]);
+        const data = await GetStudentDataByClassId(4);
+        if (Array.isArray(data.result) && data.isSuccess) {
+          // data.result = [];
+          if (data.result.length === 0) {
+            setError("Không có sinh viên nào trong lớp học này.");
+          } else {
+            setStudentData(data.result);
+          }
+        } else {
+          setError(data.message);
+        }
+      } catch (error) {
+        setError(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStudentDetailClass();
+  }, [classSubjectId]);
+
+  if (loading) {
+    return <div className="text-center">Loading...</div>;
+  }
+
+  return (
+    <div>
+      {/* Tiêu đề */}
+      <div className="flex justify-center">
+        <p className="mt-8 text-3xl font-bold">Xem chi tiết lớp học</p>
+      </div>
+      {/* Bảng hiển thị */}
+      <div className="w-full sm:w-[90%] lg:w-[1570px] mx-auto overflow-x-auto relative flex flex-col mb-4 mt-4 bg-white shadow-md rounded-2xl border border-gray">
+        <table className="min-w-full text-left table-auto bg-white">
+          <thead className="bg-gray-100">
+            <tr>
+              <th className="p-4 font-semibold text-white text-center align-middle bg-secondaryBlue">
+                STT
+              </th>
+              <th className="p-4 font-semibold text-white text-center align-middle bg-secondaryBlue">
+                Hình ảnh
+              </th>
+              <th className="p-4 font-semibold text-white text-center align-middle bg-secondaryBlue">
+                MSSV
+              </th>
+              <th className="p-4 font-semibold text-white text-center align-middle bg-secondaryBlue">
+                Họ
+              </th>
+              <th className="p-4 font-semibold text-white text-center align-middle bg-secondaryBlue">
+                Tên đệm
+              </th>
+              <th className="p-4 font-semibold text-white text-center align-middle bg-secondaryBlue">
+                Tên
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {error && (
+              <tr className="text-center text-red-700">
+                <td colSpan={6}>{error}</td>
+              </tr>
+            )}
+            {studentData.map((student, index) => (
+              <tr key={index} className="hover:bg-gray-50 even:bg-gray-50">
+                <td className="p-4 text-center align-middle">{index + 1}</td>
+                <td className="p-4 text-center align-middle">
+                  <img
+                    src={student.userAvatar}
+                    alt="Student Avatar"
+                    className="w-16 h-16 mx-auto"
+                  />
+                </td>
+                <td className="p-4 text-center align-middle">
+                  {student.userId}
+                </td>
+                <td className="p-4 text-center align-middle">
+                  {student.lastName}
+                </td>
+                <td className="p-4 text-center align-middle">
+                  {student.middleName}
+                </td>
+                <td className="p-4 text-center align-middle">
+                  {student.firstName}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
 }
+
+TeacherDetailClass.propTypes = {
+  classSubjectId: PropTypes.number.isRequired,
+};
 export default TeacherDetailClass;
