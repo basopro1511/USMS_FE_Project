@@ -60,3 +60,15 @@ export const getScheduleForStaff = async (majorId, classId, term, startDay, endD
     }
 };
 //#endregion
+
+//#region Get Schedule for Student
+// Get all Schedule for student in Database
+export const getScheduleForStudent = async (studentId, startDay, endDay) => {
+    try {
+        const response = await request.get(`/Schedule/Student/${studentId}/${startDay}/${endDay}`);
+        return response.data;
+    } catch (error) {
+        console.log(error);
+    }
+};
+//#endregion

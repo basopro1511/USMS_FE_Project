@@ -493,7 +493,6 @@ function ManageSchedule() {
   //#region Render Giao diện (UI)
   return (
     <>
-    
       <div className="border border-white mt-4 w-[1600px] h-auto bg-white rounded-2xl mb-5">
         <div className="flex">
           <p className="m-auto text-3xl font-bold mt-8">Thời Khóa Biểu</p>
@@ -603,7 +602,7 @@ function ManageSchedule() {
             <thead>
               <tr className="bg-secondaryBlue text-white rounded-xl">
                 <th className="border-t border-l border-black rounded-tl-xl">
-                  Slot
+                  Buổi
                 </th>
                 {weekDates.map((date, index) => {
                   let dayLabel;
