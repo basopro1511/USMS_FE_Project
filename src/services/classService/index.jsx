@@ -50,6 +50,15 @@ export const getClassesIdByClassId = async (id) => {
     }
 }
 
+// Get ClassSubject By ID
+export const getClassSubjectById = async (id) => {
+    try {
+        const response = await request.get(`/ClassSubject/${id}`)
+        return response.data
+    } catch (error) {
+        console.log(error);
+    }
+}
 // // Change the status of a room
 // export const changeRoomStatus = async (id, status) => {
 //     try {

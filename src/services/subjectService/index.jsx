@@ -57,3 +57,12 @@ export const getSubjectsByMajorAndTerm = async (id, term) => {
     }
 }
 
+// Get Subject By ID
+export const getSubjectById = async (id) => {
+    try {
+        const response = await request.get(`/Subjects/${id}`)
+        return response.data
+    } catch (error) {
+        console.log(error);
+    }
+}
