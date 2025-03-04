@@ -145,7 +145,7 @@ function Login() {
               type="submit"
               className="w-full max-w-[460px] bg-green-500 text-white font-bold text-lg rounded-md py-4 transition-transform transform hover:bg-green-700 hover:scale-105 mb-6"
             >
-              Login
+              Đăng nhập
             </button>
           </form>
         </div>

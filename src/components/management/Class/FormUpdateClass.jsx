@@ -152,6 +152,7 @@ function FormUpdateClass({ classToUpdate, onClassUpdated }) {
                 Chọn chuyên ngành:
               </p>
               <select
+               readOnly
                 name="majorId"
                 value={classData.majorId}
                 onChange={handleInputChange}
@@ -162,7 +163,7 @@ function FormUpdateClass({ classToUpdate, onClassUpdated }) {
                   Chọn chuyên ngành
                 </option>
                 {majorData.map((major) => (
-                  <option key={major.majorId} value={major.majorId}>
+                  <option key={major.majorId} value={major.majorId} disabled>
                     {major.majorName}
                   </option>
                 ))}
@@ -171,7 +172,7 @@ function FormUpdateClass({ classToUpdate, onClassUpdated }) {
               <p className="text-left ml-[100px] text-xl">Mã số kỳ học:</p>
               <select
                 type="number"
-                name="term"
+                name="term"readOnly
                 value={classData.term}
                 onChange={handleInputChange}
                 placeholder="Nhập kì học"
@@ -183,7 +184,7 @@ function FormUpdateClass({ classToUpdate, onClassUpdated }) {
                 </option>
                 {Array.from({ length: 9 }, (_, index) => index + 1).map(
                   (term) => (
-                    <option key={term} value={term}>
+                    <option key={term} value={term} disabled>
                       {term}
                     </option>
                   )
@@ -201,7 +202,7 @@ function FormUpdateClass({ classToUpdate, onClassUpdated }) {
                   Chọn môn học
                 </option>
                 {subjectData.map((subject) => (
-                  <option key={subject.subjectId} value={subject.subjectId}>
+                  <option key={subject.subjectId} value={subject.subjectId} selected>
                     {subject.subjectName}
                   </option>
                 ))}

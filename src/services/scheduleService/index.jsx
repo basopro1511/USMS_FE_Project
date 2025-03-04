@@ -72,3 +72,28 @@ export const getScheduleForStudent = async (studentId, startDay, endDay) => {
     }
 };
 //#endregion
+
+//#region Get Schedule for Teacher
+// Get all Schedule for Teacher in Database
+export const getScheduleForTeacher = async (teacherId, startDay, endDay) => {
+    try {
+        const response = await request.get(`/Schedule/Teacher/${teacherId}/${startDay}/${endDay}`);
+        return response.data;
+    } catch (error) {
+        console.log(error);
+    }
+};
+//#endregion
+
+//#region Get Availables Teacher for add Schedule
+// Get all Availables Teacher for add Schedule
+export const getAvailableTeachersForAddSchedule = async (majorId, date, slot) => {
+    try {
+        const response = await request.get(`/Schedule/AvailableTeachers/${majorId}/${date}/${slot}`);
+        console.log(response.data);
+        return response.data;
+    } catch (error) {
+        console.log(error);
+    }
+};
+//#endregion

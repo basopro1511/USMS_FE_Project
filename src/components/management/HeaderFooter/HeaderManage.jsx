@@ -17,6 +17,12 @@ function HeaderManage() {
             <p className="text-lg italic">Quản lý lịch học</p>
           </>
         )}
+         {isActive("/manageExamSchedule") && (
+          <>
+            <i className="fa fa-calendar-day w-4 h-4"></i>
+            <p className="text-lg italic">Quản lý lịch thi</p>
+          </>
+        )}
         {isActive("/manageClass") && (
           <>
             <i

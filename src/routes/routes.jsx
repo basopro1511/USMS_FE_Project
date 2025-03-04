@@ -26,6 +26,8 @@ import TeacherViewExam from '../pages/user/Teacher/TeacherViewExam';
 import ManageSlot from '../pages/manage/slot/slot';
 import Notification from '../pages/manage/notification/notification';
 import TeacherSendRequest from '../pages/user/Teacher/TeacherSendRequest';
+import TeacherSchedule from '../pages/manage/teacher/teacherSchedule';
+import ManageExamSchedule from '../pages/manage/examSchedule/examschedule';
 
 
 const AppRoutes = () => {
@@ -47,7 +49,8 @@ const AppRoutes = () => {
     { path: "/teacherDetailClass", component: TeacherDetailClass, layout: LayoutUser},
     { path: "/teacherViewExam", component: TeacherViewExam, layout: LayoutUser},
     { path: "/teacherSendRequest", component: TeacherSendRequest, layout: LayoutUser},
-
+    { path: "/teacherSchedule", component: TeacherSchedule, layout: LayoutUser},
+    
     //Manange Zone //
     { path: "/manageClass", component: ManageClass, layout: ManageLayout },
     { path: "/studentInClass/:classSubjectId/:classId", component: StudentInClass, layout: ManageLayout },
@@ -59,6 +62,8 @@ const AppRoutes = () => {
     { path: "/manageStudent", component: ManageStudent, layout: ManageLayout },
     { path: "/manageSlot", component: ManageSlot, layout: ManageLayout },
     { path: "/manageNotification", component: Notification, layout: ManageLayout},
+    { path: "/manageExamSchedule", component: ManageExamSchedule, layout: ManageLayout},
+
 
 ];
   return (
