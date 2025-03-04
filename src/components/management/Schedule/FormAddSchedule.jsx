@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
 import { getClassesIdByClassId } from "../../../services/classService";
 import { GetAvailableRoom } from "../../../services/roomService";
-import { AddSchedule } from "../../../services/scheduleService";
+import {
+  AddSchedule,
+  getAvailableTeachersForAddSchedule,
+} from "../../../services/scheduleService";
 
 // eslint-disable-next-line react/prop-types
-function FormAddSchedule({ selectedClassId,onAdded }) {
+function FormAddSchedule({ selectedClassId, selectedMajorId, onAdded }) {
   //#region State & Error
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
@@ -14,14 +17,15 @@ function FormAddSchedule({ selectedClassId,onAdded }) {
   // Dữ liệu cho form
   const [classSubjects, setClassSubjects] = useState([]); // dropdown Lớp-Môn
   const [rooms, setRooms] = useState([]); // dropdown phòng (nếu fetch)
-
+  const [teachers, setTeachers] = useState([]);
   // Dữ liệu schedule
   const [newSchedule, setNewSchedule] = useState({
     classSubjectId: 0,
     date: "",
     slotId: 0,
     roomId: "",
-    slotNoInSubject: 0
+    slotNoInSubject: 0,
+    teacherId: "",
   });
 
   //#endregion
@@ -30,6 +34,26 @@ function FormAddSchedule({ selectedClassId,onAdded }) {
   const handleCancel = () => {
     setIsFormVisible(false); // Hide form when cancel is clicked
   };
+
+  //#region  lấy danh sách giáo viên
+  useEffect(() => {
+    if (newSchedule.date && newSchedule.slotId) {
+      const fetchAvailableTeachers = async () => {
+        try {
+          const teachers = await getAvailableTeachersForAddSchedule(
+            selectedMajorId,
+            newSchedule.date,
+            newSchedule.slotId
+          );
+          setTeachers(teachers.result);
+        } catch (error) {
+          console.error("Error fetching subjects:", error);
+        }
+      };
+      fetchAvailableTeachers();
+    }
+  }, [newSchedule.date, newSchedule.slotId]);
+  //#endregion
 
   //#region  lấy danh sách lớp
   useEffect(() => {
@@ -58,18 +82,21 @@ function FormAddSchedule({ selectedClassId,onAdded }) {
       fetchAvailableRooms();
     }
   }, [newSchedule.date, newSchedule.slotId]);
+
   //#endregion
 
   //#region handle input change
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    
+
     setNewSchedule((prev) => ({
       ...prev,
-      [name]: 
-        name === "classSubjectId" || name === "slotId" || name === "slotNoInSubject"
-          ? Number(value)  // Chuyển đổi thành number
-          : value
+      [name]:
+        name === "classSubjectId" ||
+        name === "slotId" ||
+        name === "slotNoInSubject"
+          ? Number(value) // Chuyển đổi thành number
+          : value,
     }));
   };
   //#endregion
@@ -168,12 +195,12 @@ function FormAddSchedule({ selectedClassId,onAdded }) {
                     value={newSchedule.classSubjectId}
                     onChange={handleInputChange}
                   >
-                        <option value="">-- Chọn Lớp-Môn --</option>
-                  {classSubjects.map((cs) => (
-                    <option key={cs.classSubjectId} value={cs.classSubjectId}>
-                      {cs.classId} - {cs.subjectId}
-                    </option>
-                  ))}
+                    <option value="">-- Chọn Lớp-Môn --</option>
+                    {classSubjects.map((cs) => (
+                      <option key={cs.classSubjectId} value={cs.classSubjectId}>
+                        {cs.classId} - {cs.subjectId}
+                      </option>
+                    ))}
                   </select>
                   <p className="text-left ml-[100px] text-xl ">Ngày:</p>
                   <input
@@ -191,9 +218,6 @@ function FormAddSchedule({ selectedClassId,onAdded }) {
                     value={newSchedule.slotId}
                     onChange={handleInputChange}
                     className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl mb-3 px-4"
-                    // onChange={(e) =>
-                    //     setNewSemester({ ...newSemester, endDate: e.target.value })
-                    // }
                   >
                     <option value="">-- Chọn Slot --</option>
                     <option value="1">1</option>
@@ -201,6 +225,20 @@ function FormAddSchedule({ selectedClassId,onAdded }) {
                     <option value="3">3</option>
                     <option value="4">4</option>
                     <option value="5">5</option>
+                  </select>
+                  <p className="text-left ml-[100px] text-xl ">Giáo viên:</p>
+                  <select
+                    required
+                    name="teacherId"
+                    className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl mb-3 px-4"
+                    onChange={handleInputChange}
+                  >
+                    <option value="">-- Chọn Giáo viên --</option>
+                    {teachers.map((r) => (
+                      <option key={r.userId} value={r.userId}>
+                        {r.fullUserName} - {r.majorId}
+                      </option>
+                    ))}
                   </select>
 
                   <p className="text-left ml-[100px] text-xl ">Phòng:</p>

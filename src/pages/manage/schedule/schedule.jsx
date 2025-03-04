@@ -35,6 +35,7 @@ function ManageSchedule() {
   const [currentWeek, setCurrentWeek] = useState(new Date());
   // Thêm state lưu ClassId
   const [selectedClassId, setSelectedClassId] = useState("");
+  const [selectedMajorId, setselectedMajorId] = useState("");
   const [dataToUpdate, setDataUpdate] = useState(null);
   // State để lưu ID của lịch cần xóa
   const [deleteId, setDeleteId] = useState(null);
@@ -212,6 +213,10 @@ function ManageSchedule() {
   const handleClassChange = (event) => {
     setSelectedClassId(event.target.value);
   };
+    // Khi chọn majorId từ dropdown
+    const handleMajorChange = (event) => {
+      setselectedMajorId(event.target.value);
+    };
   //#endregion
 
   //#region Time Calculator & Xử lý Thời gian
@@ -506,7 +511,10 @@ function ManageSchedule() {
               className="max-w-sm mx-auto ml-3 h-12 w-[230px] border border-black rounded-xl"
               name="majorId"
               value={filterData.majorId}
-              onChange={handleInputChange}
+              onChange={(e) => {
+                handleInputChange(e);
+                handleMajorChange(e);
+              }}
             >
               <option value="" disabled>
                 Chọn chuyên ngành
@@ -634,6 +642,7 @@ function ManageSchedule() {
           {showAddForm && (
             <FormAddSchedule
               selectedClassId={selectedClassId}
+              selectedMajorId = {selectedMajorId}
               onAdded={handleReload}
             />
           )}
@@ -641,6 +650,7 @@ function ManageSchedule() {
           {showUpdateForm && (
             <FormUpdateSchedule
               selectedClassId={selectedClassId}
+              selectedMajorId = {selectedMajorId}
               dataToUpdate={dataToUpdate}
               onAdded={handleReload}
             />
@@ -648,6 +658,7 @@ function ManageSchedule() {
           {showDeletePopup && (
             <PopUpDeleteSchedule
             scheduleId={deleteId}
+            selectedMajorId = {selectedMajorId}
             onDeleted={handleDeleteSuccess}
             onCancel={() => setShowDeletePopup(false)}
           />

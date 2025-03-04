@@ -198,7 +198,7 @@ function FormAddClass({ onClassAdded }) {
                 ))}
               </select>
 
-              {/* Mã số lớp học */}
+              {/* Mã số lớp học
               <p className="text-left ml-[100px] text-xl ">Mã lớp học:</p>
               <input
                 name="classId"
@@ -207,7 +207,7 @@ function FormAddClass({ onClassAdded }) {
                 onChange={handleInputChange}
                 required
                 className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl px-4"
-              />
+              /> */}
 
               {/* Mã kỳ học */}
               <p className="text-left ml-[100px] text-xl">Kỳ học:</p>

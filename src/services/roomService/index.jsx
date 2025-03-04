@@ -15,7 +15,6 @@ export const getRooms = async () => {
 export const AddRoom = async (roomData) => {
     try {
         const response = await request.post("Room", roomData)
-        console.log(response.data)
         return response.data
     } catch (error) {
         console.log(error);
@@ -26,7 +25,6 @@ export const AddRoom = async (roomData) => {
 export const UpdateRoom = async (roomData) => {
     try {
         const response = await request.put("Room", roomData)
-        console.log(response.data)
         return response.data
     } catch (error) {
         console.log(error);
@@ -38,7 +36,6 @@ export const changeRoomStatus = async (id, status) => {
     try {
         // Construct the URL with id and status
         const response = await request.get(`/Room/ChangeStatus/${id}/${status}`);
-        console.log(response.data);
         return response.data;
     } catch (error) {
         console.log(error);
@@ -50,10 +47,18 @@ export const GetAvailableRoom = async (date, slotId) => {
     try {
         // Construct the URL with id and status
         const response = await request.get(`/Room/AvailableRooms/${date}/${slotId}`);
-        console.log(response.data);
         return response.data;
     } catch (error) {
         console.log(error);
     }
 }
 
+// Get Available Room To Add Exam Schedule
+export const GetAvailableRoomToAddExamSchedule = async (date, startTime, endTime) => {
+    try {
+        const response = await request.get(`/Room/AvailableRoomsToAddExamSchedule/${date}/${startTime}/${endTime}`);
+        return response.data;
+    } catch (error) {
+        console.log(error);
+    }
+}

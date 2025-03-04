@@ -1,22 +1,21 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import FormAddClass from "../../../components/management/Class/FormAddClass";
-import FormUpdateClass from "../../../components/management/Class/FormUpdateClass";
-import { getClasses } from "../../../services/classService";
+import { getExamSchedules,  } from "../../../services/examScheduleService";
+import FormAddExamSchedule from "../../../components/management/ExamSchedule/FormAddExamSchedule";
+import FormUpdateExamSchedule from "../../../components/management/ExamSchedule/FormUpdateExamSchedule";
+import { getMajors } from "../../../services/majorService";
 
-function ManageClass() {
+function ManageExamSchedule() {
   //#region State 
   const [data, setData] = useState([]);
   const [filters, setFilters] = useState({
-    majorName: "",
+    majorId: "",
     subjectId: "",
-    classId: "",
     semesterId: "",
   });
 
   // Dữ liệu cho các <select> động
   const [availableSubjects, setAvailableSubjects] = useState([]);
-  const [availableClasses, setAvailableClasses] = useState([]);
   const [availableSemesters, setAvailableSemesters] = useState([]);
 
   // Bảng hiển thị
@@ -31,19 +30,31 @@ function ManageClass() {
 
   //#region Fetch Data
   useEffect(() => {
-    const fetchClassData = async () => {
-      const response = await getClasses();
+    const fetchData = async () => {
+      const response = await getExamSchedules();
       setData(response.result || []);
     };
-    fetchClassData();
+    fetchData();
   }, []);
+
+  // Fetch Data Major - Start
+  const [majorData, setMajorData] = useState([]);
+  useEffect(() => {
+    const fetchMajorData = async () => {
+      const majorData = await getMajors(); //Lấy ra list room rtong database
+      setMajorData(majorData.result);
+    };
+    fetchMajorData();
+  }, []);
+  //Fetch Data Major - End
+
   //#endregion
 
   //#region Filter logic phân tầng
   useEffect(() => {
     // Bước 1: Nếu có chọn majorName, lọc dữ liệu theo majorName. Nếu chưa, lấy toàn bộ data.
-    let dataByMajor = filters.majorName
-      ? data.filter((item) => item.majorName === filters.majorName)
+    let dataByMajor = filters.majorId
+      ? data.filter((item) => item.majorId === filters.majorId)
       : data;
 
     // Lấy tất cả subjectId duy nhất sau khi lọc
@@ -57,20 +68,9 @@ function ManageClass() {
       ? dataByMajor.filter((item) => item.subjectId === filters.subjectId)
       : dataByMajor;
 
-    // Lấy tất cả classId duy nhất sau khi lọc
-    const classes = Array.from(
-      new Set(dataBySubject.map((item) => item.classId))
-    );
-    setAvailableClasses(classes);
-
-    // Bước 3: Nếu có chọn classId, tiếp tục lọc trên dataBySubject
-    let dataByClass = filters.classId
-      ? dataBySubject.filter((item) => item.classId === filters.classId)
-      : dataBySubject;
-
     // Lấy tất cả semesterId duy nhất sau khi lọc
     const semesters = Array.from(
-      new Set(dataByClass.map((item) => item.semesterId))
+      new Set(dataBySubject.map((item) => item.semesterId))
     );
     setAvailableSemesters(semesters);
   }, [filters, data]);
@@ -118,7 +118,7 @@ function ManageClass() {
 
   //#region Show & Hide form + Reload
   const handleClassReload = async () => {
-    const response = await getClasses();
+    const response = await getExamSchedules();
     setData(response.result || []);
   };
 
@@ -127,14 +127,14 @@ function ManageClass() {
     setAddForm(!showAddForm);
   };
 
-  const [classToUpdate, setClassToUpdate] = useState(null);
+  const [examScheduleToUpdate, setExamScheduleToUpdate] = useState(null);
   const [showUpdateForm, setUpdateForm] = useState(false);
   const toggleShowUpdateForm = () => {
     setUpdateForm(!showUpdateForm);
   };
 
   const handleUpdateClick = (classItem) => {
-    setClassToUpdate(classItem);
+    setExamScheduleToUpdate(classItem);
     toggleShowUpdateForm();
   };
   //#endregion
@@ -146,12 +146,14 @@ function ManageClass() {
     // Reset về trang 1 mỗi khi thay đổi filter
     setCurrentPage(1);
   };
+
+  
   //#endregion
 
   return (
     <div className="border mt-4 h-auto pb-7 w-[1600px] bg-white rounded-2xl">
       <div className="flex justify-center">
-        <p className="mt-8 text-3xl font-bold">Quản lý lớp học</p>
+        <p className="mt-8 text-3xl font-bold">Quản lý lịch thi</p>
       </div>
 
       {/* Filter Section */}
@@ -160,17 +162,17 @@ function ManageClass() {
         {/* Select chuyên ngành */}
         <select
           name="majorName"
-          value={filters.majorName}
+          value={filters.majorId}
           onChange={handleFilterChange}
           className="max-w-sm ml-3 h-12 w-[230px] border border-black rounded-xl"
         >
           <option value="">Chuyên ngành</option>
           {/* majors: lấy tất cả majorName duy nhất từ data */}
-          {Array.from(new Set(data.map((d) => d.majorName))).map((major) => (
-            <option key={major} value={major}>
-              {major}
-            </option>
-          ))}
+          {majorData.map((major) => (
+                  <option key={major.majorId} value={major.majorId}>
+                    {major.majorName}
+                  </option>
+                ))}
         </select>
 
         {/* Select môn (theo majorName đã chọn) */}
@@ -188,7 +190,7 @@ function ManageClass() {
           ))}
         </select>
 
-        {/* Select lớp (theo subjectId đã chọn) */}
+        {/* Select lớp (theo subjectId đã chọn)
         <select
           name="classId"
           value={filters.classId}
@@ -201,7 +203,7 @@ function ManageClass() {
               {cls}
             </option>
           ))}
-        </select>
+        </select> */}
 
         {/* Select kỳ học (tùy chọn) */}
         <select
@@ -225,23 +227,23 @@ function ManageClass() {
             onClick={toggleShowForm}
           >
             <i className="fa fa-plus mr-2" aria-hidden="true"></i>
-            Thêm lớp học
+            Thêm lịch thi
           </button>
         </div>
       </div>
 
-      {/* Bảng hiển thị */}
+      {/* table - Start */}
       <div className="w-[1565px] ml-3 relative flex flex-col mt-4 bg-white shadow-md rounded-2xl border border-gray overflow-hidden">
         <table className="w-full text-left table-auto bg-white">
           <thead className="bg-gray-100">
             <tr>
               <th
-                className="p-4 font-semibold cursor-pointer transition-all hover:bg-primaryBlue text-white text-center align-middle bg-secondaryBlue"
-                onClick={() => handleSort("classId")}
+                className="p-4 font-semibold cursor-pointer  transition-all hover:bg-primaryBlue text-white text-center align-middle bg-secondaryBlue "
+                onClick={() => handleSort("examScheduleId")}
               >
                 <div className="flex items-center justify-between">
                   <p className="m-auto transition-all hover:scale-105">
-                    Mã lớp
+                    Mã lịch thi
                   </p>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -260,31 +262,9 @@ function ManageClass() {
                   </svg>
                 </div>
               </th>
+
               <th
-                className="p-4 font-semibold cursor-pointer transition-all hover:bg-primaryBlue text-white text-center align-middle bg-secondaryBlue"
-                onClick={() => handleSort("subjectId")}
-              >
-                <div className="flex items-center justify-between">
-                  <p className="m-auto">Mã môn</p>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth="2"
-                    stroke="currentColor"
-                    aria-hidden="true"
-                    className="w-4 h-4"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9"
-                    />
-                  </svg>
-                </div>
-              </th>
-              <th
-                className="p-4 font-semibold cursor-pointer hover:bg-primaryBlue text-white text-center align-middle bg-secondaryBlue"
+                className="p-4 font-semibold cursor-pointer hover:bg-primaryBlue text-white text-center align-middle bg-secondaryBlue "
                 onClick={() => handleSort("semesterId")}
               >
                 <div className="flex items-center justify-between">
@@ -306,9 +286,10 @@ function ManageClass() {
                   </svg>
                 </div>
               </th>
+
               <th
-                className="p-4 font-semibold cursor-pointer hover:bg-primaryBlue text-white text-center align-middle bg-secondaryBlue"
-                onClick={() => handleSort("majorName")}
+                className="p-4 font-semibold cursor-pointer hover:bg-primaryBlue text-white text-center align-middle bg-secondaryBlue "
+                onClick={() => handleSort("majorId")}
               >
                 <div className="flex items-center justify-between">
                   <p className="m-auto">Chuyên ngành</p>
@@ -329,12 +310,37 @@ function ManageClass() {
                   </svg>
                 </div>
               </th>
+
               <th
-                className="p-4 font-semibold cursor-pointer hover:bg-primaryBlue text-white text-center align-middle bg-secondaryBlue"
-                onClick={() => handleSort("term")}
+                className="p-4 font-semibold cursor-pointer  transition-all hover:bg-primaryBlue text-white text-center align-middle bg-secondaryBlue "
+                onClick={() => handleSort("subjectId")}
               >
                 <div className="flex items-center justify-between">
-                  <p className="m-auto">Kì học</p>
+                  <p className="m-auto">Mã môn</p>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth="2"
+                    stroke="currentColor"
+                    aria-hidden="true"
+                    className="w-4 h-4"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9"
+                    />
+                  </svg>
+                </div>
+              </th>
+
+              <th
+                className="p-4 font-semibold cursor-pointer hover:bg-primaryBlue text-white text-center align-middle bg-secondaryBlue "
+                onClick={() => handleSort("roomId")}
+              >
+                <div className="flex items-center justify-between">
+                  <p className="m-auto">Phòng học</p>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
@@ -353,11 +359,11 @@ function ManageClass() {
                 </div>
               </th>
               <th
-                className="p-4 font-semibold cursor-pointer hover:bg-primaryBlue text-white text-center align-middle bg-secondaryBlue"
-                onClick={() => handleSort("numberOfStudentInClasss")}
+                className="p-4 font-semibold cursor-pointer hover:bg-primaryBlue text-white text-center align-middle bg-secondaryBlue "
+                onClick={() => handleSort("date")}
               >
                 <div className="flex items-center justify-between">
-                  <p className="m-auto">Sĩ số</p>
+                  <p className="m-auto">Ngày</p>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
@@ -376,7 +382,76 @@ function ManageClass() {
                 </div>
               </th>
               <th
-                className="p-4 font-semibold cursor-pointer hover:bg-primaryBlue text-white text-center align-middle bg-secondaryBlue"
+                className="p-4 font-semibold cursor-pointer hover:bg-primaryBlue text-white text-center align-middle bg-secondaryBlue "
+                onClick={() => handleSort("startTime")}
+              >
+                <div className="flex items-center justify-between">
+                  <p className="m-auto">Thời gian bắt đầu</p>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth="2"
+                    stroke="currentColor"
+                    aria-hidden="true"
+                    className="w-4 h-4"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9"
+                    />
+                  </svg>
+                </div>
+              </th>
+              <th
+                className="p-4 font-semibold cursor-pointer hover:bg-primaryBlue text-white text-center align-middle bg-secondaryBlue "
+                onClick={() => handleSort("endTime")}
+              >
+                <div className="flex items-center justify-between">
+                  <p className="m-auto">Thời gian kết thúc</p>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth="2"
+                    stroke="currentColor"
+                    aria-hidden="true"
+                    className="w-4 h-4"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9"
+                    />
+                  </svg>
+                </div>
+              </th>
+              <th
+                className="p-4 font-semibold cursor-pointer hover:bg-primaryBlue text-white text-center align-middle bg-secondaryBlue "
+                onClick={() => handleSort("teacherId")}
+              >
+                <div className="flex items-center justify-between">
+                  <p className="m-auto">Giáo viên </p>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth="2"
+                    stroke="currentColor"
+                    aria-hidden="true"
+                    className="w-4 h-4"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9"
+                    />
+                  </svg>
+                </div>
+              </th>
+              <th
+                className="p-4 font-semibold cursor-pointer hover:bg-primaryBlue text-white text-center align-middle bg-secondaryBlue "
                 onClick={() => handleSort("status")}
               >
                 <div className="flex items-center justify-between">
@@ -398,27 +473,36 @@ function ManageClass() {
                   </svg>
                 </div>
               </th>
-              <th className="p-4 font-semibold text-white text-center align-middle bg-secondaryBlue">
-                Thao tác
+              <th className="p-4 font-semibold cursor-pointer hover:bg-primaryBlue text-white text-center align-middle bg-secondaryBlue ">
+                <div className="flex items-center justify-between">
+                  <p className="m-auto">Thao tác</p>
+                </div>
               </th>
             </tr>
           </thead>
           <tbody>
             {currentData.map((item, index) => (
               <tr key={index} className="hover:bg-gray-50 even:bg-gray-50">
-                <td className="p-4 text-center align-middle">{item.classId}</td>
                 <td className="p-4 text-center align-middle">
-                  {item.subjectId}
+                  {item.examScheduleId}
                 </td>
                 <td className="p-4 text-center align-middle">
                   {item.semesterId}
                 </td>
                 <td className="p-4 text-center align-middle">
-                  {item.majorName}
+                  {item.majorId}
                 </td>
-                <td className="p-4 text-center align-middle">{item.term}</td>
                 <td className="p-4 text-center align-middle">
-                  {item.numberOfStudentInClasss}/40
+                  {item.subjectId}
+                </td>
+                <td className="p-4 text-center align-middle">{item.roomId}</td>
+                <td className="p-4 text-center align-middle">{item.date}</td>
+                <td className="p-4 text-center align-middle">
+                  {item.startTime}
+                </td>
+                <td className="p-4 text-center align-middle">{item.endTime}</td>
+                <td className="p-4 text-center align-middle">
+                  {item.teacherId}
                 </td>
                 <td className="p-4 text-center align-middle">
                   {item.status === 0
@@ -436,8 +520,10 @@ function ManageClass() {
                   >
                     <i className="fa-solid fa-pen-fancy"></i>
                   </button>
-                  {/* Button 2: Xem chi tiết hoặc danh sách sinh viên */}
-                  <Link to={`/studentInClass/${item.classSubjectId}/${item.classId}`}>
+                  {/* Button 2 */}
+                  <Link
+                    to={`/studentInClass/${item.classSubjectId}/${item.classId}`}
+                  >
                     <button className="w-8 h-8 mr-auto bg-green-600 text-white rounded-xl shadow-md hover:bg-green-700 transition-all hover:scale-125">
                       <i className="fa-regular fa-address-card"></i>
                     </button>
@@ -448,7 +534,7 @@ function ManageClass() {
           </tbody>
         </table>
       </div>
-
+      {/* table - End */}
       {/* Phân trang */}
       <div className="flex mt-5">
         <button
@@ -473,12 +559,12 @@ function ManageClass() {
       </div>
 
       {/* Form thêm lớp học */}
-      {showAddForm && <FormAddClass onClassAdded={handleClassReload} />}
+      {showAddForm && <FormAddExamSchedule onClassAdded={handleClassReload} />}
 
       {/* Form cập nhật lớp học */}
       {showUpdateForm && (
-        <FormUpdateClass
-          classToUpdate={classToUpdate}
+        <FormUpdateExamSchedule
+        examScheduleToUpdate={examScheduleToUpdate}
           onClassUpdated={handleClassReload}
         />
       )}
@@ -486,4 +572,4 @@ function ManageClass() {
   );
 }
 
-export default ManageClass;
+export default ManageExamSchedule;

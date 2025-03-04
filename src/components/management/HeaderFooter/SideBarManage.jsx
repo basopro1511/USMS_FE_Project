@@ -80,7 +80,17 @@ function SidebarManage() {
                 <span>Quản lý lịch học</span>
               </li>
             </Link>
-
+            <Link to="/manageExamSchedule">
+              <li
+                className={`flex items-center cursor-pointer w-56 mb-2 ml-2 rounded-lg p-2 transition-all duration-300 ${isActive("/manageExamSchedule")
+                  ? "bg-quaternartyBlue pl-6"
+                  : "hover:bg-quaternartyBlue hover:pl-6"
+                  }`}
+              >
+                <i className="fa fa-calendar-day mr-2"></i>
+                <span>Quản lý lịch thi</span>
+              </li>
+            </Link>
             <Link to="/manageStudent">
               <li
                 className={`flex items-center cursor-pointer w-56 mb-2 ml-2 rounded-lg p-2 transition-all duration-300 ${isActive("/manageStudent")
