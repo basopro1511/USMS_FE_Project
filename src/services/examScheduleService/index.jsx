@@ -51,6 +51,28 @@ export const getAvailalbeTeacherForAddExamSchedule = async (date, startTime, end
 };
 //#endregion
 
+//#region Get Exam Schedule for Student
+export const getExamScheduleForStudent = async (id) => {
+    try {
+        const response = await request.get(`/ExamSchedule/Student/${id}`);
+        return response.data;
+    } catch (error) {
+        console.log(error);
+    }
+};
+//#endregion
+
+//#region Get Exam Schedule for Student
+export const getExamScheduleForTeacher = async (id) => {
+    try {
+        const response = await request.get(`/ExamSchedule/Teacher/${id}`);
+        return response.data;
+    } catch (error) {
+        console.log(error);
+    }
+};
+//#endregion
+
 // Get Available Room To Add Exam Schedule
 export const GetAvailableRoomToAddExamSchedule = async (date, startTime, endTime) => {
     try {

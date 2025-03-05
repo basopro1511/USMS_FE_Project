@@ -54,7 +54,6 @@ function ManageSubject() {
   // -------------------------------
   //            FILTER
   // -------------------------------
-  // State lưu các giá trị filter
   const [filters, setFilters] = useState({
     majorId: "",
     term: "",
@@ -62,47 +61,77 @@ function ManageSubject() {
     status: "",
   });
 
-  // Mảng các trạng thái cố định
+  // Trạng thái cố định
   const [availableStatuses] = useState([
     { id: 0, label: "Chưa bắt đầu" },
     { id: 1, label: "Đang diễn ra" },
     { id: 2, label: "Đã kết thúc" },
   ]);
 
-  // Mảng để hiển thị trên các <select> filter (dạng phân tầng)
+  // Mảng cho term, subjectId
   const [availableTerms, setAvailableTerms] = useState([]);
   const [availableSubjectIds, setAvailableSubjectIds] = useState([]);
 
-  // Tính toán dynamic options cho majorId (tất cả majorId duy nhất)
-  const availableMajors = Array.from(new Set(subjectData.map((d) => d.majorId)));
+  // Tính danh sách major: *kể cả* null => "__NULL__"
+  // Lưu ý: "Chung" => ta quy ước hiển thị
+  const availableMajors = Array.from(
+    new Set(
+      subjectData.map((d) =>
+        d.majorId === null ? "__NULL__" : d.majorId
+      )
+    )
+  );
 
-  // Lắng nghe thay đổi `filters` hoặc `subjectData` để cập nhật các select con (Term, SubjectId)
+  // Lắng nghe thay đổi filter/subjectData
   useEffect(() => {
     // 1) Lọc theo majorId (nếu có)
-    let dataByMajor = filters.majorId
-      ? subjectData.filter((item) => item.majorId === filters.majorId)
-      : subjectData;
+    // Chuyển filters.majorId="__NULL__" => item.majorId===null
+    let dataByMajor;
+    if (filters.majorId) {
+      if (filters.majorId === "__NULL__") {
+        dataByMajor = subjectData.filter((item) => item.majorId === null);
+      } else {
+        dataByMajor = subjectData.filter((item) => item.majorId === filters.majorId);
+      }
+    } else {
+      dataByMajor = subjectData;
+    }
 
     // Lấy danh sách term duy nhất
     const termSet = new Set(dataByMajor.map((item) => item.term));
-    setAvailableTerms(Array.from(termSet)); // chuyển thành mảng để .map
+    setAvailableTerms(Array.from(termSet));
 
-    // 2) Lọc tiếp theo term (nếu có)
-    let dataByTerm = filters.term
-      ? dataByMajor.filter((item) => item.term === parseInt(filters.term))
-      : dataByMajor;
+    // 2) Lọc tiếp theo term
+    let dataByTerm = dataByMajor;
+    if (filters.term) {
+      const termNumber = parseInt(filters.term, 10);
+      dataByTerm = dataByTerm.filter((item) => item.term === termNumber);
+    }
 
-    // Lấy danh sách subjectId duy nhất
+    // Lấy subjectId duy nhất
     const subjectIdSet = new Set(dataByTerm.map((item) => item.subjectId));
     setAvailableSubjectIds(Array.from(subjectIdSet));
   }, [filters, subjectData]);
 
   // Áp dụng filter cuối cùng cho bảng
   const filteredData = subjectData.filter((item) => {
-    if (filters.majorId && item.majorId !== filters.majorId) return false;
+    // so sánh majorId
+    if (filters.majorId) {
+      if (filters.majorId === "__NULL__") {
+        // user muốn "Môn chung"
+        if (item.majorId !== null) return false;
+      } else {
+        // user chọn majorId thực
+        if (item.majorId !== filters.majorId) return false;
+      }
+    }
+    // term
     if (filters.term && item.term !== parseInt(filters.term)) return false;
+    // subjectId
     if (filters.subjectId && item.subjectId !== filters.subjectId) return false;
+    // status
     if (filters.status && item.status !== parseInt(filters.status)) return false;
+
     return true;
   });
 
@@ -144,9 +173,6 @@ function ManageSubject() {
     }
   };
 
-  // -------------------------------
-  //       HANDLE FILTER CHANGE
-  // -------------------------------
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
     setFilters((prev) => ({ ...prev, [name]: value }));
@@ -162,7 +188,7 @@ function ManageSubject() {
 
       {/* Filter Section */}
       <div className="flex w-full h-12 flex-wrap md:flex-nowrap">
-        {/* majorId */}
+        {/* majorId (chuyên ngành) */}
         <select
           name="majorId"
           value={filters.majorId}
@@ -170,11 +196,20 @@ function ManageSubject() {
           className=" ml-3 h-12 w-full md:w-[160px] border border-black rounded-xl"
         >
           <option value="">Chọn chuyên ngành</option>
-          {availableMajors.map((major) => (
-            <option key={major} value={major}>
-              {major}
-            </option>
-          ))}
+          {availableMajors.map((major) => {
+            if (major === "__NULL__") {
+              return (
+                <option key={major} value="__NULL__">
+                  Môn chung
+                </option>
+              );
+            }
+            return (
+              <option key={major} value={major}>
+                {major}
+              </option>
+            );
+          })}
         </select>
 
         {/* term (kì học) */}
@@ -240,8 +275,8 @@ function ManageSubject() {
         <table className="min-w-full text-left table-auto bg-white">
           <thead className="bg-gray-100">
             <tr>
-              {/* Tạo mảng cột để map cho gọn */}
               {[
+                { key: "stt", label: "STT" },
                 { key: "subjectId", label: "Mã môn" },
                 { key: "subjectName", label: "Tên môn học" },
                 { key: "majorId", label: "Chuyên ngành" },
@@ -281,38 +316,48 @@ function ManageSubject() {
           </thead>
 
           <tbody>
-            {currentData.map((item, index) => (
-              <tr key={index} className="hover:bg-gray-50 even:bg-gray-50">
-                <td className="p-4 text-center">{item.subjectId}</td>
-                <td className="p-4 text-center">{item.subjectName}</td>
-                <td className="p-4 text-center">{item.majorId}</td>
-                <td className="p-4 text-center">{item.term}</td>
-                <td className="p-4 text-center">{item.numberOfSlot}</td>
-                <td className="p-4 text-center">
-                  {item.status === 1
-                    ? "Đang diễn ra"
-                    : item.status === 2
-                    ? "Đã kết thúc"
-                    : "Chưa bắt đầu"}
-                </td>
-                <td className="p-4 text-center align-middle">
-                  <div className="flex justify-center space-x-2">
-                    <button
-                      className="w-8 h-8 bg-primaryBlue text-white rounded-xl shadow-md hover:bg-blue-700 transition-all hover:scale-125"
-                      onClick={() => handleUpdateClick(item)}
-                    >
-                      <i className="fa-solid fa-pen-fancy"></i>
-                    </button>
-                    <button
-                      className="w-8 h-8 bg-green-600 text-white rounded-xl shadow-md hover:bg-green-700 transition-all hover:scale-125"
-                      onClick={() => handleDetailClick(item)}
-                    >
-                      <i className="fa-regular fa-address-card"></i>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
+            {currentData.map((item, index) => {
+              // Tính STT nối tiếp giữa các trang
+              const stt = indexOfFirstItem + (index + 1);
+
+              // Hiển thị major
+              // Nếu item.majorId===null => "Môn chung", ngược lại item.majorId
+              const displayMajor = item.majorId === null ? "Môn chung" : item.majorId;
+
+              return (
+                <tr key={index} className="hover:bg-gray-50 even:bg-gray-50">
+                  <td className="p-4 text-center">{stt}</td>
+                  <td className="p-4 text-center">{item.subjectId}</td>
+                  <td className="p-4 text-center">{item.subjectName}</td>
+                  <td className="p-4 text-center">{displayMajor}</td>
+                  <td className="p-4 text-center">{item.term}</td>
+                  <td className="p-4 text-center">{item.numberOfSlot}</td>
+                  <td className="p-4 text-center">
+                    {item.status === 1
+                      ? "Đang diễn ra"
+                      : item.status === 2
+                      ? "Đã kết thúc"
+                      : "Chưa bắt đầu"}
+                  </td>
+                  <td className="p-4 text-center align-middle">
+                    <div className="flex justify-center space-x-2">
+                      <button
+                        className="w-8 h-8 bg-primaryBlue text-white rounded-xl shadow-md hover:bg-blue-700 transition-all hover:scale-125"
+                        onClick={() => handleUpdateClick(item)}
+                      >
+                        <i className="fa-solid fa-pen-fancy"></i>
+                      </button>
+                      <button
+                        className="w-8 h-8 bg-green-600 text-white rounded-xl shadow-md hover:bg-green-700 transition-all hover:scale-125"
+                        onClick={() => handleDetailClick(item)}
+                      >
+                        <i className="fa-regular fa-address-card"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>

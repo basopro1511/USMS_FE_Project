@@ -2,11 +2,11 @@
 import { useState, useEffect } from "react";
 import {
   AddMultipleStudentToClass,
-  AddStudentToClass,
   getAvailableStudent,
 } from "../../../services/studentInClassService";
+import { AddStudentToClassExamSchedule, GetAvailableStudentInExamSchedule } from "../../../services/studentInExamScheduleService";
 
-function FormAddStudentInClass({ onStudentAdded, classSubjectIdParam }) {
+function FormAddStudentInExamSchdule({ onStudentAdded, examScheduleId }) {
   //#region State Management
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
@@ -35,15 +35,15 @@ function FormAddStudentInClass({ onStudentAdded, classSubjectIdParam }) {
   //#region Fetch Data
   useEffect(() => {
     fetchStudentData();
-  }, [classSubjectIdParam]); // Re-fetch khi classSubjectIdParam thay đổi
+  }, [examScheduleId]); // Re-fetch khi classSubjectIdParam thay đổi
 
   const fetchStudentData = async () => {
     try {
-      if (!classSubjectIdParam) {
+      if (!examScheduleId) {
         console.error("Lỗi: classSubjectIdParam không hợp lệ!");
         return;
       }
-      const data = await getAvailableStudent(classSubjectIdParam);
+      const data = await GetAvailableStudentInExamSchedule(examScheduleId);
       if (!data || !data.result) {
         setStudentData([]);
         return;
@@ -58,7 +58,7 @@ function FormAddStudentInClass({ onStudentAdded, classSubjectIdParam }) {
   //Update bảng mà không cần reload
   const handleAddStudentReload = async () => {
     try {
-      const data = await getAvailableStudent(classSubjectIdParam);
+      const data = await GetAvailableStudentInExamSchedule(examScheduleId);
       if (data && data.result) {
         setStudentData(data.result);
       }
@@ -172,11 +172,11 @@ function FormAddStudentInClass({ onStudentAdded, classSubjectIdParam }) {
   const handleAddStudent = async (userId) => {
     try {
       const studentData = {
-        studentClassId: 0,
-        classSubjectId: classSubjectIdParam,
+        studentExamId: 0,
+        examScheduleId: examScheduleId,
         studentId: userId, // Lấy studentId khi click button
       };
-      const response = await AddStudentToClass(studentData);
+      const response = await AddStudentToClassExamSchedule(studentData);
       if (response.isSuccess) {
         setShowAlert("success");
         setSuccessMessage(response.message);
@@ -206,8 +206,8 @@ function FormAddStudentInClass({ onStudentAdded, classSubjectIdParam }) {
       }
       // Tạo danh sách
       const studentsData = selectedStudents.map((userId) => ({
-        studentClassId: 0,
-        classSubjectId: classSubjectIdParam,
+        studentExamId: 0,
+        examScheduleId: examScheduleId,
         studentId: userId,
       }));
 
@@ -221,7 +221,7 @@ function FormAddStudentInClass({ onStudentAdded, classSubjectIdParam }) {
         setSelectedStudents([]);
         // Gọi lại danh sách còn lại
         setTimeout(async () => {
-          const updatedData = await getAvailableStudent(classSubjectIdParam);
+          const updatedData = await getAvailableStudent(examScheduleId);
           if (updatedData && updatedData.result) {
             setStudentData(updatedData.result);
           }
@@ -646,4 +646,4 @@ function FormAddStudentInClass({ onStudentAdded, classSubjectIdParam }) {
   //#endregion
 }
 
-export default FormAddStudentInClass;
+export default FormAddStudentInExamSchdule;

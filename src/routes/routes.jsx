@@ -28,6 +28,7 @@ import Notification from '../pages/manage/notification/notification';
 import TeacherSendRequest from '../pages/user/Teacher/TeacherSendRequest';
 import TeacherSchedule from '../pages/manage/teacher/teacherSchedule';
 import ManageExamSchedule from '../pages/manage/examSchedule/examschedule';
+import StudentInExamSchedule from '../pages/manage/examSchedule/studentInExamSchedule';
 
 
 const AppRoutes = () => {
@@ -63,6 +64,8 @@ const AppRoutes = () => {
     { path: "/manageSlot", component: ManageSlot, layout: ManageLayout },
     { path: "/manageNotification", component: Notification, layout: ManageLayout},
     { path: "/manageExamSchedule", component: ManageExamSchedule, layout: ManageLayout},
+    { path: "/studentInExamSchedule/:examScheduleId/:subjectId", component: StudentInExamSchedule, layout: ManageLayout },
+
 
 
 ];
