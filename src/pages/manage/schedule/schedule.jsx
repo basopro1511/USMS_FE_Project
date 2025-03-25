@@ -1,9 +1,7 @@
 import { useState, useEffect } from "react";
 import { getMajors } from "../../../services/majorService";
 import { getSlots } from "../../../services/slotService";
-import {
-  getScheduleForStaff,
-} from "../../../services/scheduleService";
+import { getScheduleForStaff } from "../../../services/scheduleService";
 import { getClassesIdByMajorId } from "../../../services/classService";
 import FormAddSchedule from "../../../components/management/Schedule/FormAddSchedule";
 import FormUpdateSchedule from "../../../components/management/Schedule/FormUpdateSchedule";
@@ -53,7 +51,6 @@ function ManageSchedule() {
     setDataUpdate(data);
     setUpdateForm(!showUpdateForm);
   };
-
   //#endregion
 
   //#region Fetch Data từ API
@@ -213,10 +210,10 @@ function ManageSchedule() {
   const handleClassChange = (event) => {
     setSelectedClassId(event.target.value);
   };
-    // Khi chọn majorId từ dropdown
-    const handleMajorChange = (event) => {
-      setselectedMajorId(event.target.value);
-    };
+  // Khi chọn majorId từ dropdown
+  const handleMajorChange = (event) => {
+    setselectedMajorId(event.target.value);
+  };
   //#endregion
 
   //#region Time Calculator & Xử lý Thời gian
@@ -638,11 +635,36 @@ function ManageSchedule() {
           </table>
           {/* --- End Bảng thời khóa biểu --- */}
 
+          <div className="">
+            <h1 className="text-right">Thay đổi trạng thái thời khóa biểu: (hiện tại : )</h1>
+            <div className="flex w-full h-20 border ">
+            <button
+              type="button"
+              className="ml-auto w-full max-w-[150px] h-[50px] sm:h-[45px] border rounded-2xl bg-gray-500 text-white font-bold text-lg sm:text-xl transition-all hover:scale-105 hover:bg-primaryBlue mt-auto mb-auto"
+            >
+              Vô hiệu hóa
+            </button>
+            <button
+              type="button"
+              className="w-full max-w-[150px] h-[50px] sm:h-[45px] border rounded-2xl bg-yellow-500 text-white font-bold text-lg sm:text-xl transition-all hover:scale-105 hover:bg-yellow-600 mt-auto mb-auto"
+            >
+              Khả dụng
+            </button>
+            <button
+              type="button"
+              className=" w-full max-w-[150px] h-[50px] sm:h-[45px] border rounded-2xl bg-red-500 text-white font-bold text-lg sm:text-xl transition-all hover:scale-105 hover:bg-red-600 mt-auto mb-auto"
+            >
+              Bảo trì
+            </button>
+            </div>
+       
+          </div>
+
           {/* Ẩn & hiện form start */}
           {showAddForm && (
             <FormAddSchedule
               selectedClassId={selectedClassId}
-              selectedMajorId = {selectedMajorId}
+              selectedMajorId={selectedMajorId}
               onAdded={handleReload}
             />
           )}
@@ -650,18 +672,18 @@ function ManageSchedule() {
           {showUpdateForm && (
             <FormUpdateSchedule
               selectedClassId={selectedClassId}
-              selectedMajorId = {selectedMajorId}
+              selectedMajorId={selectedMajorId}
               dataToUpdate={dataToUpdate}
               onAdded={handleReload}
             />
           )}
           {showDeletePopup && (
             <PopUpDeleteSchedule
-            scheduleId={deleteId}
-            selectedMajorId = {selectedMajorId}
-            onDeleted={handleDeleteSuccess}
-            onCancel={() => setShowDeletePopup(false)}
-          />
+              scheduleId={deleteId}
+              selectedMajorId={selectedMajorId}
+              onDeleted={handleDeleteSuccess}
+              onCancel={() => setShowDeletePopup(false)}
+            />
           )}
           {/* Ẩn & hiện form end */}
 

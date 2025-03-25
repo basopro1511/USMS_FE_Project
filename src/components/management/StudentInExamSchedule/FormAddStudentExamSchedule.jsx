@@ -2,12 +2,11 @@
 import { useState, useEffect } from "react";
 import {
   AddMultipleStudentToClass,
-  AddStudentToClass,
   getAvailableStudent,
 } from "../../../services/studentInClassService";
-import { getMajors } from "../../../services/majorService";
+import { AddStudentToClassExamSchedule, GetAvailableStudentInExamSchedule } from "../../../services/studentInExamScheduleService";
 
-function FormAddStudentInClass({ onStudentAdded, classSubjectIdParam }) {
+function FormAddStudentInExamSchdule({ onStudentAdded, examScheduleId }) {
   //#region State Management
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
@@ -27,7 +26,7 @@ function FormAddStudentInClass({ onStudentAdded, classSubjectIdParam }) {
   // --- Chứa các giá trị filter
   const [filter, setFilters] = useState({
     userId: "",
-    majorId: "",
+    majorName: "",
     term: "",
     studentName: "", // thêm để lọc theo tên
   });
@@ -36,15 +35,15 @@ function FormAddStudentInClass({ onStudentAdded, classSubjectIdParam }) {
   //#region Fetch Data
   useEffect(() => {
     fetchStudentData();
-  }, [classSubjectIdParam]); // Re-fetch khi classSubjectIdParam thay đổi
+  }, [examScheduleId]); // Re-fetch khi classSubjectIdParam thay đổi
 
   const fetchStudentData = async () => {
     try {
-      if (!classSubjectIdParam) {
+      if (!examScheduleId) {
         console.error("Lỗi: classSubjectIdParam không hợp lệ!");
         return;
       }
-      const data = await getAvailableStudent(classSubjectIdParam);
+      const data = await GetAvailableStudentInExamSchedule(examScheduleId);
       if (!data || !data.result) {
         setStudentData([]);
         return;
@@ -59,7 +58,7 @@ function FormAddStudentInClass({ onStudentAdded, classSubjectIdParam }) {
   //Update bảng mà không cần reload
   const handleAddStudentReload = async () => {
     try {
-      const data = await getAvailableStudent(classSubjectIdParam);
+      const data = await GetAvailableStudentInExamSchedule(examScheduleId);
       if (data && data.result) {
         setStudentData(data.result);
       }
@@ -67,20 +66,6 @@ function FormAddStudentInClass({ onStudentAdded, classSubjectIdParam }) {
       console.error("Lỗi khi reload danh sách sinh viên:", error);
     }
   };
-
-  const [majorData, setMajorData] = useState([]);
-  useEffect(() => {
-    const fetchMajorData = async () => {
-      try {
-        const majorData = await getMajors();
-        setMajorData(majorData.result || []);
-      } catch (error) {
-        console.error("Lỗi khi lấy danh sách chuyên ngành:", error);
-      }
-    };
-    fetchMajorData();
-  }, []);
-
   //#endregion
 
   //#region Filtering & Sorting
@@ -88,36 +73,43 @@ function FormAddStudentInClass({ onStudentAdded, classSubjectIdParam }) {
   // useEffect để áp dụng filter
   useEffect(() => {
     const filteredData = studentData.filter((item) => {
-      // Lọc theo chuyên ngành: sử dụng filter.majorId và so sánh với item.majorId
-      if (filter.majorId && filter.majorId !== item.majorId) {
+      // 1) Lọc chuyên ngành
+      if (filter.majorName && filter.majorName !== item.majorName) {
         return false;
       }
-      // Lọc theo kỳ học
+
+      // 2) Lọc term (kỳ học)
       if (filter.term && String(filter.term) !== String(item.term)) {
         return false;
       }
-      // Lọc theo mã sinh viên (userId) - case-insensitive
+
+      // 3) Lọc userId (Mã SV) - case-insensitive
       if (filter.userId) {
+        // so sánh toLowerCase
         const userIdLower = item.userId.toLowerCase();
         const filterUserId = filter.userId.toLowerCase();
         if (!userIdLower.includes(filterUserId)) {
           return false;
         }
       }
-      // Lọc theo tên sinh viên (ghép full name) - case-insensitive
+
+      // 4) Lọc tên sinh viên (fullName) - case-insensitive
       if (filter.studentName) {
-        const fullName = (item.firstName + " " + item.middleName + " " + item.lastName).toLowerCase();
+        const fullName = (
+          item.firstName + " " + item.middleName + " " + item.lastName
+        ).toLowerCase();
         const filterName = filter.studentName.toLowerCase();
         if (!fullName.includes(filterName)) {
           return false;
         }
       }
-      // Có thể bổ sung thêm các điều kiện filter khác (ví dụ: status) nếu cần
+
       return true;
     });
+
     setFilteredStudents(filteredData);
   }, [filter, studentData]);
-  
+
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
     setFilters((prev) => ({ ...prev, [name]: value }));
@@ -163,11 +155,10 @@ function FormAddStudentInClass({ onStudentAdded, classSubjectIdParam }) {
   };
 
   const handleSelectStudent = (userId) => {
-    setSelectedStudents(
-      (prevSelected) =>
-        prevSelected.includes(userId)
-          ? prevSelected.filter((id) => id !== userId) // Bỏ chọn nếu đã có
-          : [...prevSelected, userId] // Thêm nếu chưa
+    setSelectedStudents((prevSelected) =>
+      prevSelected.includes(userId)
+        ? prevSelected.filter((id) => id !== userId) // Bỏ chọn nếu đã có
+        : [...prevSelected, userId] // Thêm nếu chưa
     );
   };
   //#endregion
@@ -181,11 +172,11 @@ function FormAddStudentInClass({ onStudentAdded, classSubjectIdParam }) {
   const handleAddStudent = async (userId) => {
     try {
       const studentData = {
-        studentClassId: 0,
-        classSubjectId: classSubjectIdParam,
+        studentExamId: 0,
+        examScheduleId: examScheduleId,
         studentId: userId, // Lấy studentId khi click button
       };
-      const response = await AddStudentToClass(studentData);
+      const response = await AddStudentToClassExamSchedule(studentData);
       if (response.isSuccess) {
         setShowAlert("success");
         setSuccessMessage(response.message);
@@ -215,8 +206,8 @@ function FormAddStudentInClass({ onStudentAdded, classSubjectIdParam }) {
       }
       // Tạo danh sách
       const studentsData = selectedStudents.map((userId) => ({
-        studentClassId: 0,
-        classSubjectId: classSubjectIdParam,
+        studentExamId: 0,
+        examScheduleId: examScheduleId,
         studentId: userId,
       }));
 
@@ -230,7 +221,7 @@ function FormAddStudentInClass({ onStudentAdded, classSubjectIdParam }) {
         setSelectedStudents([]);
         // Gọi lại danh sách còn lại
         setTimeout(async () => {
-          const updatedData = await getAvailableStudent(classSubjectIdParam);
+          const updatedData = await getAvailableStudent(examScheduleId);
           if (updatedData && updatedData.result) {
             setStudentData(updatedData.result);
           }
@@ -246,6 +237,7 @@ function FormAddStudentInClass({ onStudentAdded, classSubjectIdParam }) {
     }
   };
   //#endregion
+
 
   //#region Render UI
   return (
@@ -295,17 +287,21 @@ function FormAddStudentInClass({ onStudentAdded, classSubjectIdParam }) {
               <div className="flex w-full ml-4 h-12 flex-wrap md:flex-nowrap">
                 <div className="flex w-full md:w-auto md:mb-0">
                   <select
-                    name="majorId"
-                    value={filter.majorId}
+                    name="majorName"
+                    value={filter.majorName}
                     onChange={handleFilterChange}
                     className="max-w-sm mx-auto ml-3 h-12 w-full md:w-[230px] border border-black rounded-xl"
                   >
-                    <option value="">Chọn chuyên ngành</option>
-  {majorData.map((major) => (
-    <option key={major.majorId} value={major.majorId}>
-      {major.majorName}
-    </option>
-  ))}
+                    <option value="">Chuyên ngành</option>
+                    {[
+                      ...new Set(
+                        studentData.map((student) => student.majorName)
+                      ),
+                    ].map((majorName) => (
+                      <option key={majorName} value={majorName}>
+                        {majorName}
+                      </option>
+                    ))}
                   </select>
 
                   <select
@@ -546,68 +542,55 @@ function FormAddStudentInClass({ onStudentAdded, classSubjectIdParam }) {
                         </tr>
                       </thead>
                       <tbody>
-                        {currentData.map((student, index) => {
-                          // tăng số thứ tự
-                          const stt = indexOfFirstItem + (index + 1);
-                          // Tìm majorName tương ứng
-                          const foundMajor = majorData.find(
-                            (m) => m.majorId === student.majorId
-                          );
-                          const majorName = foundMajor
-                            ? foundMajor.majorName
-                            : student.majorId;
-                          return (
-                            <tr
-                              key={student.userId}
-                              className="hover:bg-gray-50 even:bg-gray-50"
-                            >
-                              <td className="p-4 border-b text-center">
-                                <input
-                                  type="checkbox"
-                                  checked={selectedStudents.includes(
-                                    student.userId
-                                  )}
-                                  onChange={() =>
-                                    handleSelectStudent(student.userId)
-                                  }
-                                />
-                              </td>
-                              <td className="p-4 border-b text-center">
-                                {stt}
-                              </td>
-                              <td className="p-4 border-b text-center">
-                                {student.userId}
-                              </td>
-                              <td className="p-4 border-b text-center">
-                                {student.lastName} {student.middleName}{" "}
-                                {student.firstName}
-                              </td>
-                              <td className="p-4 border-b text-center">
-                                {student.email}
-                              </td>
-                              <td className="p-4 border-b text-center">
-                                {student.phoneNumber}
-                              </td>
-                              <td className="p-4 border-b text-center">
-                                {majorName}
-                              </td>
-                              <td className="p-4 border-b text-center">
-                                {student.term}
-                              </td>
-                              <td className="p-4 border-b text-center">
-                                <button
-                                  type="button"
-                                  className="border border-white w-[40px] h-[40px] bg-green-600 text-white font-bold rounded-[10px] transition-all duration-300 hover:scale-95"
-                                  onClick={() =>
-                                    handleAddStudent(student.userId)
-                                  }
-                                >
-                                  <i className="fa fa-plus text-white"></i>
-                                </button>
-                              </td>
-                            </tr>
-                          );
-                        })}
+                        {currentData.map((student, index) => (
+                          <tr
+                            key={student.userId}
+                            className="hover:bg-gray-50 even:bg-gray-50"
+                          >
+                            <td className="p-4 border-b text-center">
+                              <input
+                                type="checkbox"
+                                checked={selectedStudents.includes(
+                                  student.userId
+                                )}
+                                onChange={() =>
+                                  handleSelectStudent(student.userId)
+                                }
+                              />
+                            </td>
+                            <td className="p-4 border-b text-center">
+                              {index + 1}
+                            </td>
+                            <td className="p-4 border-b text-center">
+                              {student.userId}
+                            </td>
+                            <td className="p-4 border-b text-center">
+                              {student.lastName} {student.middleName}{" "}
+                              {student.firstName}
+                            </td>
+                            <td className="p-4 border-b text-center">
+                              {student.email}
+                            </td>
+                            <td className="p-4 border-b text-center">
+                              {student.phoneNumber}
+                            </td>
+                            <td className="p-4 border-b text-center">
+                              {student.majorName}
+                            </td>
+                            <td className="p-4 border-b text-center">
+                              {student.term}
+                            </td>
+                            <td className="p-4 border-b text-center">
+                              <button
+                                type="button"
+                                className="border border-white w-[40px] h-[40px] bg-green-600 text-white font-bold rounded-[10px] transition-all duration-300 hover:scale-95"
+                                onClick={() => handleAddStudent(student.userId)}
+                              >
+                                <i className="fa fa-plus text-white"></i>
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
                       </tbody>
                     </table>
                   )}
@@ -663,4 +646,4 @@ function FormAddStudentInClass({ onStudentAdded, classSubjectIdParam }) {
   //#endregion
 }
 
-export default FormAddStudentInClass;
+export default FormAddStudentInExamSchdule;

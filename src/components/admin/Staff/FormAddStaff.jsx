@@ -1,17 +1,16 @@
 /* eslint-disable react/prop-types */
-import { useState, useRef, useEffect } from "react";
-import { getMajors } from "../../../services/majorService";
-import { AddTeacher } from "../../../services/TeacherService";
+import { useState, useRef,  } from "react";
 import Avatar from "../../../assets/Imgs/avatar_square.jpg";
+import { AddStaff } from "../../../services/staffService";
 import { bool } from "prop-types";
 
-function FormAddStudent({ onReaload }) {
+function FormAddStaff({ onReaload }) {
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [showAlert, setShowAlert] = useState(false); // Alert for success or failure notification
   const fileInputRef = useRef(null);
 
-  const [newTeacher, setNewTeacher] = useState({
+  const [newStaff, setNewStaff] = useState({
     userId:"",
     firstName: "",
     middleName: "",
@@ -23,7 +22,7 @@ function FormAddStudent({ onReaload }) {
     phoneNumber: "",
     userAvartar: null,
     dateOfBirth: "",
-    roleId: 4,
+    roleId: 2,
     majorId: "",
     status: 1,
     address: "", // Thêm lại field địa chỉ
@@ -31,20 +30,7 @@ function FormAddStudent({ onReaload }) {
 
   const [userAvartar, setuserAvartar] = useState(null);
   const [isFormVisible, setIsFormVisible] = useState(true);
-  const [majorData, setMajorData] = useState([]);
 
-  useEffect(() => {
-    const fetchMajorData = async () => {
-      try {
-        const majorData = await getMajors();
-        setMajorData(majorData.result || []);
-      } catch (error) {
-        console.error("Lỗi khi lấy danh sách chuyên ngành:", error);
-      }
-    };
-    fetchMajorData();
-  }, []);
-  
   const handleCancel = () => {
     setIsFormVisible(false); 
   };
@@ -64,8 +50,8 @@ function FormAddStudent({ onReaload }) {
   const handleAddTeacher = async (e) => {
     e.preventDefault();
     try {
-      const updatedTeacher = { ...newTeacher, userAvartar };
-      const response = await AddTeacher(updatedTeacher);
+      const updatedUser = { ...newStaff, userAvartar };
+      const response = await AddStaff(updatedUser);
       if (response.isSuccess) {
         setShowAlert("success");
         setSuccessMessage(response.message);
@@ -79,7 +65,7 @@ function FormAddStudent({ onReaload }) {
         setIsFormVisible(true); 
       }
     } catch (error) {
-      console.error("Lỗi khi thêm giáo viên:", error);
+      console.error("Lỗi khi thêm nhân viên:", error);
     } 
   };
 
@@ -126,7 +112,7 @@ function FormAddStudent({ onReaload }) {
       {isFormVisible && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
           <div className="bg-white border w-full max-w-[750px] h-auto rounded-2xl shadow-xl p-6">
-            <p className="font-bold text-3xl text-secondaryBlue text-center">Thêm mới giáo viên</p>
+            <p className="font-bold text-3xl text-secondaryBlue text-center">Thêm mới nhân viên</p>
             <form onSubmit={handleAddTeacher}>
               <div className="flex items-start gap-8 my-6">
                 {/* Avatar Section */}
@@ -141,22 +127,13 @@ function FormAddStudent({ onReaload }) {
                 <div className="flex-1 grid gap-4">
                   {/* Name Fields */}
                   <div className="grid grid-cols-3 gap-4">
-                    <input type="text" required placeholder="Nhập họ" className="border rounded-md px-3 py-2" onChange={(e) => setNewTeacher({ ...newTeacher, lastName: e.target.value })} />
-                    <input type="text" placeholder="Nhập tên đệm" className="border rounded-md px-3 py-2" onChange={(e) => setNewTeacher({ ...newTeacher, middleName: e.target.value })} />
-                    <input type="text" required placeholder="Nhập tên" className="border rounded-md px-3 py-2" onChange={(e) => setNewTeacher({ ...newTeacher, firstName: e.target.value })} />
-                  </div>  
-                  {/* Major Selection */}
-                  <select required className="border rounded-md px-3 py-2" onChange={(e) => setNewTeacher({ ...newTeacher, majorId: e.target.value })}>
-                    <option value="">Chọn chuyên ngành</option>
-                    {majorData.map((major) => (
-                      <option key={major.majorId} value={major.majorId}>
-                        {major.majorName}
-                      </option>
-                    ))}
-                  </select>
+                    <input type="text" required placeholder="Nhập họ" className="border rounded-md px-3 py-2" onChange={(e) => setNewStaff({ ...newStaff, lastName: e.target.value })} />
+                    <input type="text" placeholder="Nhập tên đệm" className="border rounded-md px-3 py-2" onChange={(e) => setNewStaff({ ...newStaff, middleName: e.target.value })} />
+                    <input type="text" required placeholder="Nhập tên" className="border rounded-md px-3 py-2" onChange={(e) => setNewStaff({ ...newStaff, firstName: e.target.value })} />
+                  </div>
 
                   <select required className="border rounded-md px-3 py-2" 
-                  onChange={(e) => setNewTeacher({ ...newTeacher,gender: JSON.parse(e.target.value),
+                  onChange={(e) => setNewStaff({ ...newStaff, gender: JSON.parse(e.target.value), // Ép về boolean
                   })}>
                  <option value="" disabled>Chọn giới tính</option>
                   <option value="false">Nam</option>
@@ -164,10 +141,10 @@ function FormAddStudent({ onReaload }) {
                   </select>
 
                   {/* Other Fields */}
-                  <input type="email" required placeholder="Nhập email cá nhân" className="border rounded-md px-3 py-2" onChange={(e) => setNewTeacher({ ...newTeacher, personalEmail: e.target.value })} />
-                  <input type="text" required placeholder="Nhập số điện thoại" className="border rounded-md px-3 py-2" onChange={(e) => setNewTeacher({ ...newTeacher, phoneNumber: e.target.value })} />
-                  <input type="text"  placeholder="Nhập địa chỉ" className="border rounded-md px-3 py-2" onChange={(e) => setNewTeacher({ ...newTeacher, address: e.target.value })} />
-                  <input type="date" required className="border rounded-md px-3 py-2" onChange={(e) => setNewTeacher({ ...newTeacher, dateOfBirth: e.target.value })} />
+                  <input type="email" required placeholder="Nhập email cá nhân" className="border rounded-md px-3 py-2" onChange={(e) => setNewStaff({ ...newStaff, personalEmail: e.target.value })} />
+                  <input type="text" required placeholder="Nhập số điện thoại" className="border rounded-md px-3 py-2" onChange={(e) => setNewStaff({ ...newStaff, phoneNumber: e.target.value })} />
+                  <input type="text"  placeholder="Nhập địa chỉ" className="border rounded-md px-3 py-2" onChange={(e) => setNewStaff({ ...newStaff, address: e.target.value })} />
+                  <input type="date" required className="border rounded-md px-3 py-2" onChange={(e) => setNewStaff({ ...newStaff, dateOfBirth: e.target.value })} />
                   {/* Buttons */}
                   <div className="flex flex-wrap justify-center gap-4 mt-4">
                     <button type="submit" className="w-full max-w-[200px] h-[50px] border rounded-3xl bg-secondaryBlue text-white font-bold hover:scale-105">
@@ -187,4 +164,4 @@ function FormAddStudent({ onReaload }) {
   );
 }
 
-export default FormAddStudent;
+export default FormAddStaff;

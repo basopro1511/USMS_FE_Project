@@ -26,12 +26,20 @@ import TeacherViewExam from '../pages/user/Teacher/TeacherViewExam';
 import ManageSlot from '../pages/manage/slot/slot';
 import Notification from '../pages/manage/notification/notification';
 import TeacherSendRequest from '../pages/user/Teacher/TeacherSendRequest';
-import TeacherSchedule from '../pages/manage/teacher/teacherSchedule';
 import ManageExamSchedule from '../pages/manage/examSchedule/examschedule';
+import StudentInExamSchedule from '../pages/manage/examSchedule/studentInExamSchedule';
+import PersonalInformation from '../pages/manage/Information';
+import LayoutAdmin from '../layouts/LayoutAdmin';
+import TeacherDetailInformation from '../pages/user/Teacher/TeacherDetailInformation';
+import ManageStaff from '../pages/admin/Staff/staff';
+import TeacherSchedule from '../pages/user/Teacher/teacherSchedule';
 
 
 const AppRoutes = () => {
   const routes = [
+    //Admin Zone //
+    { path: "/manageStaff", component: ManageStaff, layout: LayoutAdmin },
+
     //Login Zone //
     { path: "/", component: Login, layout: LayoutDefault },
     { path: "/form", component: FormDetailRoom, layout: LayoutDefault },
@@ -50,7 +58,8 @@ const AppRoutes = () => {
     { path: "/teacherViewExam", component: TeacherViewExam, layout: LayoutUser},
     { path: "/teacherSendRequest", component: TeacherSendRequest, layout: LayoutUser},
     { path: "/teacherSchedule", component: TeacherSchedule, layout: LayoutUser},
-    
+    { path: "/teacherDetail", component: TeacherDetailInformation, layout: LayoutUser },
+
     //Manange Zone //
     { path: "/manageClass", component: ManageClass, layout: ManageLayout },
     { path: "/studentInClass/:classSubjectId/:classId", component: StudentInClass, layout: ManageLayout },
@@ -63,7 +72,8 @@ const AppRoutes = () => {
     { path: "/manageSlot", component: ManageSlot, layout: ManageLayout },
     { path: "/manageNotification", component: Notification, layout: ManageLayout},
     { path: "/manageExamSchedule", component: ManageExamSchedule, layout: ManageLayout},
-
+    { path: "/studentInExamSchedule/:examScheduleId/:subjectId", component: StudentInExamSchedule, layout: ManageLayout },
+    { path: "/manageInformation", component: PersonalInformation, layout: ManageLayout},
 
 ];
   return (

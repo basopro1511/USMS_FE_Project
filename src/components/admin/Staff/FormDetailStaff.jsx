@@ -1,16 +1,14 @@
 /* eslint-disable react/prop-types */
 import { useState, useEffect } from "react";
-import { getMajors } from "../../../services/majorService";
 
 // eslint-disable-next-line react/prop-types
-function FormDetailTeacher({ teacherDetail }) {
-  const [teacherData, setTeacherData] = useState({
+function FormDetailStaff({ userDetail }) {
+  const [userData, setUserData] = useState({
     userId: "",
     majorId: "",
     firstName: "",
     middleName: "",
     lastName: "",
-    gender: true,
     email: "",
     phoneNumber: "",
     dateOfBirth: "",
@@ -20,48 +18,31 @@ function FormDetailTeacher({ teacherDetail }) {
     userAvartar: "",
   });
 
-  // Cập nhật dữ liệu khi teacherDetail thay đổi
+  // Cập nhật dữ liệu khi userDetail thay đổi
   useEffect(() => {
-    if (teacherDetail) {
-      console.log("Teacher Detail Received:", teacherDetail);
-      setTeacherData({
-        userId: teacherDetail.userId || "",
-        majorId: teacherDetail.majorId || "",
-        firstName: teacherDetail.firstName || "",
-        middleName: teacherDetail.middleName || "",
-        gender: teacherDetail.gender || "",
-        lastName: teacherDetail.lastName || "",
-        email: teacherDetail.email || "",
-        phoneNumber: teacherDetail.phoneNumber || "",
-        dateOfBirth: teacherDetail.dateOfBirth || "",
-        createdAt: teacherDetail.createdAt || "",
-        updatedAt: teacherDetail.updatedAt || "",
-        personalEmail: teacherDetail.personalEmail || "",
-        userAvartar: teacherDetail.userAvartar || "",
+    if (userDetail) {
+      console.log("Teacher Detail Received:", userDetail);
+      setUserData({
+        userId: userDetail.userId || "",
+        majorId: userDetail.majorId || "",
+        firstName: userDetail.firstName || "",
+        middleName: userDetail.middleName || "",
+        lastName: userDetail.lastName || "",
+        email: userDetail.email || "",
+        phoneNumber: userDetail.phoneNumber || "",
+        dateOfBirth: userDetail.dateOfBirth || "",
+        createdAt: userDetail.createdAt || "",
+        updatedAt: userDetail.updatedAt || "",
+        personalEmail: userDetail.personalEmail || "",
+        userAvartar: userDetail.userAvartar || "",
       });
     }
-  }, [teacherDetail]);
-
-  const [majorData, setMajorData] = useState([]);
-
-  useEffect(() => {
-    const fetchMajorData = async () => {
-      try {
-        const majorData = await getMajors();
-        setMajorData(majorData.result || []);
-      } catch (error) {
-        console.error("Lỗi khi lấy danh sách chuyên ngành:", error);
-      }
-    };
-    fetchMajorData();
-  }, []);
+  }, [userDetail]);
 
   const [isFormVisible, setIsFormVisible] = useState(true);
   const handleCancel = () => {
     setIsFormVisible(false);
   };
-  const foundMajor = majorData.find((m) => m.majorId === teacherData.majorId);
-  const majorName = foundMajor ? foundMajor.majorName : teacherData.majorId;
   return (
     <>
       {isFormVisible && (
@@ -69,7 +50,7 @@ function FormDetailTeacher({ teacherDetail }) {
           <div className="bg-white border w-full max-w-[900px] rounded-2xl items-center text-center shadow-xl">
             <div>
               <p className="font-bold text-3xl sm:text-4xl md:text-5xl mt-8 text-secondaryBlue">
-                Xem Chi Tiết Giáo Viên
+                Xem chi tiết nhân viên
               </p>
               <form className="flex flex-col items-center gap-4 mt-8">
                 <div className="flex gap-8">
@@ -77,8 +58,8 @@ function FormDetailTeacher({ teacherDetail }) {
                     <div className="mb-4">
                       <img
                         src={
-                          teacherData.userAvartar
-                            ? teacherData.userAvartar
+                          userData.userAvartar
+                            ? userData.userAvartar
                             : "https://res.cloudinary.com/djvanrbcm/image/upload/v1740591518/i3qeccbtpgefqa03iho7.jpg"
                         }
                         alt="Upload Preview"
@@ -87,7 +68,26 @@ function FormDetailTeacher({ teacherDetail }) {
                     </div>
                   </div>
                   <div className="flex flex-col gap-4">
-                 
+                    <div className="flex gap-4">
+                      <div>
+                        <p className="text-left">Mã số nhân viên:</p>
+                        <input
+                          type="text"
+                          readOnly
+                          className="w-full h-[40px] border border-gray-300 rounded-md px-3"
+                          value={userData.userId}
+                        />
+                      </div>
+                      <div>
+                        <p className="text-left">Giới tính:</p>
+                        <input
+                          type="text"
+                          readOnly
+                          className="w-[100px] h-[40px] border border-gray-300 rounded-md px-3"
+                          value={userData.gender ? "Nữ" : "Nam"}
+                        />
+                      </div>
+                    </div>
                     <div className="flex gap-4">
                       <div>
                         <p className="text-left">Họ:</p>
@@ -95,7 +95,7 @@ function FormDetailTeacher({ teacherDetail }) {
                           type="text"
                           readOnly
                           className="w-full h-[40px] border border-gray-300 rounded-md px-3"
-                          value={teacherData.lastName}
+                          value={userData.lastName}
                         />
                       </div>
                       <div>
@@ -104,7 +104,7 @@ function FormDetailTeacher({ teacherDetail }) {
                           type="text"
                           readOnly
                           className="w-full h-[40px] border border-gray-300 rounded-md px-3"
-                          value={teacherData.middleName}
+                          value={userData.middleName}
                         />
                       </div>
                       <div>
@@ -113,37 +113,7 @@ function FormDetailTeacher({ teacherDetail }) {
                           type="text"
                           readOnly
                           className="w-full h-[40px] border border-gray-300 rounded-md px-3"
-                          value={teacherData.firstName}
-                        />
-                      </div>
-                    </div>
-                    <div className="flex gap-4">
-                      <div>
-                        <p className="text-left">Mã số Giáo Viên:</p>
-                        <input
-                          type="text"
-                          readOnly
-                          className="w-full h-[40px] border border-gray-300 rounded-md px-3"
-                          value={teacherData.userId}
-                        />
-                      </div>
-                      <div>
-                        <p className="text-left">Chuyên ngành:</p>
-                        <input
-                          type="text"
-                          readOnly
-                          className="w-full h-[40px] border border-gray-300 rounded-md px-3"
-                          value={majorName}
-                        />
-                      </div>
-                      <div>
-                        <p className="text-left">Giới tính:</p>
-                        <input
-                          type="text"
-                          readOnly
-                          className="w-full h-[40px] border border-gray-300 rounded-md px-3"
-                          value={teacherData.gender ? "Nữ" : "Nam"}
-
+                          value={userData.firstName}
                         />
                       </div>
                     </div>
@@ -153,7 +123,7 @@ function FormDetailTeacher({ teacherDetail }) {
                         type="email"
                         readOnly
                         className="w-full h-[40px] border border-gray-300 rounded-md px-3"
-                        value={teacherData.email}
+                        value={userData.email}
                       />
                     </div>
                     <div>
@@ -162,7 +132,7 @@ function FormDetailTeacher({ teacherDetail }) {
                         type="email"
                         readOnly
                         className="w-full h-[40px] border border-gray-300 rounded-md px-3"
-                        value={teacherData.personalEmail}
+                        value={userData.personalEmail}
                       />
                     </div>
                     <div>
@@ -171,7 +141,7 @@ function FormDetailTeacher({ teacherDetail }) {
                         type="text"
                         readOnly
                         className="w-full h-[40px] border border-gray-300 rounded-md px-3"
-                        value={teacherData.phoneNumber}
+                        value={userData.phoneNumber}
                       />
                     </div>
                     <div>
@@ -180,7 +150,7 @@ function FormDetailTeacher({ teacherDetail }) {
                         type="date"
                         readOnly
                         className="w-full h-[40px] border border-gray-300 rounded-md px-3"
-                        value={teacherData.dateOfBirth}
+                        value={userData.dateOfBirth}
                       />
                     </div>
                   </div>
@@ -203,4 +173,4 @@ function FormDetailTeacher({ teacherDetail }) {
   );
 }
 
-export default FormDetailTeacher;
+export default FormDetailStaff;

@@ -1,16 +1,15 @@
 /* eslint-disable react/prop-types */
 import { useState, useEffect, useRef } from "react";
-import { getMajors } from "../../../services/majorService";
-import { UpdateTeacher } from "../../../services/TeacherService";
+import { UpdateStudent } from "../../../services/studentService";
 
-function FormUpdateTeacher({ teacherToUpdate, onReaload }) {
+function FormUpdateStudentPersonalInformation({ infoToUpdate, onReaload }) {
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [showAlert, setShowAlert] = useState(false);
   const [isFormVisible, setIsFormVisible] = useState(true);
   const fileInputRef = useRef(null); // Sử dụng useRef để tham chiếu đến input file
 
-  const [teacherData, setTeacherData] = useState({
+  const [studentData, setstudentData] = useState({
     userId: "",
     firstName: "",
     middleName: "",
@@ -29,23 +28,10 @@ function FormUpdateTeacher({ teacherToUpdate, onReaload }) {
   });
 
   useEffect(() => {
-    if (teacherToUpdate) {
-      setTeacherData(teacherToUpdate);
+    if (infoToUpdate) {
+      setstudentData(infoToUpdate);
     }
-  }, [teacherToUpdate]);
-
-  const [majorData, setMajorData] = useState([]);
-  useEffect(() => {
-    const fetchMajorData = async () => {
-      try {
-        const majorData = await getMajors();
-        setMajorData(majorData.result || []);
-      } catch (error) {
-        console.error("Lỗi khi lấy danh sách chuyên ngành:", error);
-      }
-    };
-    fetchMajorData();
-  }, []);
+  }, [infoToUpdate]);
 
   const [userAvartar, setuserAvartar] = useState(null);
   const handleuserAvartarChange = (e) => {
@@ -66,9 +52,9 @@ function FormUpdateTeacher({ teacherToUpdate, onReaload }) {
 
   const handleUpdateTeacher = async (e) => {
     e.preventDefault();
-    try {    
-        const updatedTeacher = { ...teacherData, userAvartar };
-      const response = await UpdateTeacher(updatedTeacher); // Giả sử đây là API gọi để cập nhật thông tin giáo viên
+    try {
+      const updatedStaff = { ...studentData, userAvartar };
+      const response = await UpdateStudent(updatedStaff); // Giả sử đây là API gọi để cập nhật thông tin giáo viên
       if (response.isSuccess) {
         setShowAlert("success");
         setSuccessMessage(response.message);
@@ -88,11 +74,6 @@ function FormUpdateTeacher({ teacherToUpdate, onReaload }) {
 
   const handleCancel = () => {
     setIsFormVisible(false);
-  };
-  const statusMapping = {
-    0: "Vô hiệu hóa",
-    1: "Đang khả dụng",
-    2: "Đang tạm hoãn",
   };
   return (
     <>
@@ -123,8 +104,8 @@ function FormUpdateTeacher({ teacherToUpdate, onReaload }) {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
           <div className="bg-white border w-full max-w-[900px] rounded-2xl items-center text-center shadow-xl">
             <div>
-              <p className="font-bold text-3xl sm:text-4xl md:text-5xl mt-8 text-secondaryBlue">
-                Cập Nhật Giáo Viên
+              <p className="font-bold text-3xl sm:text-4xl md:text-5xl mt-8 text-blue-700">
+                Cập Nhật Thông Tin
               </p>
               <form
                 onSubmit={handleUpdateTeacher}
@@ -133,8 +114,12 @@ function FormUpdateTeacher({ teacherToUpdate, onReaload }) {
                 <div className="flex gap-8">
                   <div>
                     <div className="mb-4">
-                     <img src={userAvartar ||teacherData.userAvartar} alt="Avatar" className="w-[180px] h-[220px] object-cover rounded-md" />
-                     
+                      <img
+                        src={userAvartar || studentData.userAvartar}
+                        alt="Avatar"
+                        className="w-[180px] h-[220px] object-cover rounded-md"
+                      />
+
                       <input
                         type="file"
                         accept="image/*"
@@ -142,29 +127,21 @@ function FormUpdateTeacher({ teacherToUpdate, onReaload }) {
                         onChange={handleuserAvartarChange}
                         ref={fileInputRef}
                       />
-
-                      <button
-                        type="button"
-                        onClick={() => fileInputRef.current.click()}
-                        className="w-full bg-[#2B559B] text-white font-bold text-sm rounded-md mt-2 py-2"
-                      >
-                        Upload
-                      </button>
                     </div>
                   </div>
                   <div className="flex flex-col gap-4">
                     <div className="flex gap-4">
                       <div>
-                        <p className="text-left">Mã số Giáo Viên:</p>
+                        <p className="text-left">Mã số sinh viên:</p>
                         <input
                           type="text"
                           required
                           readOnly
                           className="w-full h-[40px] border border-gray-300 rounded-md px-3"
-                          value={teacherData.userId}
+                          value={studentData.userId}
                           onChange={(e) =>
-                            setTeacherData({
-                              ...teacherData,
+                            setstudentData({
+                              ...studentData,
                               teacherId: e.target.value,
                             })
                           }
@@ -172,45 +149,21 @@ function FormUpdateTeacher({ teacherToUpdate, onReaload }) {
                       </div>
                       <div>
                         {/* Major Selection */}
-                        <p className="text-left">Chuyên ngành:</p>
-                        <select
-                          required
-                          className="border rounded-md px-3 py-2  h-[40px] "
-                          value={teacherData.majorId}
-                          onChange={(e) =>
-                            setTeacherData({
-                              ...teacherData,
-                              majorId: e.target.value,
-                            })
-                          }
-                        >
-                          <option value="">Chọn chuyên ngành</option>
-                          {majorData.map((major) => (
-                            <option key={major.majorId} value={major.majorId}>
-                              {major.majorName}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                      <div>
-                        {/* Major Selection */}
                         <p className="text-left">Giới tính:</p>
                         <select
                           required
-                          className="border rounded-md px-3 py-2 h-[40px] w-[100px]"
-                          value={teacherData.gender}
+                          className="border rounded-md px-3 py-2 h-[40px]"
+                          value={studentData.gender}
                           onChange={(e) =>
-                            setTeacherData({
-                              ...teacherData,
-                              gender: e.target.value === "true",
+                            setstudentData({
+                              ...studentData,
+                              gender: e.target.value, // ép kiểu boolean luôn
                             })
                           }
                         >
-                               <option value="" disabled>
-                          Chọn giới tính
-                        </option>
-                        <option value="false">Nam</option>
-                        <option value="true">Nữ</option>
+                          <option value="">Chọn giới tính</option>
+                          <option value="false">Nam</option>
+                          <option value="true">Nữ</option>
                         </select>
                       </div>
                     </div>
@@ -221,10 +174,10 @@ function FormUpdateTeacher({ teacherToUpdate, onReaload }) {
                           type="text"
                           required
                           className="w-full h-[40px] border border-gray-300 rounded-md px-3"
-                          value={teacherData.lastName}
+                          value={studentData.lastName}
                           onChange={(e) =>
-                            setTeacherData({
-                              ...teacherData,
+                            setstudentData({
+                              ...studentData,
                               lastName: e.target.value,
                             })
                           }
@@ -235,10 +188,10 @@ function FormUpdateTeacher({ teacherToUpdate, onReaload }) {
                         <input
                           type="text"
                           className="w-full h-[40px] border border-gray-300 rounded-md px-3"
-                          value={teacherData.middleName}
+                          value={studentData.middleName}
                           onChange={(e) =>
-                            setTeacherData({
-                              ...teacherData,
+                            setstudentData({
+                              ...studentData,
                               middleName: e.target.value,
                             })
                           }
@@ -250,55 +203,40 @@ function FormUpdateTeacher({ teacherToUpdate, onReaload }) {
                           type="text"
                           required
                           className="w-full h-[40px] border border-gray-300 rounded-md px-3"
-                          value={teacherData.firstName}
+                          value={studentData.firstName}
                           onChange={(e) =>
-                            setTeacherData({
-                              ...teacherData,
+                            setstudentData({
+                              ...studentData,
                               firstName: e.target.value,
                             })
                           }
                         />
                       </div>
                     </div>
-                    <div>
-                      <p className="text-left">Email:</p>
-                      <input
-                        type="email"
-                        required
-                        className="w-full h-[40px] border border-gray-300 rounded-md px-3"
-                        value={teacherData.email}
-                        onChange={(e) =>
-                          setTeacherData({
-                            ...teacherData,
-                            email: e.target.value,
-                          })
-                        }
-                      />
-                    </div>
+              
                     {/* Lưu ẩn mật khẩu */}
                     <input
                       type="passwordHash"
                       hidden
-                      value={teacherData.passwordHash}
+                      value={studentData.passwordHash}
                       onChange={(e) =>
-                        setTeacherData({
-                          ...teacherData,
+                        setstudentData({
+                          ...studentData,
                           passwordHash: e.target.value,
                         })
                       }
                     />
                     {/* Lưu ẩn mật khẩu */}
-
                     <div>
                       <p className="text-left">Email cá nhân:</p>
                       <input
                         type="email"
                         required
                         className="w-full h-[40px] border border-gray-300 rounded-md px-3"
-                        value={teacherData.personalEmail}
+                        value={studentData.personalEmail}
                         onChange={(e) =>
-                          setTeacherData({
-                            ...teacherData,
+                          setstudentData({
+                            ...studentData,
                             personalEmail: e.target.value,
                           })
                         }
@@ -310,10 +248,10 @@ function FormUpdateTeacher({ teacherToUpdate, onReaload }) {
                         type="text"
                         required
                         className="w-full h-[40px] border border-gray-300 rounded-md px-3"
-                        value={teacherData.phoneNumber}
+                        value={studentData.phoneNumber}
                         onChange={(e) =>
-                          setTeacherData({
-                            ...teacherData,
+                          setstudentData({
+                            ...studentData,
                             phoneNumber: e.target.value,
                           })
                         }
@@ -325,33 +263,29 @@ function FormUpdateTeacher({ teacherToUpdate, onReaload }) {
                         type="date"
                         required
                         className="w-full h-[40px] border border-gray-300 rounded-md px-3"
-                        value={teacherData.dateOfBirth}
+                        value={studentData.dateOfBirth}
                         onChange={(e) =>
-                          setTeacherData({
-                            ...teacherData,
+                          setstudentData({
+                            ...studentData,
                             dateOfBirth: e.target.value,
                           })
                         }
                       />
                     </div>
                     <div>
-                      <p className="text-left">Trạng thái</p>
-                      <select
-                        value={teacherData.status}
-                        className="w-full border rounded-md px-3 py-2"
+                      <p className="text-left">Địa chỉ</p>
+                      <input
+                        type="text"
+                        required
+                        className="w-full h-[40px] border border-gray-300 rounded-md px-3"
+                        value={studentData.address}
                         onChange={(e) =>
-                          setTeacherData({
-                              ...teacherData,
-                              status: parseInt(e.target.value),
-                            })
-                          }
-                      >
-                        {Object.entries(statusMapping).map(([key, value]) => (
-                          <option key={key} value={key}>
-                            {value}
-                          </option>
-                        ))}
-                      </select>
+                          setstudentData({
+                            ...studentData,
+                            address: e.target.value,
+                          })
+                        }
+                      />{" "}
                     </div>
                   </div>
                 </div>
@@ -359,13 +293,13 @@ function FormUpdateTeacher({ teacherToUpdate, onReaload }) {
                 <div className="flex justify-center gap-8 mt-8 mb-8">
                   <button
                     type="submit"
-                    className="w-[150px] h-[50px] bg-secondaryBlue text-white rounded-md font-bold"
+                    className="w-[150px] h-[50px] bg-blue-700 hover:bg-blue-900 hover:scale-95 text-white rounded-md font-bold"
                   >
                     Lưu
                   </button>
                   <button
                     type="button"
-                    className="w-[150px] h-[50px] bg-red-500 text-white rounded-md font-bold"
+                    className="w-[150px] h-[50px] bg-red-500  hover:bg-red-900 hover:scale-95 text-white rounded-md font-bold"
                     onClick={handleCancel}
                   >
                     Hủy
@@ -380,4 +314,4 @@ function FormUpdateTeacher({ teacherToUpdate, onReaload }) {
   );
 }
 
-export default FormUpdateTeacher;
+export default FormUpdateStudentPersonalInformation;

@@ -52,8 +52,6 @@ export const GetAvailableRoom = async (date, slotId) => {
         console.log(error);
     }
 }
-
-// Get Available Room To Add Exam Schedule
 export const GetAvailableRoomToAddExamSchedule = async (date, startTime, endTime) => {
     try {
         const response = await request.get(`/Room/AvailableRoomsToAddExamSchedule/${date}/${startTime}/${endTime}`);

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 function TeacherSendRequest() {
@@ -177,11 +177,11 @@ function TeacherSendRequest() {
 
 
 
-    // Reset giáo viên khi thay đổi môn học
-    const handleSubjectChange = (event) => {
-        setSelectedSubject(event.target.value);
-        setSelectedTeacher(""); // Reset giáo viên khi thay đổi môn học
-    };
+    // // Reset giáo viên khi thay đổi môn học
+    // const handleSubjectChange = (event) => {
+    //     setSelectedSubject(event.target.value);
+    //     setSelectedTeacher(""); // Reset giáo viên khi thay đổi môn học
+    // };
 
     return (
         <div>

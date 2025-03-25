@@ -1,9 +1,8 @@
 /* eslint-disable react/prop-types */
 import { useState, useEffect, useRef } from "react";
-import { getMajors } from "../../../services/majorService";
-import { UpdateTeacher } from "../../../services/TeacherService";
+import { UpdateStaff } from "../../../services/staffService";
 
-function FormUpdateTeacher({ teacherToUpdate, onReaload }) {
+function FormUpdateStaff({ teacherToUpdate, onReaload }) {
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [showAlert, setShowAlert] = useState(false);
@@ -22,7 +21,7 @@ function FormUpdateTeacher({ teacherToUpdate, onReaload }) {
     phoneNumber: "",
     userAvartar: null,
     dateOfBirth: "",
-    roleId: 4,
+    roleId: 2,
     majorId: "",
     status: 1,
     address: "",
@@ -33,19 +32,6 @@ function FormUpdateTeacher({ teacherToUpdate, onReaload }) {
       setTeacherData(teacherToUpdate);
     }
   }, [teacherToUpdate]);
-
-  const [majorData, setMajorData] = useState([]);
-  useEffect(() => {
-    const fetchMajorData = async () => {
-      try {
-        const majorData = await getMajors();
-        setMajorData(majorData.result || []);
-      } catch (error) {
-        console.error("Lỗi khi lấy danh sách chuyên ngành:", error);
-      }
-    };
-    fetchMajorData();
-  }, []);
 
   const [userAvartar, setuserAvartar] = useState(null);
   const handleuserAvartarChange = (e) => {
@@ -64,11 +50,12 @@ function FormUpdateTeacher({ teacherToUpdate, onReaload }) {
     }
   };
 
-  const handleUpdateTeacher = async (e) => {
+  const handleUpdate = async (e) => {
     e.preventDefault();
     try {    
         const updatedTeacher = { ...teacherData, userAvartar };
-      const response = await UpdateTeacher(updatedTeacher); // Giả sử đây là API gọi để cập nhật thông tin giáo viên
+        updatedTeacher.majorId= "";
+      const response = await UpdateStaff(updatedTeacher); // Giả sử đây là API gọi để cập nhật thông tin giáo viên
       if (response.isSuccess) {
         setShowAlert("success");
         setSuccessMessage(response.message);
@@ -124,10 +111,10 @@ function FormUpdateTeacher({ teacherToUpdate, onReaload }) {
           <div className="bg-white border w-full max-w-[900px] rounded-2xl items-center text-center shadow-xl">
             <div>
               <p className="font-bold text-3xl sm:text-4xl md:text-5xl mt-8 text-secondaryBlue">
-                Cập Nhật Giáo Viên
+                Cập Nhật Nhân Viên
               </p>
               <form
-                onSubmit={handleUpdateTeacher}
+                onSubmit={handleUpdate}
                 className="flex flex-col items-center gap-4 mt-8"
               >
                 <div className="flex gap-8">
@@ -155,7 +142,7 @@ function FormUpdateTeacher({ teacherToUpdate, onReaload }) {
                   <div className="flex flex-col gap-4">
                     <div className="flex gap-4">
                       <div>
-                        <p className="text-left">Mã số Giáo Viên:</p>
+                        <p className="text-left">Mã số nhân viên:</p>
                         <input
                           type="text"
                           required
@@ -172,45 +159,21 @@ function FormUpdateTeacher({ teacherToUpdate, onReaload }) {
                       </div>
                       <div>
                         {/* Major Selection */}
-                        <p className="text-left">Chuyên ngành:</p>
-                        <select
-                          required
-                          className="border rounded-md px-3 py-2  h-[40px] "
-                          value={teacherData.majorId}
-                          onChange={(e) =>
-                            setTeacherData({
-                              ...teacherData,
-                              majorId: e.target.value,
-                            })
-                          }
-                        >
-                          <option value="">Chọn chuyên ngành</option>
-                          {majorData.map((major) => (
-                            <option key={major.majorId} value={major.majorId}>
-                              {major.majorName}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                      <div>
-                        {/* Major Selection */}
                         <p className="text-left">Giới tính:</p>
                         <select
                           required
-                          className="border rounded-md px-3 py-2 h-[40px] w-[100px]"
+                          className="border rounded-md px-3 py-2 h-[40px]"
                           value={teacherData.gender}
                           onChange={(e) =>
                             setTeacherData({
                               ...teacherData,
-                              gender: e.target.value === "true",
+                              gender: e.target.value === 'true' // ép kiểu boolean
                             })
                           }
                         >
-                               <option value="" disabled>
-                          Chọn giới tính
-                        </option>
-                        <option value="false">Nam</option>
-                        <option value="true">Nữ</option>
+                          <option value="">Chọn giới tính</option>
+                          <option value="false">Nam</option>
+                          <option value="true">Nữ</option>
                         </select>
                       </div>
                     </div>
@@ -380,4 +343,4 @@ function FormUpdateTeacher({ teacherToUpdate, onReaload }) {
   );
 }
 
-export default FormUpdateTeacher;
+export default FormUpdateStaff;

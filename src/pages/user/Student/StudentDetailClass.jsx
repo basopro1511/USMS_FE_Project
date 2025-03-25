@@ -13,7 +13,7 @@ function StudentDetailClass({ classSubjectId }) {
         setError(null);
         setLoading(true);
         setStudentData([]);
-        const data = await GetStudentDataByClassId(4);
+        const data = await GetStudentDataByClassId(33);
         if (Array.isArray(data.result) && data.isSuccess) {
           // data.result = [];
           if (data.result.length === 0) {
@@ -30,7 +30,6 @@ function StudentDetailClass({ classSubjectId }) {
         setLoading(false);
       }
     };
-
     fetchStudentDetailClass();
   }, [classSubjectId]);
 

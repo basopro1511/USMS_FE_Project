@@ -30,11 +30,10 @@ export const GetStudentById = async (id) => {
 }
 
 //Update Student
-export const UpdateStudent = async (StudentData) => {
-    const userId = StudentData.userId
+export const UpdateStudent = async (data) => {
     try {
-        const response = await request.put(`Student/${userId}`, StudentData);
-        return response.data;
+        const response = await request.put("Student", data)
+        return response.data
     } catch (error) {
         console.log(error);
     }
@@ -50,3 +49,20 @@ export const changeStudentStatus = async (id, status) => {
         console.log(error);
     }
 }
+//#region import student
+export const importStudents = async (file) => {
+    try {
+        const formData = new FormData();
+        formData.append("file", file);
+        const response = await request.post("/Student/import", formData, {
+            headers: {
+                "Content-Type": "multipart/form-data",
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Import error:", error);
+        throw error;
+    }
+};
+//#endregion

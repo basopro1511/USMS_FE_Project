@@ -1,14 +1,15 @@
 import { useState, useEffect } from "react";
-import FormAddStudentInClass from "../../../components/management/StudentInClass/FormAddStudentInClass";
-import PopUpRemoveStudentInClass from "../../../components/management/StudentInClass/PopUpRemoveStudentInClass";
-import { GetStudentDataByClassId } from "../../../services/studentInClassService";
 import { useParams } from "react-router-dom";
+import { GetStudentDataByExamScheduleId } from "../../../services/studentInExamScheduleService";
 import { getMajors } from "../../../services/majorService";
+import FormAddStudentInExamSchdule from "../../../components/management/StudentInExamSchedule/FormAddStudentExamSchedule";
+import PopUpRemoveStudentInExamScheduke from "../../../components/management/StudentInExamSchedule/PopUpRemoveStudenInExamSchedule";
 
-function StudentInClass() {
+function StudentInExamSchedule() {
   //#region State & error
   const [studentData, setStudentData] = useState([]);
-  const { classSubjectId, classId } = useParams(); // Lấy classId, classSubjectId từ URL
+  const { examScheduleId, subjectId } = useParams(); // Lấy classId, classSubjectId từ URL
+  const [majorData, setMajorData] = useState([]);
   // State để lưu ID của lịch cần xóa
   const [deleteId, setDeleteId] = useState(null);
   const [showDeletePopup, setShowDeletePopup] = useState(false);
@@ -24,8 +25,8 @@ function StudentInClass() {
   useEffect(() => {
     const fetchDataStudent = async () => {
       try {
-        if (!classSubjectId) return; // Nếu không có classId thì không gọi API
-        const studentData = await GetStudentDataByClassId(classSubjectId);
+        if (!examScheduleId) return; // Nếu không có classId thì không gọi API
+        const studentData = await GetStudentDataByExamScheduleId(examScheduleId);
         console.log(studentData);
         if (studentData && studentData.result) {
           setStudentData(studentData.result);
@@ -38,39 +39,42 @@ function StudentInClass() {
       }
     };
     fetchDataStudent();
-  }, [classSubjectId]); // Thêm classId vào dependency để re-fetch khi nó thay đổi
+  }, [examScheduleId]); // Thêm classId vào dependency để re-fetch khi nó thay đổi
+
+  // --- Fetch dữ liệu chuyên ngành ---
+  useEffect(() => {
+    const fetchMajorData = async () => {
+      try {
+        const majorRes = await getMajors();
+        if (majorRes && majorRes.result) {
+          setMajorData(majorRes.result);
+        } else {
+          setMajorData([]);
+        }
+      } catch (err) {
+        console.error("Error fetching majors:", err);
+        setMajorData([]);
+      }
+    };
+    fetchMajorData();
+  }, []);
 
   //Update bảng mà không cần reload
   const handleReloadPage = async () => {
-    const data = await GetStudentDataByClassId(classSubjectId); // Gọi API để lấy lại tất cả các lớp
+    const data = await GetStudentDataByExamScheduleId(examScheduleId); // Gọi API để lấy lại tất cả các lớp
     setStudentData(data.result); // Cập nhật lại dữ liệu lớp
-  };
-
-  // Fetch lại danh sách sau khi xóa mà không cần reload
-  const handleDeleteSuccess = (id) => {
-    setStudentData((prev) => prev.filter((item) => item.studentClassId !== id));
-    setShowDeletePopup(false);
   };
 
   // Khi bấm nút xóa, mở popup xác nhận
   const handleDeleteStudent = (id) => {
-    setDeleteId(id);
-    setShowDeletePopup(true);
+    setDeleteId(null);         // reset 
+    setShowDeletePopup(false); // reset
+    setTimeout(() => {
+      setDeleteId(id);
+      setShowDeletePopup(true);
+    }, 0);
   };
-
   
-      const [majorData, setMajorData] = useState([]);
-      useEffect(() => {
-        const fetchMajorData = async () => {
-          try {
-            const majorData = await getMajors();
-            setMajorData(majorData.result || []);
-          } catch (error) {
-            console.error("Lỗi khi lấy danh sách chuyên ngành:", error);
-          }
-        };
-        fetchMajorData();
-      }, []);
   //#endregion
 
   //#region Filter, Sort, Paging
@@ -143,7 +147,8 @@ function StudentInClass() {
     <div className="border mt-4 h-auto pb-7 w-[1600px] bg-white rounded-2xl">
       <div className="flex justify-center">
         <p className="mt-8 text-3xl font-bold">
-          Sinh viên trong lớp <span className="text-red-600">{classId}</span>
+          Sinh viên trong lớp thi{" "}
+          <span className="text-red-600">{subjectId}</span>
         </p>
       </div>
       <p className="ml-4 mt-5">Tìm kiếm: </p>
@@ -362,20 +367,18 @@ function StudentInClass() {
             </tr>
           </thead>
           <tbody>
-          {currentData.map((student, index) => {
-                // tăng số thứ tự
-             const stt = indexOfFirstItem + (index + 1);
-                // Tìm majorName tương ứng
-                const foundMajor = majorData.find(
-                  (m) => m.majorId === student.majorId
-                );
-                const majorName = foundMajor
-                  ? foundMajor.majorName
-                  : student.majorId;
-                return (
-                  
-                  <tr
-                  key={student.studentId}
+            {currentData.map((student, index) => {
+                const stt = indexOfFirstItem + (index + 1);
+
+              const foundMajor = majorData.find(
+                (m) => m.majorId === student.majorId
+              );
+              const majorName = foundMajor
+                ? foundMajor.majorName
+                : student.majorId;
+              return (
+                <tr
+                  key={student.studentExamId}
                   className="hover:bg-gray-50 even:bg-gray-50"
                 >
                   <td className="p-4 border-b text-center">{stt}</td>
@@ -391,13 +394,13 @@ function StudentInClass() {
                   <td className="p-4 border-b text-center">
                     {student.phoneNumber}
                   </td>
-                  <td className="p-4 border-b text-center">
-                    {majorName}
-                  </td>
+                  <td className="p-4 border-b text-center">{majorName}</td>
                   <td className="p-4 border-b text-center">{student.term}</td>
                   <td className="p-4 border-b text-center">
                     <button
-                      onClick={() => handleDeleteStudent(student.studentClassId)}
+                      onClick={() =>
+                        handleDeleteStudent(student.studentExamId)
+                      }
                       type="button"
                       className="border border-white w-[45px] h-[35px] bg-red-600 text-white font-bold rounded-[10px] transition-all duration-300  hover:scale-95"
                     >
@@ -408,9 +411,9 @@ function StudentInClass() {
                     </button>
                   </td>
                 </tr>
-                );
-              })}
-              </tbody>
+              );
+            })}
+          </tbody>
         </table>
       </div>
       {/* Phân trang - start */}
@@ -442,16 +445,16 @@ function StudentInClass() {
 
       {/* Add Student Form */}
       {showAddForm && (
-        <FormAddStudentInClass
+        <FormAddStudentInExamSchdule
           onClose={toggleShowForm}
-          classSubjectIdParam={classSubjectId}
+          examScheduleId={examScheduleId}
           onStudentAdded={handleReloadPage}
         />
       )}
       {showDeletePopup && (
-        <PopUpRemoveStudentInClass
-          studentClassId={deleteId}
-          onDeleted={handleDeleteSuccess}
+        <PopUpRemoveStudentInExamScheduke
+        studentExamId={deleteId}
+          onDeleted={handleReloadPage}
           onCancel={() => setShowDeletePopup(false)}
         />
       )}
@@ -460,4 +463,4 @@ function StudentInClass() {
   //#endregion
 }
 
-export default StudentInClass;
+export default StudentInExamSchedule;

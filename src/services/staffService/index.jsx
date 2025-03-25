@@ -1,27 +1,27 @@
 import request from "../../utils/baseURL";
 
 //Get all Students in Database 
-export const getTeachers = async () => {
+export const GetStaffs = async () => {
     try {
-        const response = await request.get("Teacher")
+        const response = await request.get("Staff")
         return response.data
     } catch (error) {
         console.log(error);
     }
 }
 //Add New Teacher
-export const AddTeacher = async (teacherData) => {
+export const AddStaff = async (staffData) => {
     try {
-        const response = await request.post("Teacher", teacherData)
+        const response = await request.post("Staff", staffData)
         return response.data
     } catch (error) {
         console.log(error);
     }
 }
 //Update Teacher
-export const UpdateTeacher = async (teacherData) => {
+export const UpdateStaff = async (staffData) => {
     try {
-        const response = await request.put("Teacher", teacherData)
+        const response = await request.put("Staff", staffData)
         return response.data
     } catch (error) {
         console.log(error);
@@ -29,11 +29,11 @@ export const UpdateTeacher = async (teacherData) => {
 }
 
 //#region import teacher
-export const importTeachers = async (file) => {
+export const importStaff = async (file) => {
     try {
         const formData = new FormData();
         formData.append("file", file);
-        const response = await request.post("/Teacher/import", formData, {
+        const response = await request.post("/Staff/import", formData, {
             headers: {
                 "Content-Type": "multipart/form-data",
             },

@@ -23,7 +23,7 @@ function UserHome() {
   };
 
   return (
-    <div className="h-auto w-full sm:w-[1600px] m-auto bg-secondaryGray mt-6 mb-6 rounded-2xl overflow-hidden">
+    <div className="h-auto w-full sm:w-[1600px] m-auto bg-secondaryGray mt-2 mb-2 rounded-2xl overflow-hidden">
       <div className="relative h-[580px] w-full rounded-2xl overflow-hidden">
         {/* Background Wrapper */}
         <div
@@ -135,7 +135,7 @@ function UserHome() {
             <div className="w-full sm:w-[320px] h-[390px] border border-black mt-6 bg-white rounded-2xl text-center">
               <i className="fa fa-calendar-day text-[150px] mt-10"></i>
               <p className="font-bold text-[35px] mt-2 mb-2">Xem lịch thi</p>
-              <Link to="/">
+              <Link to="/studentViewExam">
                 <button className="border rounded-xl bg-tritenaryGreen w-[200px] h-[70px] p-2 hover:scale-90 hover:bg-primaryGreen hover:text-white text-[20px] font-semibold">
                   Xem ngay
                 </button>

@@ -6,8 +6,10 @@ import FormUpdateExamSchedule from "../../../components/management/ExamSchedule/
 import { getMajors } from "../../../services/majorService";
 
 function ManageExamSchedule() {
-  //#region State 
+  //#region State
   const [data, setData] = useState([]);
+
+  // filter chỉ có 3 trường: majorId, subjectId, semesterId
   const [filters, setFilters] = useState({
     majorId: "",
     subjectId: "",
@@ -23,8 +25,8 @@ function ManageExamSchedule() {
     key: "classId",
     direction: "asc",
   });
-  const [currentPage, setCurrentPage] = useState(1); // Trang hiện tại
-  const pageSize = 9; // Số item mỗi trang
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 9;
 
   //#endregion
 
@@ -37,38 +39,36 @@ function ManageExamSchedule() {
     fetchData();
   }, []);
 
-  // Fetch Data Major - Start
+  // Fetch Data Major
   const [majorData, setMajorData] = useState([]);
   useEffect(() => {
     const fetchMajorData = async () => {
-      const majorData = await getMajors(); //Lấy ra list room rtong database
-      setMajorData(majorData.result);
+      const res = await getMajors();
+      setMajorData(res.result || []);
     };
     fetchMajorData();
   }, []);
-  //Fetch Data Major - End
-
   //#endregion
 
   //#region Filter logic phân tầng
   useEffect(() => {
-    // Bước 1: Nếu có chọn majorName, lọc dữ liệu theo majorName. Nếu chưa, lấy toàn bộ data.
+    // 1) Lọc theo majorId (nếu có)
     let dataByMajor = filters.majorId
       ? data.filter((item) => item.majorId === filters.majorId)
       : data;
 
-    // Lấy tất cả subjectId duy nhất sau khi lọc
+    // Lấy các subjectId duy nhất từ dataByMajor
     const subjects = Array.from(
       new Set(dataByMajor.map((item) => item.subjectId))
     );
     setAvailableSubjects(subjects);
 
-    // Bước 2: Nếu có chọn subjectId, tiếp tục lọc trên dataByMajor
+    // 2) Nếu có chọn subjectId, tiếp tục lọc
     let dataBySubject = filters.subjectId
       ? dataByMajor.filter((item) => item.subjectId === filters.subjectId)
       : dataByMajor;
 
-    // Lấy tất cả semesterId duy nhất sau khi lọc
+    // Lấy semesterId duy nhất
     const semesters = Array.from(
       new Set(dataBySubject.map((item) => item.semesterId))
     );
@@ -78,9 +78,8 @@ function ManageExamSchedule() {
 
   //#region Filter cuối cùng để hiển thị ra bảng
   const filteredData = data.filter((item) => {
-    if (filters.majorName && item.majorName !== filters.majorName) return false;
+    if (filters.majorId && item.majorId !== filters.majorId) return false;
     if (filters.subjectId && item.subjectId !== filters.subjectId) return false;
-    if (filters.classId && item.classId !== filters.classId) return false;
     if (filters.semesterId && item.semesterId !== filters.semesterId) return false;
     return true;
   });
@@ -146,8 +145,6 @@ function ManageExamSchedule() {
     // Reset về trang 1 mỗi khi thay đổi filter
     setCurrentPage(1);
   };
-
-  
   //#endregion
 
   return (
@@ -161,7 +158,7 @@ function ManageExamSchedule() {
       <div className="flex w-auto h-12">
         {/* Select chuyên ngành */}
         <select
-          name="majorName"
+          name="majorId"
           value={filters.majorId}
           onChange={handleFilterChange}
           className="max-w-sm ml-3 h-12 w-[230px] border border-black rounded-xl"
@@ -452,6 +449,29 @@ function ManageExamSchedule() {
               </th>
               <th
                 className="p-4 font-semibold cursor-pointer hover:bg-primaryBlue text-white text-center align-middle bg-secondaryBlue "
+                onClick={() => handleSort("teacherId")}
+              >
+                <div className="flex items-center justify-between">
+                  <p className="m-auto">Sĩ số </p>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth="2"
+                    stroke="currentColor"
+                    aria-hidden="true"
+                    className="w-4 h-4"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9"
+                    />
+                  </svg>
+                </div>
+              </th>
+              <th
+                className="p-4 font-semibold cursor-pointer hover:bg-primaryBlue text-white text-center align-middle bg-secondaryBlue "
                 onClick={() => handleSort("status")}
               >
                 <div className="flex items-center justify-between">
@@ -503,6 +523,8 @@ function ManageExamSchedule() {
                 <td className="p-4 text-center align-middle">{item.endTime}</td>
                 <td className="p-4 text-center align-middle">
                   {item.teacherId}
+                </td><td className="p-4 text-center align-middle">
+                {item.numberOfStudentInExamSchedule}/20
                 </td>
                 <td className="p-4 text-center align-middle">
                   {item.status === 0
@@ -522,7 +544,7 @@ function ManageExamSchedule() {
                   </button>
                   {/* Button 2 */}
                   <Link
-                    to={`/studentInClass/${item.classSubjectId}/${item.classId}`}
+                    to={`/studentInExamSchedule/${item.examScheduleId}/${item.subjectId}`}
                   >
                     <button className="w-8 h-8 mr-auto bg-green-600 text-white rounded-xl shadow-md hover:bg-green-700 transition-all hover:scale-125">
                       <i className="fa-regular fa-address-card"></i>
