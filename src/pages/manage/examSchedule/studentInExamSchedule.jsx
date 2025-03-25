@@ -65,13 +65,6 @@ function StudentInExamSchedule() {
     setStudentData(data.result); // Cập nhật lại dữ liệu lớp
   };
 
-  // Fetch lại danh sách sau khi xóa mà không cần reload
-  const handleDeleteSuccess = (id) => {
-    setStudentData((prev) => prev.filter((item) => item.examScheduleId !== id));
-    setShowDeletePopup(false);
-  };
-
-  // Khi bấm nút xóa, mở popup xác nhận
   // Khi bấm nút xóa, mở popup xác nhận
   const handleDeleteStudent = (id) => {
     setDeleteId(null);         // reset 

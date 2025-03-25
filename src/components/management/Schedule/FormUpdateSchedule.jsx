@@ -1,11 +1,15 @@
 import { useEffect, useState } from "react";
 import { getClassesIdByClassId } from "../../../services/classService";
 import { GetAvailableRoom } from "../../../services/roomService";
-import { getAvailableTeachersForAddSchedule, UpdateSchedule } from "../../../services/scheduleService";
+import {
+  getAvailableTeachersForAddSchedule,
+  UpdateSchedule,
+} from "../../../services/scheduleService";
 import { getTeachers } from "../../../services/TeacherService";
 
 // eslint-disable-next-line react/prop-types
-function FormUpdateSchedule({ dataToUpdate,selectedMajorId, selectedClassId, onAdded }) {
+function FormUpdateSchedule({dataToUpdate,selectedMajorId,selectedClassId,onAdded,
+}) {
   //#region State & Error
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
@@ -53,40 +57,40 @@ function FormUpdateSchedule({ dataToUpdate,selectedMajorId, selectedClassId, onA
     fetchClassSubject();
   }, []);
 
-    //#region  lấy danh sách giáo viên
-    useEffect(() => {
-      if (scheduleData.date && scheduleData.slotId) {
-        const fetchAvailableTeachers = async () => {
-          try {
-            const teachers = await getAvailableTeachersForAddSchedule(
-              selectedMajorId,
-              scheduleData.date,
-              scheduleData.slotId
-            );
-            setTeachers(teachers.result);
-          } catch (error) {
-            console.error("Error fetching subjects:", error);
-          }
-        };
-        fetchAvailableTeachers();
+  //#region  lấy danh sách giáo viên
+  useEffect(() => {
+    if (scheduleData.date && scheduleData.slotId) {
+      const fetchAvailableTeachers = async () => {
+        try {
+          const teachers = await getAvailableTeachersForAddSchedule(
+            selectedMajorId,
+            scheduleData.date,
+            scheduleData.slotId
+          );
+          setTeachers(teachers.result);
+        } catch (error) {
+          console.error("Error fetching subjects:", error);
+        }
+      };
+      fetchAvailableTeachers();
+    }
+  }, [scheduleData.date, scheduleData.slotId]);
+
+  const [teacherData, setTeacherData] = useState([]);
+  const selectedTeacher = teacherData.find(
+    (t) => t.userId === scheduleData.teacherId
+  );
+  // Lấy danh sách Teacher
+  useEffect(() => {
+    const fetchTeacherData = async () => {
+      const data = await getTeachers(); // Lấy danh sách giáo viên
+      if (data && data.result) {
+        setTeacherData(data.result);
       }
-    }, [scheduleData.date, scheduleData.slotId]);
-
-     const [teacherData, setTeacherData] = useState([]);
-     const selectedTeacher = teacherData.find(t => t.userId === scheduleData.teacherId);
-     console.log(selectedTeacher);
-
-      // Lấy danh sách Teacher
-      useEffect(() => {
-        const fetchTeacherData = async () => {
-          const data = await getTeachers(); // Lấy danh sách giáo viên
-          if (data && data.result) {
-            setTeacherData(data.result);
-          }
-        };
-        fetchTeacherData();
-      }, []);
-    //#endregion
+    };
+    fetchTeacherData();
+  }, []);
+  //#endregion
 
   //#endregion
 
@@ -257,24 +261,25 @@ function FormUpdateSchedule({ dataToUpdate,selectedMajorId, selectedClassId, onA
                     <option value="5">5</option>
                   </select>
                   <p className="text-left ml-[100px] text-xl">Giáo viên:</p>
-<select
-  name="teacherId"
-  value={scheduleData.teacherId}
-  className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl mb-3 px-4"
-  onChange={handleInputChange}
->
-  <option value="">-- Chọn Giáo viên --</option>
-  {selectedTeacher && (
-    <option value={selectedTeacher.userId}>
-      {selectedTeacher.firstName} {selectedTeacher.middleName} {selectedTeacher.lastName}  - {selectedTeacher.majorId}
-    </option>
-  )}
-  {teachers.map((r) => (
-    <option key={r.userId} value={r.userId}>
-      {r.fullUserName} - {r.majorId}
-    </option>
-  ))}
-</select>
+                  <select
+                    name="teacherId"
+                    value={scheduleData.teacherId}
+                    className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl mb-3 px-4"
+                    onChange={handleInputChange}
+                  >
+                    <option value="">-- Chọn Giáo viên --</option>
+                    {selectedTeacher && (
+                      <option value={selectedTeacher.userId}>
+                        {selectedTeacher.firstName} {selectedTeacher.middleName}{" "}
+                        {selectedTeacher.lastName} - {selectedTeacher.majorId}
+                      </option>
+                    )}
+                    {teachers.map((r) => (
+                      <option key={r.userId} value={r.userId}>
+                        {r.fullUserName} - {r.majorId}
+                      </option>
+                    ))}
+                  </select>
 
                   <p className="text-left ml-[100px] text-xl ">Phòng:</p>
                   <select
@@ -292,7 +297,7 @@ function FormUpdateSchedule({ dataToUpdate,selectedMajorId, selectedClassId, onA
                     ))}
                   </select>
                   <input
-                  hidden
+                    hidden
                     type="number"
                     name="slotNoInSubject"
                     value={scheduleData.slotNoInSubject || 0}

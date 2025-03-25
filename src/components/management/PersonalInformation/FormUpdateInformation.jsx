@@ -1,9 +1,8 @@
 /* eslint-disable react/prop-types */
 import { useState, useEffect, useRef } from "react";
-import { getMajors } from "../../../services/majorService";
-import { UpdateTeacher } from "../../../services/TeacherService";
+import { UpdateStaff } from "../../../services/staffService";
 
-function FormUpdateTeacher({ teacherToUpdate, onReaload }) {
+function FormUpdateInformation({ infoToUpdate, onReaload }) {
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [showAlert, setShowAlert] = useState(false);
@@ -29,23 +28,10 @@ function FormUpdateTeacher({ teacherToUpdate, onReaload }) {
   });
 
   useEffect(() => {
-    if (teacherToUpdate) {
-      setTeacherData(teacherToUpdate);
+    if (infoToUpdate) {
+      setTeacherData(infoToUpdate);
     }
-  }, [teacherToUpdate]);
-
-  const [majorData, setMajorData] = useState([]);
-  useEffect(() => {
-    const fetchMajorData = async () => {
-      try {
-        const majorData = await getMajors();
-        setMajorData(majorData.result || []);
-      } catch (error) {
-        console.error("Lỗi khi lấy danh sách chuyên ngành:", error);
-      }
-    };
-    fetchMajorData();
-  }, []);
+  }, [infoToUpdate]);
 
   const [userAvartar, setuserAvartar] = useState(null);
   const handleuserAvartarChange = (e) => {
@@ -66,9 +52,9 @@ function FormUpdateTeacher({ teacherToUpdate, onReaload }) {
 
   const handleUpdateTeacher = async (e) => {
     e.preventDefault();
-    try {    
-        const updatedTeacher = { ...teacherData, userAvartar };
-      const response = await UpdateTeacher(updatedTeacher); // Giả sử đây là API gọi để cập nhật thông tin giáo viên
+    try {
+      const updatedStaff = { ...teacherData, userAvartar };
+      const response = await UpdateStaff(updatedStaff); // Giả sử đây là API gọi để cập nhật thông tin giáo viên
       if (response.isSuccess) {
         setShowAlert("success");
         setSuccessMessage(response.message);
@@ -88,11 +74,6 @@ function FormUpdateTeacher({ teacherToUpdate, onReaload }) {
 
   const handleCancel = () => {
     setIsFormVisible(false);
-  };
-  const statusMapping = {
-    0: "Vô hiệu hóa",
-    1: "Đang khả dụng",
-    2: "Đang tạm hoãn",
   };
   return (
     <>
@@ -124,7 +105,7 @@ function FormUpdateTeacher({ teacherToUpdate, onReaload }) {
           <div className="bg-white border w-full max-w-[900px] rounded-2xl items-center text-center shadow-xl">
             <div>
               <p className="font-bold text-3xl sm:text-4xl md:text-5xl mt-8 text-secondaryBlue">
-                Cập Nhật Giáo Viên
+                Cập Nhật Thông Tin 
               </p>
               <form
                 onSubmit={handleUpdateTeacher}
@@ -133,8 +114,12 @@ function FormUpdateTeacher({ teacherToUpdate, onReaload }) {
                 <div className="flex gap-8">
                   <div>
                     <div className="mb-4">
-                     <img src={userAvartar ||teacherData.userAvartar} alt="Avatar" className="w-[180px] h-[220px] object-cover rounded-md" />
-                     
+                      <img
+                        src={userAvartar || teacherData.userAvartar}
+                        alt="Avatar"
+                        className="w-[180px] h-[220px] object-cover rounded-md"
+                      />
+
                       <input
                         type="file"
                         accept="image/*"
@@ -142,20 +127,12 @@ function FormUpdateTeacher({ teacherToUpdate, onReaload }) {
                         onChange={handleuserAvartarChange}
                         ref={fileInputRef}
                       />
-
-                      <button
-                        type="button"
-                        onClick={() => fileInputRef.current.click()}
-                        className="w-full bg-[#2B559B] text-white font-bold text-sm rounded-md mt-2 py-2"
-                      >
-                        Upload
-                      </button>
                     </div>
                   </div>
                   <div className="flex flex-col gap-4">
                     <div className="flex gap-4">
                       <div>
-                        <p className="text-left">Mã số Giáo Viên:</p>
+                        <p className="text-left">Mã số sinh viên:</p>
                         <input
                           type="text"
                           required
@@ -172,45 +149,21 @@ function FormUpdateTeacher({ teacherToUpdate, onReaload }) {
                       </div>
                       <div>
                         {/* Major Selection */}
-                        <p className="text-left">Chuyên ngành:</p>
-                        <select
-                          required
-                          className="border rounded-md px-3 py-2  h-[40px] "
-                          value={teacherData.majorId}
-                          onChange={(e) =>
-                            setTeacherData({
-                              ...teacherData,
-                              majorId: e.target.value,
-                            })
-                          }
-                        >
-                          <option value="">Chọn chuyên ngành</option>
-                          {majorData.map((major) => (
-                            <option key={major.majorId} value={major.majorId}>
-                              {major.majorName}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                      <div>
-                        {/* Major Selection */}
                         <p className="text-left">Giới tính:</p>
                         <select
                           required
-                          className="border rounded-md px-3 py-2 h-[40px] w-[100px]"
+                          className="border rounded-md px-3 py-2 h-[40px]"
                           value={teacherData.gender}
                           onChange={(e) =>
                             setTeacherData({
                               ...teacherData,
-                              gender: e.target.value === "true",
+                              gender: e.target.value, // ép kiểu boolean luôn
                             })
                           }
                         >
-                               <option value="" disabled>
-                          Chọn giới tính
-                        </option>
-                        <option value="false">Nam</option>
-                        <option value="true">Nữ</option>
+                          <option value="">Chọn giới tính</option>
+                          <option value="false">Nam</option>
+                          <option value="true">Nữ</option>
                         </select>
                       </div>
                     </div>
@@ -260,21 +213,7 @@ function FormUpdateTeacher({ teacherToUpdate, onReaload }) {
                         />
                       </div>
                     </div>
-                    <div>
-                      <p className="text-left">Email:</p>
-                      <input
-                        type="email"
-                        required
-                        className="w-full h-[40px] border border-gray-300 rounded-md px-3"
-                        value={teacherData.email}
-                        onChange={(e) =>
-                          setTeacherData({
-                            ...teacherData,
-                            email: e.target.value,
-                          })
-                        }
-                      />
-                    </div>
+              
                     {/* Lưu ẩn mật khẩu */}
                     <input
                       type="passwordHash"
@@ -288,7 +227,6 @@ function FormUpdateTeacher({ teacherToUpdate, onReaload }) {
                       }
                     />
                     {/* Lưu ẩn mật khẩu */}
-
                     <div>
                       <p className="text-left">Email cá nhân:</p>
                       <input
@@ -335,23 +273,19 @@ function FormUpdateTeacher({ teacherToUpdate, onReaload }) {
                       />
                     </div>
                     <div>
-                      <p className="text-left">Trạng thái</p>
-                      <select
-                        value={teacherData.status}
-                        className="w-full border rounded-md px-3 py-2"
+                      <p className="text-left">Địa chỉ</p>
+                      <input
+                        type="text"
+                        required
+                        className="w-full h-[40px] border border-gray-300 rounded-md px-3"
+                        value={teacherData.address}
                         onChange={(e) =>
                           setTeacherData({
-                              ...teacherData,
-                              status: parseInt(e.target.value),
-                            })
-                          }
-                      >
-                        {Object.entries(statusMapping).map(([key, value]) => (
-                          <option key={key} value={key}>
-                            {value}
-                          </option>
-                        ))}
-                      </select>
+                            ...teacherData,
+                            address: e.target.value,
+                          })
+                        }
+                      />{" "}
                     </div>
                   </div>
                 </div>
@@ -380,4 +314,4 @@ function FormUpdateTeacher({ teacherToUpdate, onReaload }) {
   );
 }
 
-export default FormUpdateTeacher;
+export default FormUpdateInformation;

@@ -9,7 +9,7 @@ const StudentSchedule = () => {
   const [loading, setLoading] = useState(true); // Trạng thái tải dữ liệu
   const [, setSelectedWeek] = useState(1); // Số thứ tự của tuần được chọn
   const [slotData, setSlotData] = useState([]);
-  const studentId = "SE0001";
+  const studentId = "SE250001";
   // State cho dữ liệu filter (majorId, classId, term, startDay, endDay)
   const [filterData, setFilterData] = useState({
     studentId: studentId,

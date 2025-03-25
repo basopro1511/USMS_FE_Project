@@ -3,6 +3,7 @@ import FormAddStudentInClass from "../../../components/management/StudentInClass
 import PopUpRemoveStudentInClass from "../../../components/management/StudentInClass/PopUpRemoveStudentInClass";
 import { GetStudentDataByClassId } from "../../../services/studentInClassService";
 import { useParams } from "react-router-dom";
+import { getMajors } from "../../../services/majorService";
 
 function StudentInClass() {
   //#region State & error
@@ -12,7 +13,7 @@ function StudentInClass() {
   const [deleteId, setDeleteId] = useState(null);
   const [showDeletePopup, setShowDeletePopup] = useState(false);
   //#endregion
-  
+
   //#region  Show &  Hide Form
   const [showAddForm, setAddForm] = useState(false);
   const toggleShowForm = () => setAddForm(!showAddForm);
@@ -57,6 +58,19 @@ function StudentInClass() {
     setShowDeletePopup(true);
   };
 
+  
+      const [majorData, setMajorData] = useState([]);
+      useEffect(() => {
+        const fetchMajorData = async () => {
+          try {
+            const majorData = await getMajors();
+            setMajorData(majorData.result || []);
+          } catch (error) {
+            console.error("Lỗi khi lấy danh sách chuyên ngành:", error);
+          }
+        };
+        fetchMajorData();
+      }, []);
   //#endregion
 
   //#region Filter, Sort, Paging
@@ -348,43 +362,55 @@ function StudentInClass() {
             </tr>
           </thead>
           <tbody>
-            {currentData.map((student, index) => (
-              <tr
-                key={student.studentId}
-                className="hover:bg-gray-50 even:bg-gray-50"
-              >
-                <td className="p-4 border-b text-center">{index + 1}</td>
-                <td className="p-4 border-b text-center">{student.userId}</td>
-                <td className="p-4 border-b text-center">
-                  {student.lastName +
-                    " " +
-                    student.middleName +
-                    " " +
-                    student.firstName}
-                </td>
-                <td className="p-4 border-b text-center">{student.email}</td>
-                <td className="p-4 border-b text-center">
-                  {student.phoneNumber}
-                </td>
-                <td className="p-4 border-b text-center">
-                  {student.majorName}
-                </td>
-                <td className="p-4 border-b text-center">{student.term}</td>
-                <td className="p-4 border-b text-center">
-                  <button
-                    onClick={() => handleDeleteStudent(student.studentClassId)}
-                    type="button"
-                    className="border border-white w-[45px] h-[35px] bg-red-600 text-white font-bold rounded-[10px] transition-all duration-300  hover:scale-95"
-                  >
-                    <i
-                      className="fa fa-trash  w-13 h-21 text-white m-auto"
-                      aria-hidden="true"
-                    ></i>
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
+          {currentData.map((student, index) => {
+                // tăng số thứ tự
+             const stt = indexOfFirstItem + (index + 1);
+                // Tìm majorName tương ứng
+                const foundMajor = majorData.find(
+                  (m) => m.majorId === student.majorId
+                );
+                const majorName = foundMajor
+                  ? foundMajor.majorName
+                  : student.majorId;
+                return (
+                  
+                  <tr
+                  key={student.studentId}
+                  className="hover:bg-gray-50 even:bg-gray-50"
+                >
+                  <td className="p-4 border-b text-center">{stt}</td>
+                  <td className="p-4 border-b text-center">{student.userId}</td>
+                  <td className="p-4 border-b text-center">
+                    {student.lastName +
+                      " " +
+                      student.middleName +
+                      " " +
+                      student.firstName}
+                  </td>
+                  <td className="p-4 border-b text-center">{student.email}</td>
+                  <td className="p-4 border-b text-center">
+                    {student.phoneNumber}
+                  </td>
+                  <td className="p-4 border-b text-center">
+                    {majorName}
+                  </td>
+                  <td className="p-4 border-b text-center">{student.term}</td>
+                  <td className="p-4 border-b text-center">
+                    <button
+                      onClick={() => handleDeleteStudent(student.studentClassId)}
+                      type="button"
+                      className="border border-white w-[45px] h-[35px] bg-red-600 text-white font-bold rounded-[10px] transition-all duration-300  hover:scale-95"
+                    >
+                      <i
+                        className="fa fa-trash  w-13 h-21 text-white m-auto"
+                        aria-hidden="true"
+                      ></i>
+                    </button>
+                  </td>
+                </tr>
+                );
+              })}
+              </tbody>
         </table>
       </div>
       {/* Phân trang - start */}

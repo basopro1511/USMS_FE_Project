@@ -1,16 +1,16 @@
 import { useEffect, useState } from "react";
 import AvatarSquare from "../../../assets/Imgs/avatar_square.jpg";
 import { GetUserByID } from "../../../services/userService";
-import FormUpdateStudentPersonalInformation from "../../../components/user/Student/FormUpdateInfor";
+import FormUpdateTeacherPersonalInformation from "../../../components/user/Teacher/FormUpdateTeacherInfomation";
 
-function StudentDetail() {
+function TeacherDetailInformation() {
   const [studentData, setStudentData] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [infoToUpdate, setInfoToUpdate] = useState(null);
 
   useEffect(() => {
     const fetchUserData = async () => {
-      const data = await GetUserByID("BA250001"); //Lấy ra data của user  trong database
+      const data = await GetUserByID("BichTT"); //Lấy ra data của user  trong database
       setStudentData(data.result);
     };
     fetchUserData();
@@ -30,7 +30,7 @@ function StudentDetail() {
     toggleShowForm(); // Show form update
   };
   const handleReload = async () => {
-    const data = await await GetUserByID("BA250001"); // Gọi API để lấy lại tất cả các phòng
+    const data = await await GetUserByID("BichTT"); // Gọi API để lấy lại tất cả các phòng
     setStudentData(data.result); // Cập nhật lại dữ liệu phòng
   };
 
@@ -38,7 +38,7 @@ function StudentDetail() {
     <div className="w-full mt-4 mx-auto">
       <div className="text-center">
         <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-800">
-          Thông tin học sinh
+          Thông tin giáo viên
         </h1>
         <div className="flex flex-col md:flex-row mt-6">
           {/* Avatar Start */}
@@ -48,7 +48,6 @@ function StudentDetail() {
               src={studentData.userAvartar || AvatarSquare}
               alt="Avatar"
             />
-            <p>Current Term No: 8</p>
           </div>
           {/* Avatar End */}
 
@@ -76,7 +75,7 @@ function StudentDetail() {
                 </div>
               </div>
               <div className="mb-4">
-                <label>Email học sinh</label>
+                <label>Email cơ sở</label>
                 <input
                   type="text"
                   className="w-full border px-4 py-2 mt-1 rounded-md"
@@ -123,7 +122,7 @@ function StudentDetail() {
                   />
                 </div>
                 <div className="flex-1 md:mr-4">
-                  <label>Mã số sinh viên</label>
+                  <label>Mã số giáo viên</label>
                   <input
                     type="text"
                     className="w-full border px-4 py-2 mt-1 rounded-md"
@@ -172,7 +171,7 @@ function StudentDetail() {
               </div>
             </div>{" "}
             {showForm && (
-              <FormUpdateStudentPersonalInformation
+              <FormUpdateTeacherPersonalInformation
                 infoToUpdate={infoToUpdate}
                 onReaload={handleReload}
                 onClose={toggleShowForm}
@@ -186,4 +185,4 @@ function StudentDetail() {
   );
 }
 
-export default StudentDetail;
+export default TeacherDetailInformation;

@@ -1,44 +1,31 @@
 import { useState, useEffect } from "react";
-import FormUpdateTeacher from "../../../components/management/Teacher/FormUpdateTeacher";
-import FormAddTeacher from "../../../components/management/Teacher/FormAddTeacher";
-import FormDetailTeacher from "../../../components/management/Teacher/FormDetailTeacher";
-import { getTeachers, importTeachers } from "../../../services/TeacherService";
-import { getMajors } from "../../../services/majorService";
+import { GetStaffs, importStaff } from "../../../services/staffService";
+import FormAddStaff from "../../../components/admin/Staff/FormAddStaff";
+import FormUpdateStaff from "../../../components/admin/Staff/FormUpdateStaff";
+import FormDetailStaff from "../../../components/admin/Staff/FormDetailStaff";
 
-function ManageTeacher() {
+function ManageStaff() {
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [showAlert, setShowAlert] = useState(false); // Alert for success or failure notification
-  const [teacherData, setTeacherData] = useState([]);
-  const [majorData, setMajorData] = useState([]);
+  const [staffData, setStaffData] = useState([]);
 
   // Lấy danh sách Teacher
   useEffect(() => {
-    const fetchTeacherData = async () => {
-      const data = await getTeachers(); // Lấy danh sách giáo viên
+    const fetchstaffData = async () => {
+      const data = await GetStaffs(); // Lấy danh sách giáo viên
       if (data && data.result) {
-        setTeacherData(data.result);
+        setStaffData(data.result);
       }
     };
-    fetchTeacherData();
+    fetchstaffData();
   }, []);
 
   //Update bảng mà không cần reload
   const handleReload = async () => {
-    const data = await getTeachers(); // Gọi API để lấy lại tất cả các phòng
-    setTeacherData(data.result); // Cập nhật lại dữ liệu phòng
+    const data = await GetStaffs(); // Gọi API để lấy lại tất cả các phòng
+    setStaffData(data.result); // Cập nhật lại dữ liệu phòng
   };
-
-  // Lấy danh sách Major
-  useEffect(() => {
-    const fetchMajorData = async () => {
-      const majorResponse = await getMajors();
-      if (majorResponse && majorResponse.result) {
-        setMajorData(majorResponse.result);
-      }
-    };
-    fetchMajorData();
-  }, []);
 
   // State bật/tắt form
   const [showAddForm, setAddForm] = useState(false);
@@ -80,15 +67,10 @@ function ManageTeacher() {
   };
 
   // Lọc dữ liệu
-  const [filteredTeachers, setFilteredTeachers] = useState(teacherData);
+  const [filteredTeachers, setFilteredTeachers] = useState(staffData);
 
   useEffect(() => {
-    const filteredData = teacherData.filter((item) => {
-      // Tìm majorName
-      // let majorName = "";
-      // const foundMajor = majorData.find((m) => m.majorId === item.majorId);
-      // if (foundMajor) majorName = foundMajor.majorName;
-
+    const filteredData = staffData.filter((item) => {
       // 1. Filter theo userId
       const matchUserId =
         !filters.userId ||
@@ -108,7 +90,7 @@ function ManageTeacher() {
       return matchUserId && matchName && matchMajor;
     });
     setFilteredTeachers(filteredData);
-  }, [filters, teacherData]);
+  }, [filters, staffData]);
 
   // Sắp xếp
   const [sortConfig, setSortConfig] = useState({
@@ -155,7 +137,7 @@ function ManageTeacher() {
       return;
     }
     try {
-      const response = await await importTeachers(selectedFile);
+      const response = await await importStaff(selectedFile);
       if (response.isSuccess) {
         setShowAlert("success");
         setSuccessMessage(response.message);
@@ -216,7 +198,7 @@ function ManageTeacher() {
       {/* Notification End */}
       <div className="border mt-4 h-auto pb-7 w-[1600px] bg-white rounded-2xl">
         <div className="flex justify-center">
-          <p className="mt-8 text-3xl font-bold">Quản lý giáo viên</p>
+          <p className="mt-8 text-3xl font-bold">Quản lý nhân viên</p>
         </div>
 
         <p className="ml-4 mt-5">Tìm kiếm: </p>
@@ -225,20 +207,6 @@ function ManageTeacher() {
         <div className="flex w-full h-12 flex-wrap md:flex-nowrap">
           {/* Cột lọc */}
           <div className="flex w-full md:w-auto md:mb-0">
-            {/* Lọc theo chuyên ngành */}
-            <select
-              name="major"
-              value={filters.major}
-              onChange={handleFilterChange}
-              className="max-w-sm mx-auto ml-3 h-12 w-full md:w-[200px] border border-black rounded-xl"
-            >
-              <option value="">Chọn chuyên ngành</option>
-              {majorData.map((major) => (
-                <option key={major.majorId} value={major.majorId}>
-                  {major.majorName}
-                </option>
-              ))}
-            </select>
 
             {/* Lọc theo Mã giáo viên */}
             <input
@@ -304,7 +272,7 @@ function ManageTeacher() {
               onClick={toggleShowForm}
             >
               <i className="fa fa-plus mr-2" aria-hidden="true"></i>
-              Thêm giáo viên
+              Thêm nhân viên
             </button>
           </div>
         </div>
@@ -461,31 +429,7 @@ function ManageTeacher() {
                     </svg>
                   </div>
                 </th>
-                <th
-                  className="p-4 font-semibold cursor-pointer transition-all hover:bg-primaryBlue text-white text-center align-middle bg-secondaryBlue"
-                  onClick={() => handleSort("majorId")}
-                >
-                  <div className="flex items-center justify-between">
-                    <p className="m-auto transition-all hover:scale-105">
-                      Chuyên ngành
-                    </p>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      strokeWidth="2"
-                      stroke="currentColor"
-                      aria-hidden="true"
-                      className="w-4 h-4"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9"
-                      />
-                    </svg>
-                  </div>
-                </th>  <th
+       <th
                   className="p-4 font-semibold cursor-pointer transition-all hover:bg-primaryBlue text-white text-center align-middle bg-secondaryBlue"
                   onClick={() => handleSort("status")}
                 >
@@ -520,13 +464,6 @@ function ManageTeacher() {
               {currentData.map((item, index) => {
                              const stt = indexOfFirstItem + (index + 1);
 
-                // Tìm majorName tương ứng
-                const foundMajor = majorData.find(
-                  (m) => m.majorId === item.majorId
-                );
-                const majorName = foundMajor
-                  ? foundMajor.majorName
-                  : item.majorId;
                 return (
                   <tr key={index} className="hover:bg-gray-50 even:bg-gray-50">
                           <td className="p-4 text-center align-middle">
@@ -546,9 +483,6 @@ function ManageTeacher() {
                     </td>
                     <td className="p-4 text-center align-middle">
                       {item.email}
-                    </td>
-                    <td className="p-4 text-center align-middle">
-                      {majorName}
                     </td>
                     <td className="p-4 text-center align-middle">
                     {item.status === 0 ? "Vô hiệu hóa" : item.status === 1 ?  "Đang khả dụng": item.status === 2 ?  "Đang tạm hoãn" : "Chưa bắt đầu" }
@@ -604,12 +538,12 @@ function ManageTeacher() {
 
         {/* Form Add Teacher */}
         {showAddForm && (
-          <FormAddTeacher onReaload={handleReload} onClose={toggleShowForm} />
+          <FormAddStaff onReaload={handleReload} onClose={toggleShowForm} />
         )}
 
         {/* Form Update Teacher */}
         {showUpdateForm && (
-          <FormUpdateTeacher
+          <FormUpdateStaff
             teacherToUpdate={teacherToUpdate}
             onReaload={handleReload}
             onClose={toggleShowUpdateForm}
@@ -618,8 +552,8 @@ function ManageTeacher() {
 
         {/* Form Detail Teacher */}
         {showDetailForm && (
-          <FormDetailTeacher
-            teacherDetail={teacherDetail}
+          <FormDetailStaff
+            userDetail={teacherDetail}
             onClose={toggleShowDetailForm}
           />
         )}
@@ -628,4 +562,4 @@ function ManageTeacher() {
   );
 }
 
-export default ManageTeacher;
+export default ManageStaff;

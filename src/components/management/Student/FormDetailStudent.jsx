@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 
-function FormDetailStudent({ studentDetail, onStudentDetailUpdated }) {
+// eslint-disable-next-line react/prop-types
+function FormDetailStudent({ studentDetail }) {
     const [isFormVisible, setIsFormVisible] = useState(true);
     const [studentData, setStudentData] = useState({
         studentId: "",
@@ -50,12 +51,12 @@ function FormDetailStudent({ studentDetail, onStudentDetailUpdated }) {
     return (
         <>
             {isFormVisible && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
-                    <div className="bg-white border w-full max-w-[750px] h-auto rounded-2xl items-center shadow-xl p-6">
+                <div className="fixed  inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+                    <div className="bg-white scale-95  border w-full max-w-[750px] h-auto rounded-2xl items-center shadow-xl p-4">
                         <div className="flex">
                             <button
                                 type="button"
-                                className="w-full max-w-[80px] h-[30px] sm:h-[40px] border rounded-xl bg-red-500 text-white font-bold text-lg sm:text-2xl transition-all hover:scale-105 hover:bg-red-700 ml-auto mr-3 mt-3"
+                                className="w-full max-w-[80px] h-[30px] sm:h-[40px] border rounded-xl bg-red-500 text-white font-bold text-lg sm:text-2xl transition-all hover:scale-105 hover:bg-red-700 ml-auto mr-3"
                                 onClick={handleCancel}
                             >
                                 X
@@ -207,21 +208,9 @@ function FormDetailStudent({ studentDetail, onStudentDetailUpdated }) {
                                             readOnly
                                             value={studentData.address}
                                             className="w-full border rounded-md px-3 py-2"
-                                            placeholder="Nhập địa chỉ"
-                                            onChange={(e) => handleInputChange("address", e.target.value)}
                                         />
                                     </div>
                                 </div>
-                            </div>
-
-                            <div className="flex justify-center mt-4">
-                                <button
-                                    type="button"
-                                    className="w-full max-w-[200px] h-[50px] sm:h-[64px] border rounded-3xl bg-red-500 text-white font-bold text-lg sm:text-2xl transition-all hover:scale-105 hover:bg-red-700"
-                                    onClick={handleCancel}
-                                >
-                                    Đóng
-                                </button>
                             </div>
                         </form>
                     </div>

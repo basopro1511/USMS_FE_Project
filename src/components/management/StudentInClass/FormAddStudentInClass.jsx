@@ -5,6 +5,7 @@ import {
   AddStudentToClass,
   getAvailableStudent,
 } from "../../../services/studentInClassService";
+import { getMajors } from "../../../services/majorService";
 
 function FormAddStudentInClass({ onStudentAdded, classSubjectIdParam }) {
   //#region State Management
@@ -26,7 +27,7 @@ function FormAddStudentInClass({ onStudentAdded, classSubjectIdParam }) {
   // --- Chứa các giá trị filter
   const [filter, setFilters] = useState({
     userId: "",
-    majorName: "",
+    majorId: "",
     term: "",
     studentName: "", // thêm để lọc theo tên
   });
@@ -66,6 +67,20 @@ function FormAddStudentInClass({ onStudentAdded, classSubjectIdParam }) {
       console.error("Lỗi khi reload danh sách sinh viên:", error);
     }
   };
+
+  const [majorData, setMajorData] = useState([]);
+  useEffect(() => {
+    const fetchMajorData = async () => {
+      try {
+        const majorData = await getMajors();
+        setMajorData(majorData.result || []);
+      } catch (error) {
+        console.error("Lỗi khi lấy danh sách chuyên ngành:", error);
+      }
+    };
+    fetchMajorData();
+  }, []);
+
   //#endregion
 
   //#region Filtering & Sorting
@@ -73,43 +88,36 @@ function FormAddStudentInClass({ onStudentAdded, classSubjectIdParam }) {
   // useEffect để áp dụng filter
   useEffect(() => {
     const filteredData = studentData.filter((item) => {
-      // 1) Lọc chuyên ngành
-      if (filter.majorName && filter.majorName !== item.majorName) {
+      // Lọc theo chuyên ngành: sử dụng filter.majorId và so sánh với item.majorId
+      if (filter.majorId && filter.majorId !== item.majorId) {
         return false;
       }
-
-      // 2) Lọc term (kỳ học)
+      // Lọc theo kỳ học
       if (filter.term && String(filter.term) !== String(item.term)) {
         return false;
       }
-
-      // 3) Lọc userId (Mã SV) - case-insensitive
+      // Lọc theo mã sinh viên (userId) - case-insensitive
       if (filter.userId) {
-        // so sánh toLowerCase
         const userIdLower = item.userId.toLowerCase();
         const filterUserId = filter.userId.toLowerCase();
         if (!userIdLower.includes(filterUserId)) {
           return false;
         }
       }
-
-      // 4) Lọc tên sinh viên (fullName) - case-insensitive
+      // Lọc theo tên sinh viên (ghép full name) - case-insensitive
       if (filter.studentName) {
-        const fullName = (
-          item.firstName + " " + item.middleName + " " + item.lastName
-        ).toLowerCase();
+        const fullName = (item.firstName + " " + item.middleName + " " + item.lastName).toLowerCase();
         const filterName = filter.studentName.toLowerCase();
         if (!fullName.includes(filterName)) {
           return false;
         }
       }
-
+      // Có thể bổ sung thêm các điều kiện filter khác (ví dụ: status) nếu cần
       return true;
     });
-
     setFilteredStudents(filteredData);
   }, [filter, studentData]);
-
+  
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
     setFilters((prev) => ({ ...prev, [name]: value }));
@@ -155,10 +163,11 @@ function FormAddStudentInClass({ onStudentAdded, classSubjectIdParam }) {
   };
 
   const handleSelectStudent = (userId) => {
-    setSelectedStudents((prevSelected) =>
-      prevSelected.includes(userId)
-        ? prevSelected.filter((id) => id !== userId) // Bỏ chọn nếu đã có
-        : [...prevSelected, userId] // Thêm nếu chưa
+    setSelectedStudents(
+      (prevSelected) =>
+        prevSelected.includes(userId)
+          ? prevSelected.filter((id) => id !== userId) // Bỏ chọn nếu đã có
+          : [...prevSelected, userId] // Thêm nếu chưa
     );
   };
   //#endregion
@@ -238,7 +247,6 @@ function FormAddStudentInClass({ onStudentAdded, classSubjectIdParam }) {
   };
   //#endregion
 
-
   //#region Render UI
   return (
     <>
@@ -287,21 +295,17 @@ function FormAddStudentInClass({ onStudentAdded, classSubjectIdParam }) {
               <div className="flex w-full ml-4 h-12 flex-wrap md:flex-nowrap">
                 <div className="flex w-full md:w-auto md:mb-0">
                   <select
-                    name="majorName"
-                    value={filter.majorName}
+                    name="majorId"
+                    value={filter.majorId}
                     onChange={handleFilterChange}
                     className="max-w-sm mx-auto ml-3 h-12 w-full md:w-[230px] border border-black rounded-xl"
                   >
-                    <option value="">Chuyên ngành</option>
-                    {[
-                      ...new Set(
-                        studentData.map((student) => student.majorName)
-                      ),
-                    ].map((majorName) => (
-                      <option key={majorName} value={majorName}>
-                        {majorName}
-                      </option>
-                    ))}
+                    <option value="">Chọn chuyên ngành</option>
+  {majorData.map((major) => (
+    <option key={major.majorId} value={major.majorId}>
+      {major.majorName}
+    </option>
+  ))}
                   </select>
 
                   <select
@@ -542,55 +546,68 @@ function FormAddStudentInClass({ onStudentAdded, classSubjectIdParam }) {
                         </tr>
                       </thead>
                       <tbody>
-                        {currentData.map((student, index) => (
-                          <tr
-                            key={student.userId}
-                            className="hover:bg-gray-50 even:bg-gray-50"
-                          >
-                            <td className="p-4 border-b text-center">
-                              <input
-                                type="checkbox"
-                                checked={selectedStudents.includes(
-                                  student.userId
-                                )}
-                                onChange={() =>
-                                  handleSelectStudent(student.userId)
-                                }
-                              />
-                            </td>
-                            <td className="p-4 border-b text-center">
-                              {index + 1}
-                            </td>
-                            <td className="p-4 border-b text-center">
-                              {student.userId}
-                            </td>
-                            <td className="p-4 border-b text-center">
-                              {student.lastName} {student.middleName}{" "}
-                              {student.firstName}
-                            </td>
-                            <td className="p-4 border-b text-center">
-                              {student.email}
-                            </td>
-                            <td className="p-4 border-b text-center">
-                              {student.phoneNumber}
-                            </td>
-                            <td className="p-4 border-b text-center">
-                              {student.majorName}
-                            </td>
-                            <td className="p-4 border-b text-center">
-                              {student.term}
-                            </td>
-                            <td className="p-4 border-b text-center">
-                              <button
-                                type="button"
-                                className="border border-white w-[40px] h-[40px] bg-green-600 text-white font-bold rounded-[10px] transition-all duration-300 hover:scale-95"
-                                onClick={() => handleAddStudent(student.userId)}
-                              >
-                                <i className="fa fa-plus text-white"></i>
-                              </button>
-                            </td>
-                          </tr>
-                        ))}
+                        {currentData.map((student, index) => {
+                          // tăng số thứ tự
+                          const stt = indexOfFirstItem + (index + 1);
+                          // Tìm majorName tương ứng
+                          const foundMajor = majorData.find(
+                            (m) => m.majorId === student.majorId
+                          );
+                          const majorName = foundMajor
+                            ? foundMajor.majorName
+                            : student.majorId;
+                          return (
+                            <tr
+                              key={student.userId}
+                              className="hover:bg-gray-50 even:bg-gray-50"
+                            >
+                              <td className="p-4 border-b text-center">
+                                <input
+                                  type="checkbox"
+                                  checked={selectedStudents.includes(
+                                    student.userId
+                                  )}
+                                  onChange={() =>
+                                    handleSelectStudent(student.userId)
+                                  }
+                                />
+                              </td>
+                              <td className="p-4 border-b text-center">
+                                {stt}
+                              </td>
+                              <td className="p-4 border-b text-center">
+                                {student.userId}
+                              </td>
+                              <td className="p-4 border-b text-center">
+                                {student.lastName} {student.middleName}{" "}
+                                {student.firstName}
+                              </td>
+                              <td className="p-4 border-b text-center">
+                                {student.email}
+                              </td>
+                              <td className="p-4 border-b text-center">
+                                {student.phoneNumber}
+                              </td>
+                              <td className="p-4 border-b text-center">
+                                {majorName}
+                              </td>
+                              <td className="p-4 border-b text-center">
+                                {student.term}
+                              </td>
+                              <td className="p-4 border-b text-center">
+                                <button
+                                  type="button"
+                                  className="border border-white w-[40px] h-[40px] bg-green-600 text-white font-bold rounded-[10px] transition-all duration-300 hover:scale-95"
+                                  onClick={() =>
+                                    handleAddStudent(student.userId)
+                                  }
+                                >
+                                  <i className="fa fa-plus text-white"></i>
+                                </button>
+                              </td>
+                            </tr>
+                          );
+                        })}
                       </tbody>
                     </table>
                   )}

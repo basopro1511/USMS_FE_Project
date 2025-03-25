@@ -1,26 +1,32 @@
 import { useState, useRef, useEffect } from "react";
 import { AddStudent } from "../../../services/studentService";
 import { getMajors } from "../../../services/majorService";
+import Avatar from "../../../assets/Imgs/avatar_square.jpg";
+import { bool } from "prop-types";
 
 // eslint-disable-next-line react/prop-types
 function FormAddStudent({ onStudentAdded }) {
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [showAlert, setShowAlert] = useState(false);
-  const [selectedImage, setSelectedImage] = useState(null); 
   const fileInputRef = useRef(null);
 
   const [newStudent, setNewStudent] = useState({
-    majorId: "",
+    userId: "",
     firstName: "",
     middleName: "",
     lastName: "",
+    gender: bool,
+    passwordHash: "123456789",
+    email: "",
     personalEmail: "",
     phoneNumber: "",
+    userAvartar: null,
     dateOfBirth: "",
+    roleId: 5,
+    majorId: "",
+    status: 1,
     address: "",
-    userAvartar: "",
-    passwordHash: "",
   });
 
   const [isFormVisible, setIsFormVisible] = useState(true);
@@ -68,16 +74,16 @@ function FormAddStudent({ onStudentAdded }) {
     }
   };
 
-   // Fetch Data Major - Start
-    const [majorData, setMajorData] = useState([]);
-    useEffect(() => {
-      const fetchMajorData = async () => {
-        const majorData = await getMajors(); //Lấy ra list room rtong database
-        setMajorData(majorData.result);
-      };
-      fetchMajorData();
-    }, []);
-    //Fetch Data Major - End
+  // Fetch Data Major - Start
+  const [majorData, setMajorData] = useState([]);
+  useEffect(() => {
+    const fetchMajorData = async () => {
+      const majorData = await getMajors(); //Lấy ra list room rtong database
+      setMajorData(majorData.result);
+    };
+    fetchMajorData();
+  }, []);
+  //Fetch Data Major - End
 
   return (
     <>
@@ -117,21 +123,20 @@ function FormAddStudent({ onStudentAdded }) {
                   {/* Avartar Section */}
                   <div className="relative">
                     <img
-                      src={userAvartar || "https://via.placeholder.com/150"}
-                      alt="userAvartar"
+                      src={userAvartar || Avatar}
+                      alt="Avatar"
                       className="w-[180px] h-[220px] object-cover rounded-md"
                     />
                     <input
                       type="file"
                       accept="image/*"
-                      id="userAvartar"
                       className="hidden"
                       onChange={handleuserAvartarChange}
                       ref={fileInputRef}
                     />
                     <button
                       type="button"
-                      onClick={() => fileInputRef.current.click()} // Trigger click via ref
+                      onClick={() => fileInputRef.current.click()}
                       className="w-full bg-[#2B559B] text-white font-bold text-sm rounded-md mt-2 py-2"
                     >
                       Upload
@@ -165,7 +170,6 @@ function FormAddStudent({ onStudentAdded }) {
                         </label>
                         <input
                           type="text"
-                          required
                           className="w-full border rounded-md px-3 py-2"
                           placeholder="Nhập tên đệm"
                           onChange={(e) =>
@@ -221,6 +225,27 @@ function FormAddStudent({ onStudentAdded }) {
                       </select>
                     </div>
 
+                    <div>
+                      <label className="block text-sm font-medium mb-1 ">
+                        Giới tính:
+                      </label>
+                      <select
+                        required
+                        className="border rounded-md px-3 py-2 w-full"
+                        onChange={(e) =>
+                          setNewStudent({
+                            ...newStudent,
+                            gender: JSON.parse(e.target.value), // Ép về boolean
+                          })
+                        }
+                      >
+                        <option value="" disabled>
+                          Chọn giới tính
+                        </option>
+                        <option value="false">Nam</option>
+                        <option value="true">Nữ</option>
+                      </select>
+                    </div>
                     {/* Third Row: Email */}
                     <div>
                       <label className="block text-sm font-medium mb-1">
@@ -272,24 +297,6 @@ function FormAddStudent({ onStudentAdded }) {
                           setNewStudent({
                             ...newStudent,
                             dateOfBirth: e.target.value,
-                          })
-                        }
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium mb-1">
-                        Mật Khẩu:
-                      </label>
-                      <input
-                        type="text"
-                        required
-                        className="w-full border rounded-md px-3 py-2"
-                        placeholder="Nhập mật khẩu"
-                        onChange={(e) =>
-                          setNewStudent({
-                            ...newStudent,
-                            passwordHash: e.target.value,
                           })
                         }
                       />

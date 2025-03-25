@@ -319,7 +319,6 @@ function ManageSubject() {
             {currentData.map((item, index) => {
               // Tính STT nối tiếp giữa các trang
               const stt = indexOfFirstItem + (index + 1);
-
               // Hiển thị major
               // Nếu item.majorId===null => "Môn chung", ngược lại item.majorId
               const displayMajor = item.majorId === null ? "Môn chung" : item.majorId;

@@ -23,7 +23,7 @@ function UserHome() {
   };
 
   return (
-    <div className="h-auto w-full sm:w-[1600px] m-auto bg-secondaryGray mt-6 mb-6 rounded-2xl overflow-hidden">
+    <div className="h-auto w-full sm:w-[1600px] m-auto bg-secondaryGray mt-2 mb-2 rounded-2xl overflow-hidden">
       <div className="relative h-[580px] w-full rounded-2xl overflow-hidden">
         {/* Background Wrapper */}
         <div
