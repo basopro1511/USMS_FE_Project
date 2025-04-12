@@ -63,14 +63,18 @@ function FormUpdateExamSchedule({ examScheduleToUpdate, onClassUpdated }) {
   // Fetch Data Subjcet - Start
   const [subjectData, setSubjectData] = useState([]);
   useEffect(() => {
-    if (examData.majorId && examData.semesterId) {
+    if (examData.majorId !== "" && examData.semesterId !== "") {
       const fetchSubjectData = async () => {
         try {
           const subjectResponse = await getSubjectIdsForAddExamSchedule(
             examData.majorId,
             examData.semesterId
           );
-          setSubjectData(subjectResponse.result);
+          if (subjectResponse && subjectResponse.result) {
+            setSubjectData(subjectResponse.result);
+          } else {
+            setSubjectData([]);
+          }
         } catch (error) {
           console.error("Error fetching subjects:", error);
         }
@@ -78,6 +82,7 @@ function FormUpdateExamSchedule({ examScheduleToUpdate, onClassUpdated }) {
       fetchSubjectData();
     }
   }, [examData.majorId, examData.semesterId]);
+  
   //Fetch Data Major - End
 
   // Lấy danh sách phòng khả dụng (theo date, startTime, endTime)

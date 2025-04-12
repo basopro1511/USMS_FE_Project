@@ -2,15 +2,18 @@ import { useEffect, useState } from "react";
 import AvatarSquare from "../../../assets/Imgs/avatar_square.jpg";
 import { GetUserByID } from "../../../services/userService";
 import FormUpdateTeacherPersonalInformation from "../../../components/user/Teacher/FormUpdateTeacherInfomation";
+import ChangePasswordForm from "../../../components/management/PersonalInformation/ChangePassword";
 
 function TeacherDetailInformation() {
   const [studentData, setStudentData] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [infoToUpdate, setInfoToUpdate] = useState(null);
+  const userId = localStorage.getItem("userId");
+  const [showChangePasswordForm, setShowChangePasswordForm] = useState(false);
 
   useEffect(() => {
     const fetchUserData = async () => {
-      const data = await GetUserByID("BichTT"); //Lấy ra data của user  trong database
+      const data = await GetUserByID(userId); //Lấy ra data của user  trong database
       setStudentData(data.result);
     };
     fetchUserData();
@@ -30,9 +33,20 @@ function TeacherDetailInformation() {
     toggleShowForm(); // Show form update
   };
   const handleReload = async () => {
-    const data = await await GetUserByID("BichTT"); // Gọi API để lấy lại tất cả các phòng
+    const data = await await GetUserByID(userId); // Gọi API để lấy lại tất cả các phòng
     setStudentData(data.result); // Cập nhật lại dữ liệu phòng
   };
+
+  //#region form Change Password
+  const toggleShowChangePasswordForm = () => {
+    setShowChangePasswordForm(!showChangePasswordForm);
+  };
+
+  const handleChangePasswordClick = (userData) => {
+    setInfoToUpdate(userData);
+    toggleShowChangePasswordForm(); // Show form update
+  };
+  //#endregion
 
   return (
     <div className="w-full mt-4 mx-auto">
@@ -106,6 +120,12 @@ function TeacherDetailInformation() {
                 onClick={() => handleUpdateClick(studentData)}
               >
                 Cập nhật thông tin
+              </button>{" "}
+              <button
+                className="w-[160px] text-white bg-green-600 border px-4 py-2 mt-6 rounded-md hover:bg-green-500 hover:scale-95 ml-2"
+                onClick={() => handleChangePasswordClick(studentData)}
+              >
+                Thay đổi mật khẩu
               </button>
             </div>
             {/* Left Side End */}
@@ -173,6 +193,12 @@ function TeacherDetailInformation() {
             {showForm && (
               <FormUpdateTeacherPersonalInformation
                 infoToUpdate={infoToUpdate}
+                onReaload={handleReload}
+                onClose={toggleShowForm}
+              />
+            )}   {showChangePasswordForm && (
+              <ChangePasswordForm
+                selectUserId={studentData.userId}
                 onReaload={handleReload}
                 onClose={toggleShowForm}
               />

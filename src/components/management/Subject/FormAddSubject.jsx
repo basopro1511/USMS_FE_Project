@@ -161,13 +161,15 @@ function FormAddSubject({ onSubjectAdded }) {
                 id="majorId"
                 name="majorId"
                 className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl mb-3 px-4"
-                required
                 onChange={(e) =>
                   setNewSubject({ ...newSubject, majorId: e.target.value })
                 }
               >
                 <option value="" disabled selected>
                   Chọn chuyên ngành
+                </option>
+                <option value="" >
+                  Môn Chung
                 </option>
                 {majorData.map((major) => (
                   <option key={major.majorId} value={major.majorId}>

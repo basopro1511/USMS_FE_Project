@@ -1,19 +1,18 @@
-import PropTypes from "prop-types";
 import { useState, useEffect } from "react";
 import { GetStudentDataByClassId } from "../../../services/studentInClassService";
+import { useParams } from "react-router-dom";
+import Avatar from "../../../assets/Imgs/avatar_square.jpg";
 
-function StudentDetailClass({ classSubjectId }) {
+function StudentDetailClass() {
   const [studentData, setStudentData] = useState([]);
   const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const { classSubjectId } = useParams(); // Lấy classId, classSubjectId từ URL
 
   useEffect(() => {
     const fetchStudentDetailClass = async () => {
       try {
         setError(null);
-        setLoading(true);
-        setStudentData([]);
-        const data = await GetStudentDataByClassId(33);
+        const data = await GetStudentDataByClassId(classSubjectId);
         if (Array.isArray(data.result) && data.isSuccess) {
           // data.result = [];
           if (data.result.length === 0) {
@@ -26,45 +25,39 @@ function StudentDetailClass({ classSubjectId }) {
         }
       } catch (error) {
         setError(error);
-      } finally {
-        setLoading(false);
-      }
+      } 
     };
     fetchStudentDetailClass();
-  }, [classSubjectId]);
-
-  if (loading) {
-    return <div className="text-center">Loading...</div>;
-  }
+  }, []);
 
   return (
     <div>
       {/* Tiêu đề */}
       <div className="flex justify-center">
-        <p className="mt-8 text-3xl font-bold">Xem chi tiết lớp học</p>
+        <p className="mt-8 text-3xl font-bold">Xem chi tiết lớp học </p>
       </div>
 
       {/* Bảng hiển thị */}
       <div className="w-full sm:w-[90%] lg:w-[1570px] mx-auto overflow-x-auto relative flex flex-col mb-4 mt-4 bg-white shadow-md rounded-2xl border border-gray">
         <table className="min-w-full text-left table-auto bg-white">
-          <thead className="bg-gray-100">
+          <thead className="bg-gray-100 ">
             <tr>
-              <th className="p-4 font-semibold text-white text-center align-middle bg-secondaryBlue">
+              <th className="p-4 font-semibold text-white text-center align-middle bg-tritenaryGreen">
                 STT
               </th>
-              <th className="p-4 font-semibold text-white text-center align-middle bg-secondaryBlue">
+              <th className="p-4 font-semibold text-white text-center align-middle bg-tritenaryGreen">
                 Hình ảnh
               </th>
-              <th className="p-4 font-semibold text-white text-center align-middle bg-secondaryBlue">
+              <th className="p-4 font-semibold text-white text-center align-middle bg-tritenaryGreen">
                 MSSV
               </th>
-              <th className="p-4 font-semibold text-white text-center align-middle bg-secondaryBlue">
+              <th className="p-4 font-semibold text-white text-center align-middle bg-tritenaryGreen">
                 Họ
               </th>
-              <th className="p-4 font-semibold text-white text-center align-middle bg-secondaryBlue">
+              <th className="p-4 font-semibold text-white text-center align-middle bg-tritenaryGreen">
                 Tên đệm
               </th>
-              <th className="p-4 font-semibold text-white text-center align-middle bg-secondaryBlue">
+              <th className="p-4 font-semibold text-white text-center align-middle bg-tritenaryGreen">
                 Tên
               </th>
             </tr>
@@ -80,9 +73,9 @@ function StudentDetailClass({ classSubjectId }) {
                 <td className="p-4 text-center align-middle">{index + 1}</td>
                 <td className="p-4 text-center align-middle">
                   <img
-                    src={student.userAvatar}
+                    src={student.userAvartar || Avatar}
                     alt="Student Avatar"
-                    className="w-16 h-16 mx-auto"
+                    className="w-16 h-16 mx-auto rounded-2xl"
                   />
                 </td>
                 <td className="p-4 text-center align-middle">
@@ -106,8 +99,5 @@ function StudentDetailClass({ classSubjectId }) {
   );
 }
 
-StudentDetailClass.propTypes = {
-  classSubjectId: PropTypes.number.isRequired,
-};
 
 export default StudentDetailClass;

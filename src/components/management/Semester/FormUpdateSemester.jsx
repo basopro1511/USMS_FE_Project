@@ -69,7 +69,7 @@ function FormUpdateSemester({ semesterToUpdate, onSemesterUpdated }) {
         }
     } catch (error) {
         setShowAlert("error");
-        setErrorMessage(response.message);
+        setErrorMessage(error);
         setTimeout(() => setShowAlert(false), 3000); // Ẩn bảng thông báo sau 3 giây
         console.error("Error updating semester:", error);
     }
@@ -166,31 +166,17 @@ function FormUpdateSemester({ semesterToUpdate, onSemesterUpdated }) {
                                     }
                                 />
                                 <p className="text-left ml-[100px] text-xl ">Trạng thái: </p>
-
-
                                 <select
                                     type="text"
                                     required
                                     className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl mb-3 px-4"
-                                    // value={
-                                    //     Number(semesterData.status) === 0
-                                    //         ? "Chưa bắt đầu"
-                                    //         : Number(semesterData.status) === 1
-                                    //             ? "Đang diễn ra"
-                                    //             : Number(semesterData.status) === 2
-                                    //                 ? "Đã kết thúc"
-                                    //                 : ""
-                                    // }
+                                    value={semesterData.status}
+                                    onChange={(e) =>
+                                        setSemesterData({ ...semesterData, status: e.target.value })}
                                 >
-                                    <option  onChange={(e) =>
-                                        setSemesterData({ ...semesterData, status: e.target.value })
-                                    } value={(semesterData.status) === 2}>Đã kết thúc</option>
-                                    <option  onChange={(e) =>
-                                        setSemesterData({ ...semesterData, status: e.target.value })
-                                    } value={(semesterData.status) === 1}>Đang diễn ra</option>
-                                    <option  onChange={(e) =>
-                                        setSemesterData({ ...semesterData, status: e.target.value })
-                                    } value={(semesterData.status) === 0}>Chưa bắt đầu</option>
+                                    <option value={1}>Đang diễn ra</option>
+                                    <option value={0}>Chưa bắt đầu</option>
+                                    <option value={2}>Đã kết thúc</option>
                                 </select>
                                 <div className="flex flex-wrap justify-center gap-4">
                                     <button

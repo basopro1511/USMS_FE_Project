@@ -2,15 +2,21 @@ import { useEffect, useState } from "react";
 import AvatarSquare from "../../../assets/Imgs/avatar_square.jpg";
 import { GetUserByID } from "../../../services/userService";
 import FormUpdateStudentPersonalInformation from "../../../components/user/Student/FormUpdateInfor";
+import ChangePasswordForm from "../../../components/management/PersonalInformation/ChangePassword";
 
 function StudentDetail() {
   const [studentData, setStudentData] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [infoToUpdate, setInfoToUpdate] = useState(null);
+  const [showChangePasswordForm, setShowChangePasswordForm] = useState(false);
+
+  //#region  Login Data
+  const userId = localStorage.getItem("userId");
+  //#endregion
 
   useEffect(() => {
     const fetchUserData = async () => {
-      const data = await GetUserByID("BA250001"); //Lấy ra data của user  trong database
+      const data = await GetUserByID(userId); //Lấy ra data của user  trong database
       setStudentData(data.result);
     };
     fetchUserData();
@@ -30,10 +36,20 @@ function StudentDetail() {
     toggleShowForm(); // Show form update
   };
   const handleReload = async () => {
-    const data = await await GetUserByID("BA250001"); // Gọi API để lấy lại tất cả các phòng
+    const data = await await GetUserByID(userId); // Gọi API để lấy lại tất cả các phòng
     setStudentData(data.result); // Cập nhật lại dữ liệu phòng
   };
 
+  //#region form Change Password
+  const toggleShowChangePasswordForm = () => {
+    setShowChangePasswordForm(!showChangePasswordForm);
+  };
+
+  const handleChangePasswordClick = (userData) => {
+    setInfoToUpdate(userData);
+    toggleShowChangePasswordForm(); // Show form update
+  };
+  //#endregion
   return (
     <div className="w-full mt-4 mx-auto">
       <div className="text-center">
@@ -48,7 +64,6 @@ function StudentDetail() {
               src={studentData.userAvartar || AvatarSquare}
               alt="Avatar"
             />
-            <p>Current Term No: 8</p>
           </div>
           {/* Avatar End */}
 
@@ -61,7 +76,7 @@ function StudentDetail() {
                   <input
                     type="text"
                     className="w-full border px-4 py-2 mt-1 rounded-md"
-                    value={studentData.firstName}
+                    value={studentData.lastName}
                     readOnly
                   />
                 </div>
@@ -108,6 +123,12 @@ function StudentDetail() {
               >
                 Cập nhật thông tin
               </button>
+              <button
+                className="w-[160px] text-white bg-green-600 border px-4 py-2 mt-6 rounded-md hover:bg-green-500 hover:scale-95 ml-2"
+                onClick={() => handleChangePasswordClick(studentData)}
+              >
+                Thay đổi mật khẩu
+              </button>
             </div>
             {/* Left Side End */}
             {/* Right Side Start */}
@@ -118,7 +139,7 @@ function StudentDetail() {
                   <input
                     type="text"
                     className="w-full border px-4 py-2 mt-1 rounded-md"
-                    value={studentData.lastName}
+                    value={studentData.firstName}
                     readOnly
                   />
                 </div>
@@ -174,6 +195,13 @@ function StudentDetail() {
             {showForm && (
               <FormUpdateStudentPersonalInformation
                 infoToUpdate={infoToUpdate}
+                onReaload={handleReload}
+                onClose={toggleShowForm}
+              />
+            )}
+            {showChangePasswordForm && (
+              <ChangePasswordForm
+                selectUserId={studentData.userId}
                 onReaload={handleReload}
                 onClose={toggleShowForm}
               />

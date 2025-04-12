@@ -5,14 +5,15 @@ import { getSlots } from "../../../services/slotService";
 
 const TeacherSchedule = () => {
   const [scheduleData, setScheduleData] = useState([]);
+  const userId = localStorage.getItem("userId");
+
   //#region State & Error
   const [loading, setLoading] = useState(true); // Trạng thái tải dữ liệu
   const [, setSelectedWeek] = useState(1); // Số thứ tự của tuần được chọn
   const [slotData, setSlotData] = useState([]);
-  const teacherId = "HieuNT";
   // State cho dữ liệu filter (majorId, classId, term, startDay, endDay)
   const [filterData, setFilterData] = useState({
-    teacherId: teacherId,
+    teacherId: userId,
     startDay: "",
     endDay: "",
   });
@@ -43,7 +44,11 @@ const TeacherSchedule = () => {
             scheduleRes.result &&
             scheduleRes.result.length > 0
           ) {
-            setScheduleData(scheduleRes.result);
+            const available = scheduleRes.result.filter(
+              (item) => item.status === 1
+            );
+            setScheduleData(available);
+            console.log(available);
           } else {
             setScheduleData([]);
           }
@@ -196,19 +201,18 @@ const TeacherSchedule = () => {
         );
         const startTime = slotInfo ? formatTime(slotInfo.startTime) : "N/A";
         const endTime = slotInfo ? formatTime(slotInfo.endTime) : "N/A";
-
         return (
-          <td key={schedule.classScheduleId} className="pt-1 pb-1  flex ">
+          <td key={schedule.scheduleId} className="pt-1 pb-1  flex ">
             <div className="p-2 border border-black w-[190px] h-auto m-auto rounded-2xl bg-whiteBlue">
               <div className="text-left">
               <div className="text-[14px] sm:text-[16px] md:text-[16px]">
                 Môn:{" "}
-                <Link
-                  to="/studentActivityDetail"
+                <Link                       
+                 to={`/teacherActivityDetail/${schedule.scheduleId}`}
                   className="text-blue-600 font-bold hover:text-blue-900 cursor-pointer hover:underline"
                 >
                   {schedule.subjectId}_{schedule.classId}
-                </Link>
+                  </Link>
               </div>
     
               <div>
@@ -289,7 +293,7 @@ const TeacherSchedule = () => {
       <div className="m-auto mt-2 w-full max-w-[1600px] text-center">
         {/* Title */}
         <h1 className="text-[28px] sm:text-[36px] md:text-[48px] font-bold text-primaryGreen mb-6">
-          Lịch học hàng tuần
+          Lịch dạy học hàng tuần
         </h1>
 
         {/* Select Inputs */}

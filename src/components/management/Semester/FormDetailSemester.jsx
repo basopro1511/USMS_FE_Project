@@ -157,7 +157,6 @@ function FormDetailSemester({ semesterDetail, onSemesterDetailUpdated }) {
                                                 ? "Đã kết thúc"
                                                 : ""
                                 }
-                                
                             />
 
 <p className="text-left ml-[100px] text-xl mt-3">
@@ -167,7 +166,7 @@ function FormDetailSemester({ semesterDetail, onSemesterDetailUpdated }) {
                 <button
                   type="button"
                   className=" w-full max-w-[150px] h-[50px] sm:h-[45px] border rounded-2xl bg-gray-500 text-white font-bold text-lg sm:text-xl transition-all hover:scale-105 hover:bg-primaryBlue mt-auto mb-auto"
-                  onClick={() => handleChangeSemesterStatus(semesterData.semesterId, 2)}
+                  onClick={() => handleChangeSemesterStatus(semesterData.semesterId, 0)}
                 >
                   Chưa bắt đầu
                 </button>
@@ -181,7 +180,7 @@ function FormDetailSemester({ semesterDetail, onSemesterDetailUpdated }) {
                 <button
                   type="button"
                   className=" w-full max-w-[150px] h-[50px] sm:h-[45px] border rounded-2xl bg-red-500 text-white font-bold text-lg sm:text-xl transition-all hover:scale-105 hover:bg-red-600 mt-auto mb-auto"
-                  onClick={() => handleChangeSemesterStatus(semesterData.semesterId, 0)}
+                  onClick={() => handleChangeSemesterStatus(semesterData.semesterId, 2)}
                 >
                   Đã kết thúc
                 </button>

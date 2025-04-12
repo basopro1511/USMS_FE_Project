@@ -8,8 +8,7 @@ import {
 import { getTeachers } from "../../../services/TeacherService";
 
 // eslint-disable-next-line react/prop-types
-function FormUpdateSchedule({dataToUpdate,selectedMajorId,selectedClassId,onAdded,
-}) {
+function FormUpdateSchedule({dataToUpdate,selectedMajorId,selectedClassId,onAdded,}) {
   //#region State & Error
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
@@ -24,7 +23,7 @@ function FormUpdateSchedule({dataToUpdate,selectedMajorId,selectedClassId,onAdde
   // Dữ liệu schedule
   const [scheduleData, setNewSchedule] = useState(
     dataToUpdate || {
-      classScheduleId: 0,
+      scheduleId: 0,
       classSubjectId: 0,
       slotId: 0,
       roomId: "",
@@ -103,12 +102,14 @@ function FormUpdateSchedule({dataToUpdate,selectedMajorId,selectedClassId,onAdde
             scheduleData.date,
             scheduleData.slotId
           );
-
+          const available = rooms.result.filter(
+            (item) => item.status === 1
+          );
           //  Kiểm tra nếu phòng cũ vẫn tồn tại, giữ lại nó trong danh sách
           const currentRoom = scheduleData.roomId
             ? [{ roomId: scheduleData.roomId, location: "Phòng hiện tại" }]
             : [];
-          setRooms([...currentRoom, ...rooms.result]);
+          setRooms([...currentRoom, ...available]);
         } catch (error) {
           console.error("Error fetching rooms:", error);
         }
@@ -235,7 +236,6 @@ function FormUpdateSchedule({dataToUpdate,selectedMajorId,selectedClassId,onAdde
                       </option>
                     ))}
                   </select>
-
                   <p className="text-left ml-[100px] text-xl ">Ngày:</p>
                   <input
                     type="date"

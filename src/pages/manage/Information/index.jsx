@@ -2,16 +2,20 @@ import { useState, useEffect } from "react";
 import { GetUserByID } from "../../../services/userService";
 import AvatarSquare from "../../../assets/Imgs/avatar_square.jpg";
 import FormUpdateInformation from "../../../components/management/PersonalInformation/FormUpdateInformation";
+import ChangePasswordStaff from "../../../components/management/PersonalInformation/ChangePassword";
 
 function PersonalInformation() {
   const [userData, setUserData] = useState(null);
   const [showForm, setShowForm] = useState(false);
+  const [showChangePasswordForm, setShowChangePasswordForm] = useState(false);
+
   const [infoToUpdate, setInfoToUpdate] = useState(null);
+  const userId = localStorage.getItem("userId");
 
   //#region Fetch Data
   useEffect(() => {
     const fetchUserData = async () => {
-      const data = await GetUserByID("AnhVN"); //Lấy ra data của user  trong database
+      const data = await GetUserByID(userId); //Lấy ra data của user  trong database
       setUserData(data.result);
     };
     fetchUserData();
@@ -21,6 +25,8 @@ function PersonalInformation() {
     return <div>Loading...</div>;
   }
   //#endregion
+
+  //#region form Update information
   const toggleShowForm = () => {
     setShowForm(!showForm);
   };
@@ -29,10 +35,23 @@ function PersonalInformation() {
     setInfoToUpdate(userData);
     toggleShowForm(); // Show form update
   };
+
   const handleReload = async () => {
-    const data = await await GetUserByID("AnhVN"); // Gọi API để lấy lại tất cả các phòng
+    const data = await await GetUserByID(userId); // Gọi API để lấy lại tất cả các phòng
     setUserData(data.result); // Cập nhật lại dữ liệu phòng
   };
+  //#endregion
+
+  //#region form Change Password
+  const toggleShowChangePasswordForm = () => {
+    setShowChangePasswordForm(!showChangePasswordForm);
+  };
+
+  const handleChangePasswordClick = (userData) => {
+    setInfoToUpdate(userData);
+    toggleShowChangePasswordForm(); // Show form update
+  };
+  //#endregion
 
   return (
     <>
@@ -162,6 +181,12 @@ function PersonalInformation() {
               >
                 Cập nhật thông tin
               </button>
+              <button
+                className="w-[160px] text-white bg-green-600 border px-4 py-2 mt-6 rounded-md hover:bg-green-500 hover:scale-95 ml-2"
+                onClick={() => handleChangePasswordClick(userData)}
+              >
+                Thay đổi mật khẩu
+              </button>
             </div>
             {/* Right Side End */}
           </div>
@@ -172,7 +197,14 @@ function PersonalInformation() {
           infoToUpdate={infoToUpdate}
           onReaload={handleReload}
           onClose={toggleShowForm}
-
+        />
+      
+      )}
+          {showChangePasswordForm && (
+        <ChangePasswordStaff
+        selectUserId={userData.userId}
+          onReaload={handleReload}
+          onClose={toggleShowForm}
         />
       )}
     </>

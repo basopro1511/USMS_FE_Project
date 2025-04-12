@@ -1,17 +1,23 @@
 import { useState, useEffect } from "react";
 import { getMajors } from "../../../services/majorService";
 import { getSlots } from "../../../services/slotService";
-import { getScheduleForStaff } from "../../../services/scheduleService";
+import {
+  ChangeScheduleStatus,
+  getScheduleForStaff,
+} from "../../../services/scheduleService";
 import { getClassesIdByMajorId } from "../../../services/classService";
 import FormAddSchedule from "../../../components/management/Schedule/FormAddSchedule";
 import FormUpdateSchedule from "../../../components/management/Schedule/FormUpdateSchedule";
 import PopUpDeleteSchedule from "../../../components/management/Schedule/PopUpRemoveSchedule";
+import FormAddAutoSchedule from "../../../components/management/Schedule/FormAddAutoSchedule";
 
 function ManageSchedule() {
   //#region State & Error
   const [loading, setLoading] = useState(true); // Trạng thái tải dữ liệu
   const [, setSelectedWeek] = useState(1); // Số thứ tự của tuần được chọn
-
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+  const [showAlert, setShowAlert] = useState(false); // Alert for success or failure notification
   // State cho dữ liệu filter (majorId, classId, term, startDay, endDay)
   const [filterData, setFilterData] = useState({
     majorId: "",
@@ -41,6 +47,11 @@ function ManageSchedule() {
   //#endregion
 
   //#region State ẩn & hiện form
+
+  const [showAddAutoForm, setAddAutoForm] = useState(false); // Dùng để hiển thị form
+  const toggleShowAutoForm = () => {
+    setAddAutoForm(!showAddAutoForm);
+  };
 
   const [showAddForm, setAddForm] = useState(false); // Dùng để hiển thị form
   const toggleShowForm = () => {
@@ -83,6 +94,7 @@ function ManageSchedule() {
             scheduleRes.result.length > 0
           ) {
             setScheduleData(scheduleRes.result);
+            console.log(scheduleRes.data);
           } else {
             setScheduleData([]);
           }
@@ -178,7 +190,7 @@ function ManageSchedule() {
   // Fetch lại danh sách sau khi xóa mà không cần reload
   const handleDeleteSuccess = (id) => {
     setScheduleData((prev) =>
-      prev.filter((item) => item.classScheduleId !== id)
+      prev.filter((item) => item.scheduleId !== id)
     );
     setShowDeletePopup(false);
   };
@@ -364,6 +376,32 @@ function ManageSchedule() {
   };
   //#endregion
 
+  const handleChangeScheduleStatus = async (majorId, classId, term, status) => {
+    try {
+      const response = await ChangeScheduleStatus(
+        filterData.majorId,
+        filterData.classId,
+        filterData.term,
+        status
+      );
+      if (response.isSuccess) {
+        setShowAlert("success");
+        setSuccessMessage(response.message);
+        setTimeout(() => setShowAlert(false), 3000);
+        handleReload();
+      } else {
+        setShowAlert("error");
+        setErrorMessage(response.message);
+        setTimeout(() => setShowAlert(false), 3000);
+      }
+    } catch (error) {
+      console.error("Lỗi khi thay đổi trạng thái các sinh viên:", error);
+      setShowAlert("error");
+      setErrorMessage(error.message);
+      setTimeout(() => setShowAlert(false), 3000);
+    }
+  };
+
   //#region Render Lịch (TimeTable)
   // Render các ô lịch cho 1 ngày và slot cụ thể
   const renderCellForDay = (day, slotId) => {
@@ -409,6 +447,12 @@ function ManageSchedule() {
                   {schedule.teacherId ? schedule.teacherId : "Trống"}
                 </span>
               </div>
+              <div>
+                Tiết học số:
+                <span className="ml-1 font-bold text-red-500">
+                  {schedule.slotNoInSubject}
+                </span>
+              </div>
               <div className="flex">
                 <div className="flex m-auto">
                   <button
@@ -427,7 +471,7 @@ function ManageSchedule() {
                     type="button"
                     className="border border-white w-[70px] h-[30px] bg-red-600 text-white font-bold rounded-full transition-all duration-300 hover:scale-95"
                     onClick={() =>
-                      handleDeleteSchedule(schedule.classScheduleId)
+                      handleDeleteSchedule(schedule.scheduleId)
                     }
                   >
                     <i
@@ -495,6 +539,41 @@ function ManageSchedule() {
   //#region Render Giao diện (UI)
   return (
     <>
+      {/* Notification Start */}
+      {showAlert && (
+        <div
+          className={`fixed top-5 right-0 z-50 ${
+            showAlert === "error"
+              ? "animate-slide-in text-red-800 bg-red-50 border-red-300 mr-4"
+              : "animate-slide-in text-green-800 bg-green-50 border-green-300 mr-4"
+          } border rounded-lg p-4`}
+        >
+          <div className="flex items-center">
+            <svg
+              className="flex-shrink-0 inline w-4 h-4 me-3"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 1 1 1 1v4h1a1 1 0 0 1 0 2Z" />
+            </svg>
+            <span className="sr-only">Info</span>
+            <div>
+              {showAlert === "error" ? (
+                <span>
+                  <strong>Thất bại:</strong> {errorMessage}
+                </span>
+              ) : (
+                <span>
+                  <strong>Thành công:</strong> {successMessage}
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Notification End */}
       <div className="border border-white mt-4 w-[1600px] h-auto bg-white rounded-2xl mb-5">
         <div className="flex">
           <p className="m-auto text-3xl font-bold mt-8">Thời Khóa Biểu</p>
@@ -587,8 +666,17 @@ function ManageSchedule() {
               ))}
             </select>
           </div>
-
-          <div className="flex rounded-full transition-all duration-300 hover:scale-95 ml-auto mr-4">
+          <div className="flex rounded-full transition-all duration-300 hover:scale-95 ml-auto mr-2">
+            <button
+              type="button"
+              className="border border-white rounded-xl w-[200px] bg-secondaryGreen hover:bg-primaryGreen text-white font-semibold"
+              onClick={toggleShowAutoForm}
+            >
+              <i className="fa fa-plus mr-2" aria-hidden="true"></i>
+              Thêm TKB Tự động
+            </button>
+          </div>
+          <div className="flex rounded-full transition-all duration-300 hover:scale-95  mr-4">
             <button
               type="button"
               className="border border-white rounded-xl w-[130px] bg-secondaryGreen hover:bg-primaryGreen text-white font-semibold"
@@ -636,28 +724,55 @@ function ManageSchedule() {
           {/* --- End Bảng thời khóa biểu --- */}
 
           <div className="">
-            <h1 className="text-right">Thay đổi trạng thái thời khóa biểu: (hiện tại : )</h1>
-            <div className="flex w-full h-20 border ">
-            <button
-              type="button"
-              className="ml-auto w-full max-w-[150px] h-[50px] sm:h-[45px] border rounded-2xl bg-gray-500 text-white font-bold text-lg sm:text-xl transition-all hover:scale-105 hover:bg-primaryBlue mt-auto mb-auto"
-            >
-              Vô hiệu hóa
-            </button>
-            <button
-              type="button"
-              className="w-full max-w-[150px] h-[50px] sm:h-[45px] border rounded-2xl bg-yellow-500 text-white font-bold text-lg sm:text-xl transition-all hover:scale-105 hover:bg-yellow-600 mt-auto mb-auto"
-            >
-              Khả dụng
-            </button>
-            <button
-              type="button"
-              className=" w-full max-w-[150px] h-[50px] sm:h-[45px] border rounded-2xl bg-red-500 text-white font-bold text-lg sm:text-xl transition-all hover:scale-105 hover:bg-red-600 mt-auto mb-auto"
-            >
-              Bảo trì
-            </button>
+            <h1 className="text-left mt-1">
+              Trạng thái thời khóa biểu:{"  "}
+              <span
+                className={`text-lg font-bold ${
+                  scheduleData && scheduleData.length > 0
+                    ? scheduleData[0].status === 1
+                      ? "text-green-500"
+                      : "text-red-500"
+                    : "text-gray-500"
+                }`}
+              >
+                {scheduleData && scheduleData.length > 0
+                  ? scheduleData[0].status === 1
+                    ? "Đang khả dụng"
+                    : "Vô hiệu hóa"
+                  : "Không có dữ liệu"}
+              </span>
+            </h1>
+
+            <div className="flex w-full mt-1">
+              <button
+                type="button"
+                className=" w-full max-w-[150px] h-[50px] sm:h-[45px] border rounded-2xl bg-gray-500 text-white font-bold text-lg sm:text-xl transition-all hover:scale-105 hover:bg-primaryBlue mt-auto mb-auto"
+                onClick={() =>
+                  handleChangeScheduleStatus(
+                    filterData.majorId,
+                    filterData.classId,
+                    filterData.term,
+                    0
+                  )
+                }
+              >
+                Vô hiệu hóa
+              </button>
+              <button
+                type="button"
+                className="ml-1 w-full max-w-[150px] h-[50px] sm:h-[45px] border rounded-2xl bg-green-500 text-white font-bold text-lg sm:text-xl transition-all hover:scale-105 hover:bg-green-600 mt-auto mb-auto"
+                onClick={() =>
+                  handleChangeScheduleStatus(
+                    filterData.majorId,
+                    filterData.classId,
+                    filterData.term,
+                    1
+                  )
+                }
+              >
+                Khả dụng
+              </button>
             </div>
-       
           </div>
 
           {/* Ẩn & hiện form start */}
@@ -668,7 +783,13 @@ function ManageSchedule() {
               onAdded={handleReload}
             />
           )}
-
+          {showAddAutoForm && (
+            <FormAddAutoSchedule
+              selectedClassId={selectedClassId}
+              selectedMajorId={selectedMajorId}
+              onAdded={handleReload}
+            />
+          )}
           {showUpdateForm && (
             <FormUpdateSchedule
               selectedClassId={selectedClassId}

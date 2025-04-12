@@ -1,10 +1,14 @@
 /* eslint-disable react/prop-types */
 import { useState, useEffect } from "react";
 import {
-  AddMultipleStudentToClass,
   getAvailableStudent,
 } from "../../../services/studentInClassService";
-import { AddStudentToClassExamSchedule, GetAvailableStudentInExamSchedule } from "../../../services/studentInExamScheduleService";
+import {
+  AddMultipleStudentToExamSchedule,
+  AddStudentToClassExamSchedule,
+  GetAvailableStudentInExamSchedule,
+} from "../../../services/studentInExamScheduleService";
+import { getMajors } from "../../../services/majorService";
 
 function FormAddStudentInExamSchdule({ onStudentAdded, examScheduleId }) {
   //#region State Management
@@ -74,7 +78,7 @@ function FormAddStudentInExamSchdule({ onStudentAdded, examScheduleId }) {
   useEffect(() => {
     const filteredData = studentData.filter((item) => {
       // 1) Lọc chuyên ngành
-      if (filter.majorName && filter.majorName !== item.majorName) {
+      if (filter.majorId && filter.majorId !== item.majorId) {
         return false;
       }
 
@@ -96,7 +100,11 @@ function FormAddStudentInExamSchdule({ onStudentAdded, examScheduleId }) {
       // 4) Lọc tên sinh viên (fullName) - case-insensitive
       if (filter.studentName) {
         const fullName = (
-          item.firstName + " " + item.middleName + " " + item.lastName
+          item.firstName +
+          " " +
+          item.middleName +
+          " " +
+          item.lastName
         ).toLowerCase();
         const filterName = filter.studentName.toLowerCase();
         if (!fullName.includes(filterName)) {
@@ -155,10 +163,11 @@ function FormAddStudentInExamSchdule({ onStudentAdded, examScheduleId }) {
   };
 
   const handleSelectStudent = (userId) => {
-    setSelectedStudents((prevSelected) =>
-      prevSelected.includes(userId)
-        ? prevSelected.filter((id) => id !== userId) // Bỏ chọn nếu đã có
-        : [...prevSelected, userId] // Thêm nếu chưa
+    setSelectedStudents(
+      (prevSelected) =>
+        prevSelected.includes(userId)
+          ? prevSelected.filter((id) => id !== userId) // Bỏ chọn nếu đã có
+          : [...prevSelected, userId] // Thêm nếu chưa
     );
   };
   //#endregion
@@ -211,7 +220,7 @@ function FormAddStudentInExamSchdule({ onStudentAdded, examScheduleId }) {
         studentId: userId,
       }));
 
-      const response = await AddMultipleStudentToClass(studentsData);
+      const response = await AddMultipleStudentToExamSchedule(studentsData);
 
       if (response.isSuccess) {
         setShowAlert("success");
@@ -237,7 +246,18 @@ function FormAddStudentInExamSchdule({ onStudentAdded, examScheduleId }) {
     }
   };
   //#endregion
-
+  const [majorData, setMajorData] = useState([]);
+  useEffect(() => {
+    const fetchMajorData = async () => {
+      try {
+        const majorData = await getMajors();
+        setMajorData(majorData.result || []);
+      } catch (error) {
+        console.error("Lỗi khi lấy danh sách chuyên ngành:", error);
+      }
+    };
+    fetchMajorData();
+  }, []);
 
   //#region Render UI
   return (
@@ -287,19 +307,15 @@ function FormAddStudentInExamSchdule({ onStudentAdded, examScheduleId }) {
               <div className="flex w-full ml-4 h-12 flex-wrap md:flex-nowrap">
                 <div className="flex w-full md:w-auto md:mb-0">
                   <select
-                    name="majorName"
-                    value={filter.majorName}
+                    name="majorId"
+                    value={filter.majorId}
                     onChange={handleFilterChange}
                     className="max-w-sm mx-auto ml-3 h-12 w-full md:w-[230px] border border-black rounded-xl"
                   >
-                    <option value="">Chuyên ngành</option>
-                    {[
-                      ...new Set(
-                        studentData.map((student) => student.majorName)
-                      ),
-                    ].map((majorName) => (
-                      <option key={majorName} value={majorName}>
-                        {majorName}
+                    <option value="">Chọn chuyên ngành</option>
+                    {majorData.map((major) => (
+                      <option key={major.majorId} value={major.majorId}>
+                        {major.majorName}
                       </option>
                     ))}
                   </select>
@@ -542,55 +558,68 @@ function FormAddStudentInExamSchdule({ onStudentAdded, examScheduleId }) {
                         </tr>
                       </thead>
                       <tbody>
-                        {currentData.map((student, index) => (
-                          <tr
-                            key={student.userId}
-                            className="hover:bg-gray-50 even:bg-gray-50"
-                          >
-                            <td className="p-4 border-b text-center">
-                              <input
-                                type="checkbox"
-                                checked={selectedStudents.includes(
-                                  student.userId
-                                )}
-                                onChange={() =>
-                                  handleSelectStudent(student.userId)
-                                }
-                              />
-                            </td>
-                            <td className="p-4 border-b text-center">
-                              {index + 1}
-                            </td>
-                            <td className="p-4 border-b text-center">
-                              {student.userId}
-                            </td>
-                            <td className="p-4 border-b text-center">
-                              {student.lastName} {student.middleName}{" "}
-                              {student.firstName}
-                            </td>
-                            <td className="p-4 border-b text-center">
-                              {student.email}
-                            </td>
-                            <td className="p-4 border-b text-center">
-                              {student.phoneNumber}
-                            </td>
-                            <td className="p-4 border-b text-center">
-                              {student.majorName}
-                            </td>
-                            <td className="p-4 border-b text-center">
-                              {student.term}
-                            </td>
-                            <td className="p-4 border-b text-center">
-                              <button
-                                type="button"
-                                className="border border-white w-[40px] h-[40px] bg-green-600 text-white font-bold rounded-[10px] transition-all duration-300 hover:scale-95"
-                                onClick={() => handleAddStudent(student.userId)}
-                              >
-                                <i className="fa fa-plus text-white"></i>
-                              </button>
-                            </td>
-                          </tr>
-                        ))}
+                        {currentData.map((student, index) => {
+                          // tăng số thứ tự
+                          const stt = indexOfFirstItem + (index + 1);
+                          // Tìm majorName tương ứng
+                          const foundMajor = majorData.find(
+                            (m) => m.majorId === student.majorId
+                          );
+                          const majorName = foundMajor
+                            ? foundMajor.majorName
+                            : student.majorId;
+                          return (
+                            <tr
+                              key={student.userId}
+                              className="hover:bg-gray-50 even:bg-gray-50"
+                            >
+                              <td className="p-4 border-b text-center">
+                                <input
+                                  type="checkbox"
+                                  checked={selectedStudents.includes(
+                                    student.userId
+                                  )}
+                                  onChange={() =>
+                                    handleSelectStudent(student.userId)
+                                  }
+                                />
+                              </td>
+                              <td className="p-4 border-b text-center">
+                                {stt}
+                              </td>
+                              <td className="p-4 border-b text-center">
+                                {student.userId}
+                              </td>
+                              <td className="p-4 border-b text-center">
+                                {student.lastName} {student.middleName}{" "}
+                                {student.firstName}
+                              </td>
+                              <td className="p-4 border-b text-center">
+                                {student.email}
+                              </td>
+                              <td className="p-4 border-b text-center">
+                                {student.phoneNumber}
+                              </td>
+                              <td className="p-4 border-b text-center">
+                                {majorName}
+                              </td>
+                              <td className="p-4 border-b text-center">
+                                {student.term}
+                              </td>
+                              <td className="p-4 border-b text-center">
+                                <button
+                                  type="button"
+                                  className="border border-white w-[40px] h-[40px] bg-green-600 text-white font-bold rounded-[10px] transition-all duration-300 hover:scale-95"
+                                  onClick={() =>
+                                    handleAddStudent(student.userId)
+                                  }
+                                >
+                                  <i className="fa fa-plus text-white"></i>
+                                </button>
+                              </td>
+                            </tr>
+                          );
+                        })}
                       </tbody>
                     </table>
                   )}

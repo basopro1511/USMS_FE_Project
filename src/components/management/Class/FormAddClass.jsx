@@ -36,11 +36,17 @@ function FormAddClass({ onClassAdded }) {
   const [semesterData, setSemesterData] = useState([]);
   useEffect(() => {
     const fetchSemesterData = async () => {
-      const semesterData = await getSemesters(); //Lấy ra list room rtong database
-      setSemesterData(semesterData.result);
+      const semesterData = await getSemesters(); // Lấy ra list semester từ database
+      // Chỉ giữ lại các semester có status = 1
+      const activeSemesters = semesterData.result.filter(
+        (item) => item.status === 1
+      );
+      setSemesterData(activeSemesters);
     };
+  
     fetchSemesterData();
   }, []);
+  
   //Fetch Data Semester - End
 
   // Fetch Data Subjcet - Start
@@ -193,7 +199,7 @@ function FormAddClass({ onClassAdded }) {
                 </option>
                 {subjectData.map((subject) => (
                   <option key={subject.subjectId} value={subject.subjectId}>
-                    {subject.subjectName}
+                   {subject.subjectId} - {subject.subjectName}
                   </option>
                 ))}
               </select>

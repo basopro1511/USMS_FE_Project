@@ -73,8 +73,10 @@ function FormAddSchedule({ selectedClassId, selectedMajorId, onAdded }) {
           const rooms = await GetAvailableRoom(
             newSchedule.date,
             newSchedule.slotId
+          ); const available = rooms.result.filter(
+            (item) => item.status === 1
           );
-          setRooms(rooms.result);
+          setRooms(available);
         } catch (error) {
           console.error("Error fetching subjects:", error);
         }
@@ -115,7 +117,7 @@ function FormAddSchedule({ selectedClassId, selectedMajorId, onAdded }) {
         setShowAlert("success");
         setTimeout(() => {
           setShowAlert(false); // Ẩn thông báo sau 3 giây
-        }, 3000);
+        }, 6000);
         onAdded(response.data);
         setIsFormVisible(false); // Ẩn form sau khi thông báo biến mất
       } else {
@@ -123,7 +125,7 @@ function FormAddSchedule({ selectedClassId, selectedMajorId, onAdded }) {
         setShowAlert("error");
         setTimeout(() => {
           setShowAlert(false); // Ẩn thông báo sau 3 giây
-        }, 3000);
+        }, 4000);
       }
     } catch (error) {
       setErrorMessage("Lỗi hệ thống, vui lòng thử lại!");

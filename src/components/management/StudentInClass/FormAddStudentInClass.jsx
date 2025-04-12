@@ -48,8 +48,11 @@ function FormAddStudentInClass({ onStudentAdded, classSubjectIdParam }) {
       if (!data || !data.result) {
         setStudentData([]);
         return;
-      }
-      setStudentData(data.result);
+      }      const activeStudent = data.result.filter(
+        (item) => item.status === 1
+      );
+      setStudentData(activeStudent);
+      
     } catch (error) {
       console.error("Lỗi khi fetch dữ liệu sinh viên:", error);
       setStudentData([]);
@@ -205,7 +208,6 @@ function FormAddStudentInClass({ onStudentAdded, classSubjectIdParam }) {
   // Thêm nhiều SV
   const handleAddMultipleStudents = async (event) => {
     event.preventDefault();
-
     try {
       if (selectedStudents.length === 0) {
         setShowAlert("error");
@@ -219,9 +221,7 @@ function FormAddStudentInClass({ onStudentAdded, classSubjectIdParam }) {
         classSubjectId: classSubjectIdParam,
         studentId: userId,
       }));
-
       const response = await AddMultipleStudentToClass(studentsData);
-
       if (response.isSuccess) {
         setShowAlert("success");
         setSuccessMessage(response.message);

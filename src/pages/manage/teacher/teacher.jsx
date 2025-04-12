@@ -2,8 +2,15 @@ import { useState, useEffect } from "react";
 import FormUpdateTeacher from "../../../components/management/Teacher/FormUpdateTeacher";
 import FormAddTeacher from "../../../components/management/Teacher/FormAddTeacher";
 import FormDetailTeacher from "../../../components/management/Teacher/FormDetailTeacher";
-import { getTeachers, importTeachers } from "../../../services/TeacherService";
+import {
+  changeSelectedTeacherStatus,
+  getTeachers,
+  handleExportEmptyFormTeacher,
+  handleExportTeacher,
+  importTeachers,
+} from "../../../services/TeacherService";
 import { getMajors } from "../../../services/majorService";
+import Pagination from "../../../components/management/HeaderFooter/Pagination";
 
 function ManageTeacher() {
   const [errorMessage, setErrorMessage] = useState("");
@@ -70,9 +77,14 @@ function ManageTeacher() {
   const [filters, setFilters] = useState({
     userId: "",
     teacherName: "",
-    major: "", // Lưu majorId được chọn
+    majorId: "",
+    status: ""
   });
-
+  const statusMapping = {
+    0: "Vô hiệu hóa",
+    1: "Đang khả dụng",
+    2: "Đang tạm hoãn",
+  };
   // Cập nhật filters khi nhập/chọn
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
@@ -84,31 +96,18 @@ function ManageTeacher() {
 
   useEffect(() => {
     const filteredData = teacherData.filter((item) => {
-      // Tìm majorName
-      // let majorName = "";
-      // const foundMajor = majorData.find((m) => m.majorId === item.majorId);
-      // if (foundMajor) majorName = foundMajor.majorName;
-
-      // 1. Filter theo userId
-      const matchUserId =
-        !filters.userId ||
-        item.userId.toLowerCase().includes(filters.userId.toLowerCase());
-
-      // 2. Filter theo họ tên (gộp first + middle + last)
-      const fullName = `${item.lastName} ${item.middleName} ${item.firstName}`
-        .trim()
-        .toLowerCase();
-      const matchName =
-        !filters.teacherName ||
-        fullName.includes(filters.teacherName.toLowerCase());
-
-      // 3. Filter theo majorId
-      const matchMajor = !filters.major || item.majorId === filters.major;
-
-      return matchUserId && matchName && matchMajor;
-    });
+      const fullName =
+      `${item.lastName} ${item.middleName} ${item.firstName}`.toLowerCase();
+    return (
+      (!filters.userId ||
+        item.userId.toLowerCase().includes(filters.userId.toLowerCase())) &&
+      (!filters.teacherName || fullName.includes(filters.teacherName.toLowerCase())) &&
+      (!filters.status || item.status.toString() === filters.status) &&
+      (!filters.majorId || item.majorId === filters.majorId)
+    );
+  });
     setFilteredTeachers(filteredData);
-  }, [filters, teacherData]);
+  }, [filters, teacherData, majorData]);
 
   // Sắp xếp
   const [sortConfig, setSortConfig] = useState({
@@ -130,18 +129,24 @@ function ManageTeacher() {
     return 0;
   });
 
-  // Phân trang
+  //#region Paging
+  // Calculate which items to show based on current page
   const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 9;
+  const pageSize = 9; // Số item mỗi trang
+  const totalItems = sortedData.length;
+  const totalPages = Math.ceil(totalItems / pageSize);
   const indexOfLastItem = currentPage * pageSize;
   const indexOfFirstItem = indexOfLastItem - pageSize;
   const currentData = sortedData.slice(indexOfFirstItem, indexOfLastItem);
 
   const handlePageChange = (newPage) => {
-    if (newPage >= 1 && newPage <= Math.ceil(sortedData.length / pageSize)) {
+    if (newPage >= 1 && newPage <= totalPages) {
       setCurrentPage(newPage);
     }
   };
+  // Sort, Filter Paging - End
+  //#endregion
+
   //#region chọn import file excel
   const [selectedFile, setSelectedFile] = useState(null);
   const handleFileChange = (event) => {
@@ -168,12 +173,52 @@ function ManageTeacher() {
       }
     } catch (error) {
       setShowAlert("error");
-      setErrorMessage("Import thất bại. Vui lòng thử lại!" );
+      setErrorMessage("Import thất bại. Vui lòng thử lại!");
       setTimeout(() => setShowAlert(false), 3000);
       console.error("Lỗi khi thêm giáo viên:", error);
     }
   };
+  //#endregion
+  //#region Student Selection
+  const [selectedIds, setSelectedIds] = useState([]);
+  const handleSelectAll = (isChecked) => {
+    if (isChecked) {
+      setSelectedIds(currentData.map((student) => student.userId));
+    } else {
+      setSelectedIds([]);
+    }
+  };
 
+  const handleSelectStudent = (userId) => {
+    setSelectedIds(
+      (prevSelected) =>
+        prevSelected.includes(userId)
+          ? prevSelected.filter((id) => id !== userId) // Bỏ chọn nếu đã có
+          : [...prevSelected, userId] // Thêm nếu chưa
+    );
+  };
+
+  const handleChangeSelectedStatus = async (userIds, status) => {
+    try {
+      const response = await changeSelectedTeacherStatus(userIds, status);
+      if (response.isSuccess) {
+        setShowAlert("success");
+        setSuccessMessage(response.message);
+        setTimeout(() => setShowAlert(false), 3000);
+        setSelectedIds([]);
+        handleReload(); // Cập nhật lại danh sách giáo viên
+      } else {
+        setShowAlert("error");
+        setErrorMessage(response.message);
+        setTimeout(() => setShowAlert(false), 3000);
+      }
+    } catch (error) {
+      console.error("Lỗi khi thay đổi trạng thái các sinh viên:", error);
+      setShowAlert("error");
+      setErrorMessage(error.message);
+      setTimeout(() => setShowAlert(false), 3000);
+    }
+  };
   //#endregion
   return (
     <>
@@ -219,16 +264,20 @@ function ManageTeacher() {
           <p className="mt-8 text-3xl font-bold">Quản lý giáo viên</p>
         </div>
 
-        <p className="ml-4 mt-5">Tìm kiếm: </p>
-
+        <div className="flex ml-3 mt-2">
+          <p>Tìm kiếm</p>
+          <span className="text-gray-700 md:w-[200px] text-sm  ml-auto mr-[290px]">
+            {selectedFile ? "File đã chọn: " + selectedFile.name : "Chưa chọn file"}
+          </span>
+        </div>
         {/* Filter Section */}
         <div className="flex w-full h-12 flex-wrap md:flex-nowrap">
           {/* Cột lọc */}
           <div className="flex w-full md:w-auto md:mb-0">
             {/* Lọc theo chuyên ngành */}
             <select
-              name="major"
-              value={filters.major}
+              name="majorId"
+              value={filters.majorId}
               onChange={handleFilterChange}
               className="max-w-sm mx-auto ml-3 h-12 w-full md:w-[200px] border border-black rounded-xl"
             >
@@ -239,14 +288,26 @@ function ManageTeacher() {
                 </option>
               ))}
             </select>
-
+            <select
+              name="status"
+              value={filters.status}
+              onChange={handleFilterChange}
+              className="max-w-sm mx-auto ml-3 h-12 w-full md:w-[130px] border border-black rounded-xl"
+            >
+              <option value="">Trạng thái</option>
+              {Object.keys(statusMapping).map((statusKey) => (
+                <option key={statusKey} value={statusKey}>
+                  {statusMapping[statusKey]}
+                </option>
+              ))}
+            </select>
             {/* Lọc theo Mã giáo viên */}
             <input
               type="text"
               name="userId"
               value={filters.userId}
               onChange={handleFilterChange}
-              className="max-w-sm mx-auto ml-3 h-12 px-3 w-full md:w-[230px] border border-black rounded-xl"
+              className="max-w-sm mx-auto ml-3 h-12 px-3 w-full md:w-[120px] border border-black rounded-xl"
               placeholder="Mã giáo viên"
             />
 
@@ -256,17 +317,14 @@ function ManageTeacher() {
               name="teacherName"
               value={filters.teacherName}
               onChange={handleFilterChange}
-              className="max-w-sm mx-auto ml-3 h-12 px-3 w-full md:w-[230px] border border-black rounded-xl"
+              className="max-w-sm mx-auto ml-3 h-12 px-3 w-full md:w-[200px] border border-black rounded-xl"
               placeholder="Họ và tên"
             />
           </div>
 
           {/* Button Container */}
           <div className="flex ml-auto space-x-4 mt-2 md:mt-0 mr-4">
-            {/* Import Teacher Button */}
-            <span className="text-gray-700">
-     {selectedFile ? "File đã chọn: " + selectedFile.name : "Chưa chọn file"}
-            </span>
+            {/* Import Sinh viên Button */}
             {/* Input ẩn để chọn file */}
             <input
               type="file"
@@ -275,28 +333,40 @@ function ManageTeacher() {
               id="fileInput"
               onChange={handleFileChange}
             />
-              {/* Button Xác nhận Import */}
-              <button
+            <button
               type="button"
-              className="ml-3 border border-white rounded-xl w-full md:w-[181px] bg-blue-600 hover:bg-blue-700 text-white font-semibold"
+              className="ml-3 border border-white rounded-xl w-full md:w-[130px] bg-blue-600 hover:bg-blue-700 text-white font-semibold"
+              onClick={() => handleExportTeacher(filters)} // Sử dụng callback hàm
+            >
+              <i className="fa fa-download mr-2" aria-hidden="true"></i>
+              Export Data giáo viên
+            </button>
+            <button
+              type="button"
+              className="ml-3 border border-white rounded-xl w-full md:w-[150px] bg-blue-600 hover:bg-blue-700 text-white font-semibold"
+              onClick={() => handleExportEmptyFormTeacher()} // Sử dụng callback hàm
+            >
+              <i className="fa fa-download mr-2" aria-hidden="true"></i>
+              Export mẫu thêm giáo viên
+            </button>
+            {/* Button Import */}
+            {/* Button Xác nhận Import */}
+            <button
+              type="button"
+              className="ml-3 border border-white rounded-xl w-full md:w-[112px] bg-blue-600 hover:bg-blue-700 text-white font-semibold"
               onClick={handleImport}
             >
               <i className="fa fa-check mr-2" aria-hidden="true"></i>
               Import
-            </button> {/* Hiển thị tên file đã chọn */}
-      
-     
-            {/* Button Import */}
+            </button>{" "}
             <button
               type="button"
-              className="border border-white rounded-xl w-full md:w-[181px] bg-secondaryGreen hover:bg-primaryGreen text-white font-semibold"
+              className="border border-white rounded-xl w-full md:w-[150px] bg-secondaryGreen hover:bg-primaryGreen text-white font-semibold"
               onClick={() => document.getElementById("fileInput").click()}
             >
               <i className="fa fa-upload mr-2" aria-hidden="true"></i>
-              Chọn file Excel
+              Chọn file Excel thêm giáo viên
             </button>
-    
-
             {/* Add Teacher Button */}
             <button
               type="button"
@@ -313,14 +383,23 @@ function ManageTeacher() {
         <div className="w-[1570px] overflow-x-auto ml-3 relative flex flex-col mt-4 bg-white shadow-md rounded-2xl border border-gray overflow-hidden">
           <table className="min-w-full text-left table-auto bg-white">
             <thead className="bg-gray-100">
-              <tr>  <th
+              <tr>
+                <th className="p-4 font-semibold cursor-pointer transition-all hover:bg-primaryBlue text-white text-center align-middle bg-secondaryBlue">
+                  <input
+                    type="checkbox"
+                    onChange={(e) => handleSelectAll(e.target.checked)}
+                    checked={
+                      selectedIds.length === currentData.length &&
+                      currentData.length > 0
+                    }
+                  />
+                </th>{" "}
+                <th
                   className="p-4 font-semibold cursor-pointer transition-all hover:bg-primaryBlue text-white text-center align-middle bg-secondaryBlue"
                   onClick={() => handleSort("stt")}
                 >
                   <div className="flex items-center justify-between">
-                    <p className="m-auto transition-all hover:scale-105">
-                      STT
-                    </p>
+                    <p className="m-auto transition-all hover:scale-105">STT</p>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
@@ -485,7 +564,8 @@ function ManageTeacher() {
                       />
                     </svg>
                   </div>
-                </th>  <th
+                </th>{" "}
+                <th
                   className="p-4 font-semibold cursor-pointer transition-all hover:bg-primaryBlue text-white text-center align-middle bg-secondaryBlue"
                   onClick={() => handleSort("status")}
                 >
@@ -518,7 +598,7 @@ function ManageTeacher() {
 
             <tbody>
               {currentData.map((item, index) => {
-                             const stt = indexOfFirstItem + (index + 1);
+                const stt = indexOfFirstItem + (index + 1);
 
                 // Tìm majorName tương ứng
                 const foundMajor = majorData.find(
@@ -529,9 +609,15 @@ function ManageTeacher() {
                   : item.majorId;
                 return (
                   <tr key={index} className="hover:bg-gray-50 even:bg-gray-50">
-                          <td className="p-4 text-center align-middle">
-                      {stt}
-                    </td>
+                    <td className="p-4 text-center">
+                      {" "}
+                      <input
+                        type="checkbox"
+                        checked={selectedIds.includes(item.userId)}
+                        onChange={() => handleSelectStudent(item.userId)}
+                      />
+                    </td>{" "}
+                    <td className="p-4 text-center align-middle">{stt}</td>
                     <td className="p-4 text-center align-middle">
                       {item.userId}
                     </td>
@@ -551,7 +637,13 @@ function ManageTeacher() {
                       {majorName}
                     </td>
                     <td className="p-4 text-center align-middle">
-                    {item.status === 0 ? "Vô hiệu hóa" : item.status === 1 ?  "Đang khả dụng": item.status === 2 ?  "Đang tạm hoãn" : "Chưa bắt đầu" }
+                      {item.status === 0
+                        ? "Vô hiệu hóa"
+                        : item.status === 1
+                        ? "Đang khả dụng"
+                        : item.status === 2
+                        ? "Đang tạm hoãn"
+                        : "Chưa bắt đầu"}
                     </td>
                     <td className="p-4 text-center align-middle">
                       <div className="flex justify-center space-x-2">
@@ -574,33 +666,44 @@ function ManageTeacher() {
               })}
             </tbody>
           </table>
-        </div>
-
-        {/* Phân trang */}
-        <div className="flex mt-5">
-          {/* Button: Previous */}
-          <button
-            type="button"
-            className="rounded-2xl transition-all duration-300 hover:bg-quaternarty hover:scale-95 border border-white w-[130px] h-[40px] bg-[#3c6470] text-white font-semibold ml-auto mr-4 flex items-center justify-center"
-            onClick={() => handlePageChange(currentPage - 1)}
-          >
-            <span className="font-bold text-xl">&lt;</span> Trang Trước
-          </button>
-
-          {/* Hiển thị trang hiện tại */}
-          <div className="border-2 border-black rounded-xl w-[220px] h-[40px] bg-primaryGray flex items-center justify-center">
-            <p>{`Trang ${currentPage}`}</p>
+          <div className="ml-2 mb-2">
+            <h1 className="text-left">
+              Thay đổi trạng thái giáo viên đã được chọn:{" "}
+            </h1>
+            <div className="flex w-full h-10  ">
+              <button
+                type="button"
+                className=" w-full max-w-[120px] h-[40px] sm:h-[40px] mr-2 border rounded-2xl bg-gray-500 text-white font-bold text-lg sm:text-l transition-all hover:scale-105 hover:bg-primaryBlue mt-auto mb-auto"
+                onClick={() => handleChangeSelectedStatus(selectedIds, 0)}
+              >
+                Vô hiệu hóa
+              </button>
+              <button
+                type="button"
+                className="w-full max-w-[140px] h-[40px] sm:h-[40px] mr-2 border rounded-2xl bg-yellow-500 text-white font-bold text-lg sm:text-l transition-all hover:scale-105 hover:bg-yellow-600 mt-auto mb-auto"
+                onClick={() => handleChangeSelectedStatus(selectedIds, 1)}
+              >
+                Đang khả dụng
+              </button>
+              <button
+                type="button"
+                className="w-full max-w-[140px] h-[40px] sm:h-[40px]border rounded-2xl bg-red-500 text-white font-bold text-lg sm:text-l transition-all hover:scale-105 hover:bg-red-600 mt-auto mb-auto"
+                onClick={() => handleChangeSelectedStatus(selectedIds, 2)}
+              >
+                Đang tạm hoãn
+              </button>
+            </div>
           </div>
-
-          {/* Button: Next */}
-          <button
-            type="button"
-            className="rounded-2xl transition-all duration-300 hover:bg-quaternarty hover:scale-95 border border-white w-[130px] h-[40px] bg-[#3c6470] text-white font-semibold ml-4 mr-auto flex items-center justify-center"
-            onClick={() => handlePageChange(currentPage + 1)}
-          >
-            Trang Sau <span className="font-bold text-xl">&gt;</span>
-          </button>
         </div>
+        {/* Phân trang - Start */}
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          pageSize={pageSize}
+          totalItems={totalItems}
+          onPageChange={handlePageChange}
+        />
+        {/* Phân trang - End */}
 
         {/* Form Add Teacher */}
         {showAddForm && (

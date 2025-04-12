@@ -1,5 +1,9 @@
 import { useState, useEffect } from "react";
-import { GetStaffs, importStaff } from "../../../services/staffService";
+import {
+  changeSelectedStaffStatus,
+  GetStaffs,
+  importStaff,
+} from "../../../services/staffService";
 import FormAddStaff from "../../../components/admin/Staff/FormAddStaff";
 import FormUpdateStaff from "../../../components/admin/Staff/FormUpdateStaff";
 import FormDetailStaff from "../../../components/admin/Staff/FormDetailStaff";
@@ -150,12 +154,53 @@ function ManageStaff() {
       }
     } catch (error) {
       setShowAlert("error");
-      setErrorMessage("Import thất bại. Vui lòng thử lại!" );
+      setErrorMessage("Import thất bại. Vui lòng thử lại!");
       setTimeout(() => setShowAlert(false), 3000);
       console.error("Lỗi khi thêm giáo viên:", error);
     }
   };
+  //#endregion
 
+  //#region Student Selection
+  const [selectedIds, setSelectedIds] = useState([]);
+  const handleSelectAll = (isChecked) => {
+    if (isChecked) {
+      setSelectedIds(currentData.map((student) => student.userId));
+    } else {
+      setSelectedIds([]);
+    }
+  };
+
+  const handleSelectStudent = (userId) => {
+    setSelectedIds(
+      (prevSelected) =>
+        prevSelected.includes(userId)
+          ? prevSelected.filter((id) => id !== userId) // Bỏ chọn nếu đã có
+          : [...prevSelected, userId] // Thêm nếu chưa
+    );
+  };
+
+  const handleChangeSelectedStatus = async (userIds, status) => {
+    try {
+      const response = await changeSelectedStaffStatus(userIds, status);
+      if (response.isSuccess) {
+        setShowAlert("success");
+        setSuccessMessage(response.message);
+        setTimeout(() => setShowAlert(false), 3000);
+        setSelectedIds([]);
+        handleReload(); // Cập nhật lại danh sách giáo viên
+      } else {
+        setShowAlert("error");
+        setErrorMessage(response.message);
+        setTimeout(() => setShowAlert(false), 3000);
+      }
+    } catch (error) {
+      console.error("Lỗi khi thay đổi trạng thái các sinh viên:", error);
+      setShowAlert("error");
+      setErrorMessage(error.message);
+      setTimeout(() => setShowAlert(false), 3000);
+    }
+  };
   //#endregion
   return (
     <>
@@ -207,7 +252,6 @@ function ManageStaff() {
         <div className="flex w-full h-12 flex-wrap md:flex-nowrap">
           {/* Cột lọc */}
           <div className="flex w-full md:w-auto md:mb-0">
-
             {/* Lọc theo Mã giáo viên */}
             <input
               type="text"
@@ -233,7 +277,9 @@ function ManageStaff() {
           <div className="flex ml-auto space-x-4 mt-2 md:mt-0 mr-4">
             {/* Import Teacher Button */}
             <span className="text-gray-700">
-     {selectedFile ? "File đã chọn: " + selectedFile.name : "Chưa chọn file"}
+              {selectedFile
+                ? "File đã chọn: " + selectedFile.name
+                : "Chưa chọn file"}
             </span>
             {/* Input ẩn để chọn file */}
             <input
@@ -243,17 +289,16 @@ function ManageStaff() {
               id="fileInput"
               onChange={handleFileChange}
             />
-              {/* Button Xác nhận Import */}
-              <button
+            {/* Button Xác nhận Import */}
+            <button
               type="button"
               className="ml-3 border border-white rounded-xl w-full md:w-[181px] bg-blue-600 hover:bg-blue-700 text-white font-semibold"
               onClick={handleImport}
             >
               <i className="fa fa-check mr-2" aria-hidden="true"></i>
               Import
-            </button> {/* Hiển thị tên file đã chọn */}
-      
-     
+            </button>{" "}
+            {/* Hiển thị tên file đã chọn */}
             {/* Button Import */}
             <button
               type="button"
@@ -263,8 +308,6 @@ function ManageStaff() {
               <i className="fa fa-upload mr-2" aria-hidden="true"></i>
               Chọn file Excel
             </button>
-    
-
             {/* Add Teacher Button */}
             <button
               type="button"
@@ -281,14 +324,24 @@ function ManageStaff() {
         <div className="w-[1570px] overflow-x-auto ml-3 relative flex flex-col mt-4 bg-white shadow-md rounded-2xl border border-gray overflow-hidden">
           <table className="min-w-full text-left table-auto bg-white">
             <thead className="bg-gray-100">
-              <tr>  <th
+              <tr>
+                {" "}
+                <th className="p-4 font-semibold cursor-pointer transition-all hover:bg-primaryBlue text-white text-center align-middle bg-secondaryBlue">
+                  <input
+                    type="checkbox"
+                    onChange={(e) => handleSelectAll(e.target.checked)}
+                    checked={
+                      selectedIds.length === currentData.length &&
+                      currentData.length > 0
+                    }
+                  />
+                </th>{" "}
+                <th
                   className="p-4 font-semibold cursor-pointer transition-all hover:bg-primaryBlue text-white text-center align-middle bg-secondaryBlue"
                   onClick={() => handleSort("stt")}
                 >
                   <div className="flex items-center justify-between">
-                    <p className="m-auto transition-all hover:scale-105">
-                      STT
-                    </p>
+                    <p className="m-auto transition-all hover:scale-105">STT</p>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
@@ -429,7 +482,7 @@ function ManageStaff() {
                     </svg>
                   </div>
                 </th>
-       <th
+                <th
                   className="p-4 font-semibold cursor-pointer transition-all hover:bg-primaryBlue text-white text-center align-middle bg-secondaryBlue"
                   onClick={() => handleSort("status")}
                 >
@@ -459,16 +512,20 @@ function ManageStaff() {
                 </th>
               </tr>
             </thead>
-
             <tbody>
               {currentData.map((item, index) => {
-                             const stt = indexOfFirstItem + (index + 1);
-
+                const stt = indexOfFirstItem + (index + 1);
                 return (
                   <tr key={index} className="hover:bg-gray-50 even:bg-gray-50">
-                          <td className="p-4 text-center align-middle">
-                      {stt}
-                    </td>
+                    <td className="p-4 text-center">
+                      {" "}
+                      <input
+                        type="checkbox"
+                        checked={selectedIds.includes(item.userId)}
+                        onChange={() => handleSelectStudent(item.userId)}
+                      />
+                    </td>{" "}
+                    <td className="p-4 text-center align-middle">{stt}</td>
                     <td className="p-4 text-center align-middle">
                       {item.userId}
                     </td>
@@ -485,7 +542,13 @@ function ManageStaff() {
                       {item.email}
                     </td>
                     <td className="p-4 text-center align-middle">
-                    {item.status === 0 ? "Vô hiệu hóa" : item.status === 1 ?  "Đang khả dụng": item.status === 2 ?  "Đang tạm hoãn" : "Chưa bắt đầu" }
+                      {item.status === 0
+                        ? "Vô hiệu hóa"
+                        : item.status === 1
+                        ? "Đang khả dụng"
+                        : item.status === 2
+                        ? "Đang tạm hoãn"
+                        : "Chưa bắt đầu"}
                     </td>
                     <td className="p-4 text-center align-middle">
                       <div className="flex justify-center space-x-2">
@@ -508,6 +571,34 @@ function ManageStaff() {
               })}
             </tbody>
           </table>
+          <div className="">
+            <h1 className="text-left">
+              Thay đổi trạng thái sinh viên đã được chọn:{" "}
+            </h1>
+            <div className="flex w-full h-10  ">
+              <button
+                type="button"
+                className=" w-full max-w-[120px] h-[40px] sm:h-[40px] mr-2 border rounded-2xl bg-gray-500 text-white font-bold text-lg sm:text-l transition-all hover:scale-105 hover:bg-primaryBlue mt-auto mb-auto"
+                onClick={() => handleChangeSelectedStatus(selectedIds, 0)}
+              >
+                Vô hiệu hóa
+              </button>
+              <button
+                type="button"
+                className="w-full max-w-[140px] h-[40px] sm:h-[40px] mr-2 border rounded-2xl bg-yellow-500 text-white font-bold text-lg sm:text-l transition-all hover:scale-105 hover:bg-yellow-600 mt-auto mb-auto"
+                onClick={() => handleChangeSelectedStatus(selectedIds, 1)}
+              >
+                Đang khả dụng
+              </button>
+              <button
+                type="button"
+                className="w-full max-w-[140px] h-[40px] sm:h-[40px]border rounded-2xl bg-red-500 text-white font-bold text-lg sm:text-l transition-all hover:scale-105 hover:bg-red-600 mt-auto mb-auto"
+                onClick={() => handleChangeSelectedStatus(selectedIds, 2)}
+              >
+                Đang tạm hoãn
+              </button>
+            </div>
+          </div>
         </div>
 
         {/* Phân trang */}

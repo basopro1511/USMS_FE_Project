@@ -82,3 +82,13 @@ export const GetAvailableRoomToAddExamSchedule = async (date, startTime, endTime
         console.log(error);
     }
 }
+
+export const changeSelectedExamScheduleStatus = async (Ids, status) => {
+    try {
+        // Construct the URL with id and status
+        const response = await request.put(`/ExamSchedule/ChangeSelectStatus?status=${status}`, Ids);
+        return response.data;
+    } catch (error) {
+        console.log(error);
+    }
+}

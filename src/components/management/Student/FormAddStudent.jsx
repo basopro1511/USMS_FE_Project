@@ -42,11 +42,11 @@ function FormAddStudent({ onStudentAdded }) {
       const updatedStudent = { ...newStudent, userAvartar }; // Cập nhật avatar vào newStudent
       const response = await AddStudent(updatedStudent); // Gọi API thêm sinh viên
       if (response.isSuccess) {
+        onStudentAdded(response.student);
+        setIsFormVisible(false);
         setShowAlert("success");
         setSuccessMessage(response.message);
-        onStudentAdded(response.student);
         setTimeout(() => setShowAlert(false), 3000);
-        setIsFormVisible(false);
       } else {
         setShowAlert("error");
         setErrorMessage(response.message);

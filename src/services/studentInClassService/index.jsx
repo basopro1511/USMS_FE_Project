@@ -1,10 +1,10 @@
+import { saveAs } from "file-saver";
 import request from "../../utils/baseURL";
 
 
 export const GetStudentDataByClassId = async (id) => {
     try {
         const response = await request.get(`/StudentInClass/ClassId/${id}`)
-        console.log(response.data);
         return response.data
     } catch (error) {
         console.log(error);
@@ -48,3 +48,22 @@ export const AddMultipleStudentToClass = async (data) => {
     }
 };
 
+export const handleExportStudentInClass = async (id,classId, subjectId) => {
+    try {
+        const params = new URLSearchParams();
+        if (id) params.append("id",id);
+        const response = await request.get(
+            `/StudentInClass/export?${params.toString()}`,
+            {
+              responseType: "blob", // Cực kỳ quan trọng
+            }
+          );
+      const blob = new Blob([response.data], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+    saveAs(blob, "DanhSachSinhVienTrongLop"+classId+"_"+subjectId+".xlsx");
+      return response.data;
+    } catch (error) {
+      console.error("Lỗi export:", error);
+    }
+  };

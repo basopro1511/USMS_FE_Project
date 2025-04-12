@@ -36,3 +36,12 @@ export const DeleteStudentInClassExamSchedule = async (id) => {
     }
 };
 //#endregion
+export const AddMultipleStudentToExamSchedule = async (data) => {
+    try {
+        const response = await request.post("StudentInExamSchedule/AddMutipleStudents", data);
+        return response.data;
+    } catch (error) {
+        console.error("Error adding multiple students to class:", error);
+        return { isSuccess: false, message: "Failed to add multiple students." };
+    }
+};

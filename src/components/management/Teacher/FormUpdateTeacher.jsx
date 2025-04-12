@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from "react";
 import { getMajors } from "../../../services/majorService";
 import { UpdateTeacher } from "../../../services/TeacherService";
+import { bool } from "prop-types";
 
 function FormUpdateTeacher({ teacherToUpdate, onReaload }) {
   const [errorMessage, setErrorMessage] = useState("");
@@ -15,7 +16,7 @@ function FormUpdateTeacher({ teacherToUpdate, onReaload }) {
     firstName: "",
     middleName: "",
     lastName: "",
-    gender: true,
+    gender: bool,
     passwordHash: "",
     email: "",
     personalEmail: "",
@@ -202,7 +203,7 @@ function FormUpdateTeacher({ teacherToUpdate, onReaload }) {
                           onChange={(e) =>
                             setTeacherData({
                               ...teacherData,
-                              gender: e.target.value === "true",
+                              gender: JSON.parse(e.target.value),
                             })
                           }
                         >
@@ -214,6 +215,7 @@ function FormUpdateTeacher({ teacherToUpdate, onReaload }) {
                         </select>
                       </div>
                     </div>
+                    
                     <div className="flex gap-4">
                       <div>
                         <p className="text-left">Họ:</p>

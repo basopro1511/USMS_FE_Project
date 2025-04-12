@@ -2,8 +2,15 @@ import { useEffect, useState } from "react";
 import FormAddStudent from "../../../components/management/Student/FormAddStudent";
 import FormUpdateStudent from "../../../components/management/Student/FormUpdateStudent";
 import FormDetailStudent from "../../../components/management/Student/FormDetailStudent";
-import { getStudents, importStudents } from "../../../services/studentService";
+import {
+  changeStudentStatus,
+  getStudents,
+  handleExport,
+  handleExportEmptyForm,
+  importStudents,
+} from "../../../services/studentService";
 import { getMajors } from "../../../services/majorService";
+import Pagination from "../../../components/management/HeaderFooter/Pagination";
 function ManageStudent() {
   //#region State % Error Start
   const [errorMessage, setErrorMessage] = useState("");
@@ -17,6 +24,7 @@ function ManageStudent() {
   const [showDetailForm, setDetailForm] = useState(false);
   const [filteredStudents, setFilteredStudents] = useState(studentData);
   const [majorData, setMajorData] = useState([]);
+  const [selectedStudents, setSelectedStudents] = useState([]);
 
   const [filter, setFilters] = useState({
     userId: "",
@@ -143,11 +151,14 @@ function ManageStudent() {
 
   //#region Paging
   // Calculate which items to show based on current page
+  const totalItems = sortedData.length;
+  const totalPages = Math.ceil(totalItems / pageSize);
   const indexOfLastItem = currentPage * pageSize;
   const indexOfFirstItem = indexOfLastItem - pageSize;
   const currentData = sortedData.slice(indexOfFirstItem, indexOfLastItem);
+
   const handlePageChange = (newPage) => {
-    if (newPage >= 1 && newPage <= Math.ceil(sortedData.length / pageSize)) {
+    if (newPage >= 1 && newPage <= totalPages) {
       setCurrentPage(newPage);
     }
   };
@@ -172,7 +183,7 @@ function ManageStudent() {
         setShowAlert("success");
         setSuccessMessage(response.message);
         setTimeout(() => setShowAlert(false), 3000);
-        handleStudentReload(); // Cập nhật lại danh sách giáo viên
+        handleStudentReload();
       } else {
         setShowAlert("error");
         setErrorMessage(response.message);
@@ -186,6 +197,47 @@ function ManageStudent() {
     }
   };
 
+  //#endregion
+
+  //#region Student Selection
+  const handleSelectAll = (isChecked) => {
+    if (isChecked) {
+      setSelectedStudents(currentData.map((student) => student.userId));
+    } else {
+      setSelectedStudents([]);
+    }
+  };
+
+  const handleSelectStudent = (userId) => {
+    setSelectedStudents(
+      (prevSelected) =>
+        prevSelected.includes(userId)
+          ? prevSelected.filter((id) => id !== userId) // Bỏ chọn nếu đã có
+          : [...prevSelected, userId] // Thêm nếu chưa
+    );
+  };
+
+  const handleChangeStudentStatus = async (userIds, status) => {
+    try {
+      const response = await changeStudentStatus(userIds, status);
+      if (response.isSuccess) {
+        setShowAlert("success");
+        setSuccessMessage(response.message);
+        setTimeout(() => setShowAlert(false), 3000);
+        setSelectedStudents([]);
+        handleStudentReload();
+      } else {
+        setShowAlert("error");
+        setErrorMessage(response.message);
+        setTimeout(() => setShowAlert(false), 3000);
+      }
+    } catch (error) {
+      console.error("Lỗi khi thay đổi trạng thái các sinh viên:", error);
+      setShowAlert("error");
+      setErrorMessage(error.message);
+      setTimeout(() => setShowAlert(false), 3000);
+    }
+  };
   //#endregion
 
   //#region HTML
@@ -232,8 +284,12 @@ function ManageStudent() {
         <div className="flex justify-center">
           <p className="mt-8 text-3xl font-bold">Quản lý sinh viên</p>
         </div>
-
-        <p className="ml-4 mt-5">Tìm kiếm</p>
+        <div className="flex ml-3 mt-2">
+          <p>Tìm kiếm</p>
+          <span className="text-gray-700 md:w-[200px] text-sm  ml-auto mr-[250px]">
+            {selectedFile ? "File đã chọn: " + selectedFile.name : "Chưa chọn file"}
+          </span>
+        </div>
         {/* Filter Section */}
         <div className="flex w-full h-12 flex-wrap md:flex-nowrap">
           <div className="flex w-full md:w-auto md:mb-0">
@@ -242,7 +298,7 @@ function ManageStudent() {
               name="majorId"
               value={filter.majorId}
               onChange={handleFilterChange}
-              className="max-w-sm mx-auto ml-3 h-12 w-full md:w-[230px] border border-black rounded-xl"
+              className="max-w-sm mx-auto ml-3 h-12 w-full md:w-[170px] border border-black rounded-xl"
             >
               <option value="">Chọn chuyên ngành</option>
               {majorData.map((major) => (
@@ -257,7 +313,7 @@ function ManageStudent() {
               name="term"
               value={filter.term}
               onChange={handleFilterChange}
-              className="max-w-sm mx-auto ml-3 h-12 w-full md:w-[168px] border border-black rounded-xl"
+              className="max-w-sm mx-auto ml-3 h-12 w-full md:w-[138px] border border-black rounded-xl"
             >
               <option value="">Kỳ học</option>
               {[...new Set(studentData.map((item) => item.term))].map(
@@ -304,12 +360,10 @@ function ManageStudent() {
               className="max-w-sm mx-auto ml-3 h-12 w-full md:w-[160px] border border-black rounded-xl px-3"
             />
           </div>
+
           {/* Button Container */}
           <div className="flex ml-auto space-x-4 mt-2 md:mt-0 mr-4">
             {/* Import Sinh viên Button */}
-            <span className="text-gray-700 ">
-              {selectedFile ? "File: " + selectedFile.name : "Chưa chọn file"}
-            </span>
             {/* Input ẩn để chọn file */}
             <input
               type="file"
@@ -318,35 +372,57 @@ function ManageStudent() {
               id="fileInput"
               onChange={handleFileChange}
             />
+
+            <button
+              type="button"
+              className="ml-3 border border-white rounded-xl w-full md:w-[120px] bg-blue-600 hover:bg-blue-700 text-white font-semibold"
+              onClick={() => handleExport(filter)} // Sử dụng callback hàm
+            >
+              <i className="fa fa-download mr-2" aria-hidden="true"></i>
+              Export Data Sinh viên
+            </button>
+
+            <button
+              type="button"
+              className="ml-3 border border-white rounded-xl w-full md:w-[150px] bg-blue-600 hover:bg-blue-700 text-white font-semibold"
+              onClick={() => handleExportEmptyForm()} // Sử dụng callback hàm
+            >
+              <i className="fa fa-download mr-2" aria-hidden="true"></i>
+              Export mẫu thêm sinh viên
+            </button>
+            {/* Button Import */}
+
             {/* Button Xác nhận Import */}
             <button
               type="button"
-              className="ml-3 border border-white rounded-xl w-full md:w-[181px] bg-blue-600 hover:bg-blue-700 text-white font-semibold"
+              className="ml-3 border border-white rounded-xl w-full md:w-[112px] bg-blue-600 hover:bg-blue-700 text-white font-semibold"
               onClick={handleImport}
             >
               <i className="fa fa-check mr-2" aria-hidden="true"></i>
               Import
             </button>{" "}
-            {/* Hiển thị tên file đã chọn */}
-            {/* Button Import */}
+
             <button
               type="button"
-              className="border border-white rounded-xl w-full md:w-[181px] bg-secondaryGreen hover:bg-primaryGreen text-white font-semibold"
+              className="border border-white rounded-xl w-full md:w-[150px] bg-secondaryGreen hover:bg-primaryGreen text-white font-semibold"
               onClick={() => document.getElementById("fileInput").click()}
             >
               <i className="fa fa-upload mr-2" aria-hidden="true"></i>
-              Chọn file Excel
+              Chọn file Excel thêm sinh viên
             </button>
+
             {/* Add Student Button */}
+            
             <button
               type="button"
-              className="border border-white rounded-xl w-full md:w-[181px] bg-secondaryGreen hover:bg-primaryGreen text-white font-semibold"
+              className="border border-white rounded-xl w-full md:w-[140px] bg-secondaryGreen hover:bg-primaryGreen text-white font-semibold"
               onClick={toggleShowForm}
             >
               <i className="fa fa-plus mr-2" aria-hidden="true"></i>
               Thêm sinh viên
             </button>
           </div>
+          <div></div>
         </div>
 
         {/*Bảng hiển thị thông tin học sinh*/}
@@ -354,14 +430,24 @@ function ManageStudent() {
           <table className="min-w-full text-left table-auto bg-white">
             <thead className="bg-gray-100">
               <tr>
-                {[                  { key: "stt", label: "STT" },
+                <th className="p-4 font-semibold cursor-pointer transition-all hover:bg-primaryBlue text-white text-center align-middle bg-secondaryBlue">
+                  <input
+                    type="checkbox"
+                    onChange={(e) => handleSelectAll(e.target.checked)}
+                    checked={
+                      selectedStudents.length === currentData.length &&
+                      currentData.length > 0
+                    }
+                  />
+                </th>
+                {[
+                  { key: "stt", label: "STT" },
                   { key: "userId", label: "Mã sinh viên" },
                   { key: "fullName", label: "Họ và Tên" },
                   { key: "majorId", label: "Chuyên ngành" },
                   { key: "gender", label: "Giới tính" },
                   { key: "email", label: "Email" },
                   { key: "phoneNumber", label: "Số điện thoại" },
-                  { key: "term", label: "Kỳ học" },
                   { key: "status", label: "Trạng thái" },
                 ].map((col) => (
                   <th
@@ -397,7 +483,7 @@ function ManageStudent() {
             <tbody>
               {currentData.map((item, index) => {
                 // tăng số thứ tự
-             const stt = indexOfFirstItem + (index + 1);
+                const stt = indexOfFirstItem + (index + 1);
                 // Tìm majorName tương ứng
                 const foundMajor = majorData.find(
                   (m) => m.majorId === item.majorId
@@ -406,10 +492,16 @@ function ManageStudent() {
                   ? foundMajor.majorName
                   : item.majorId;
                 return (
-                  
                   <tr key={index} className="hover:bg-gray-50 even:bg-gray-50">
-                                      <td className="p-4 text-center">{stt}</td>
-
+                    <td className="p-4 text-center">
+                      {" "}
+                      <input
+                        type="checkbox"
+                        checked={selectedStudents.includes(item.userId)}
+                        onChange={() => handleSelectStudent(item.userId)}
+                      />
+                    </td>
+                    <td className="p-4 text-center">{stt}</td>
                     <td className="p-4 text-center align-middle">
                       {item.userId}
                     </td>
@@ -428,7 +520,6 @@ function ManageStudent() {
                     <td className="p-4 text-center align-middle">
                       {item.phoneNumber}
                     </td>{" "}
-                    <td className="p-4 text-center">{item.term}</td>
                     <td className="p-4 text-center">
                       {statusMapping[item.status]}
                     </td>
@@ -453,32 +544,43 @@ function ManageStudent() {
               })}
             </tbody>
           </table>
-          {/* Phân trang - start */}
-          <div className="flex mt-5 mb-8">
-            {/* Button: Previous */}
-            <button
-              type="button"
-              className="rounded-2xl transition-all duration-300 hover:bg-quaternarty hover:scale-95 border border-white w-[130px] h-[40px] bg-[#3c6470] text-white font-semibold ml-auto mr-4 flex items-center justify-center"
-              onClick={() => handlePageChange(currentPage - 1)}
-            >
-              <span className="font-bold text-xl">&lt;</span> Trang Trước
-            </button>
-
-            {/* Date Range */}
-            <div className="border-2 border-black rounded-xl w-[220px] h-[40px] bg-primaryGray flex items-center justify-center">
-              <p>{`Trang ${currentPage}`}</p>
+          <div className="">
+            <h1 className="text-left">
+              Thay đổi trạng thái sinh viên đã được chọn:{" "}
+            </h1>
+            <div className="flex w-full h-10  ">
+              <button
+                type="button"
+                className=" w-full max-w-[120px] h-[40px] sm:h-[40px] mr-2 border rounded-2xl bg-gray-500 text-white font-bold text-lg sm:text-l transition-all hover:scale-105 hover:bg-primaryBlue mt-auto mb-auto"
+                onClick={() => handleChangeStudentStatus(selectedStudents, 0)}
+              >
+                Vô hiệu hóa
+              </button>
+              <button
+                type="button"
+                className="w-full max-w-[140px] h-[40px] sm:h-[40px] mr-2 border rounded-2xl bg-yellow-500 text-white font-bold text-lg sm:text-l transition-all hover:scale-105 hover:bg-yellow-600 mt-auto mb-auto"
+                onClick={() => handleChangeStudentStatus(selectedStudents, 1)}
+              >
+                Đang học tiếp
+              </button>
+              <button
+                type="button"
+                className="w-full max-w-[140px] h-[40px] sm:h-[40px]border rounded-2xl bg-red-500 text-white font-bold text-lg sm:text-l transition-all hover:scale-105 hover:bg-red-600 mt-auto mb-auto"
+                onClick={() => handleChangeStudentStatus(selectedStudents, 3)}
+              >
+                Đã tốt nghiệp
+              </button>
             </div>
-
-            {/* Button: Next */}
-            <button
-              type="button"
-              className="rounded-2xl transition-all duration-300 hover:bg-quaternarty hover:scale-95 border border-white w-[130px] h-[40px] bg-[#3c6470] text-white font-semibold ml-4 mr-auto flex items-center justify-center"
-              onClick={() => handlePageChange(currentPage + 1)}
-            >
-              Trang Sau <span className="font-bold text-xl">&gt;</span>
-            </button>
           </div>
-          {/* Phân trang - end */}
+          {/* Phân trang - Start */}
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            pageSize={pageSize}
+            totalItems={totalItems}
+            onPageChange={handlePageChange}
+          ></Pagination>
+          {/* Phân trang - End */}
           {/* Đường dẫn tới formAddStudent - Start */}
           {showStudentForm && (
             <FormAddStudent onStudentAdded={handleStudentReload} />
