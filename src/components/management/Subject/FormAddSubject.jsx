@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { useEffect, useState } from "react";
 import { AddSubject } from "../../../services/subjectService";
 import { getMajors } from "../../../services/majorService";

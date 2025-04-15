@@ -261,17 +261,17 @@ function FormUpdateRequest({ requestDetail, onClose, onUpdate }) {
                 </div>
               </div>
 
-              <div className="flex justify-center gap-6 mt-10">
+              <div className="flex justify-center gap-6 mt-3">
                 <button
                   type="submit"
-                  className="w-[150px] h-[50px] bg-green-600 text-white rounded-md font-bold"
-                >
+                  className="w-full max-w-[152px] h-[50px] sm:h-[64px] border rounded-3xl bg-secondaryBlue text-white font-bold text-lg sm:text-2xl transition-all hover:scale-105 hover:bg-primaryBlue"
+                  >
                   Cập nhật
                 </button>
                 <button
                   onClick={handleClose}
-                  className="w-[150px] h-[50px] bg-gray-400 text-white rounded-md font-bold"
-                >
+                  className="w-full max-w-[150px] h-[50px] sm:h-[64px] border rounded-3xl bg-red-500 text-white font-bold text-lg sm:text-2xl transition-all hover:scale-105 hover:bg-red-700 "
+                  >
                   Hủy
                 </button>
               </div>

@@ -38,6 +38,8 @@ import RoleProtectedRoute from '../pages/Login/RoleProtectedRoute';
 import NotAuthorized from '../pages/Login/UnAuthorize';
 import TeacherActivityDetail from '../pages/user/Teacher/TeacherActivityDetail';
 import TeacherRequestNotifications from '../pages/user/Teacher/TeacherViewRequest';
+import ScheduleManagement from '../pages/manage/schedule/schedule2';
+
 
 // Danh sách các đường dẫn công khai
 const publicPaths = ["/", "/forgotPassword", "/sentOTP", "/resetPassword"];
@@ -72,7 +74,7 @@ const AppRoutes = () => {
     // Manage Zone - Protected
     { path: "/manageClass", component: ManageClass, layout: ManageLayout, allowedRoles: [2] },
     { path: "/studentInClass/:classSubjectId/:classId/:subjectId", component: StudentInClass, layout: ManageLayout, allowedRoles: [2] },
-    { path: "/manageSchedule", component: ManageSchedule, layout: ManageLayout, allowedRoles: [2] },
+    // { path: "/manageSchedule", component: ManageSchedule, layout: ManageLayout, allowedRoles: [2] },
     { path: "/manageRoom", component: ManageRoom, layout: ManageLayout, allowedRoles: [2] },
     { path: "/manageSemester", component: ManageSemester, layout: ManageLayout, allowedRoles: [2] },
     { path: "/manageTeacher", component: ManageTeacher, layout: ManageLayout, allowedRoles: [2] },
@@ -83,6 +85,8 @@ const AppRoutes = () => {
     { path: "/manageExamSchedule", component: ManageExamSchedule, layout: ManageLayout, allowedRoles: [2] },
     { path: "/studentInExamSchedule/:examScheduleId/:subjectId", component: StudentInExamSchedule, layout: ManageLayout, allowedRoles: [2] },
     { path: "/manageInformation", component: PersonalInformation, layout: ManageLayout, allowedRoles: [2] },
+    { path: "/manageSchedule", component: ScheduleManagement, layout: ManageLayout, allowedRoles: [2] },
+
   ];
 
   return (

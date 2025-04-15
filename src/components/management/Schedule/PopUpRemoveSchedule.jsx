@@ -29,9 +29,9 @@ function PopUpDeleteSchedule({ scheduleId, onDeleted }) {
         setShowAlert("success");
         setTimeout(() => {
           setShowAlert(false);
-          onDeleted(scheduleId);
         }, 2000);
         setIsFormVisible(false);
+        onDeleted(scheduleId);
       } else {
         setErrorMessage(response.message);
         setShowAlert("error");

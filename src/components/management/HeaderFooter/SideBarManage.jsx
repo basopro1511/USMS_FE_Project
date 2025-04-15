@@ -52,7 +52,7 @@ function SidebarManage() {
                   }`}
               >
                 <i className="fas fa-calendar-week mr-2"></i>
-                <span>Quản lý kỳ học</span>
+                <span>Quản lý học kỳ</span>
               </li>
             </Link>
 
@@ -80,7 +80,7 @@ function SidebarManage() {
                 <span>Quản lý lịch học</span>
               </li>
             </Link>
-            <Link to="/manageExamSchedule">
+            {/* <Link to="/manageExamSchedule">
               <li
                 className={`flex items-center cursor-pointer w-56 mb-2 ml-2 rounded-lg p-2 transition-all duration-300 ${isActive("/manageExamSchedule")
                   ? "bg-quaternartyBlue pl-6"
@@ -90,7 +90,7 @@ function SidebarManage() {
                 <i className="fa fa-calendar-day mr-2"></i>
                 <span>Quản lý lịch thi</span>
               </li>
-            </Link>
+            </Link> */}
             <Link to="/manageStudent">
               <li
                 className={`flex items-center cursor-pointer w-56 mb-2 ml-2 rounded-lg p-2 transition-all duration-300 ${isActive("/manageStudent")

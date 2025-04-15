@@ -5,7 +5,7 @@ import request from "../../utils/baseURL";
 export const getSchedule = async () => {
     try {
         const response = await request.get("Schedule");
-        console.log(response.data);
+        return response.data;
     } catch (error) {
         console.log(error);
     }

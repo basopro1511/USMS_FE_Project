@@ -215,10 +215,10 @@ function FormDetailRequest({ requestDetail, onClose }) {
                 />
               </div>
             </div>
-            <div className="flex justify-center gap-8 mt-8 mb-8">
+            <div className="flex justify-center gap-8 mt-4">
               <button
                 type="button"
-                className="w-[150px] h-[50px] bg-[#508696] text-white rounded-md font-bold"
+                className="w-full max-w-[152px] h-[50px] sm:h-[64px] border rounded-3xl bg-secondaryBlue text-white font-bold text-lg sm:text-2xl transition-all hover:scale-105 hover:bg-primaryBlue"
                 onClick={handleClose}
               >
                 Quay lại

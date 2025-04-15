@@ -267,6 +267,7 @@ function FormUpdateTeacher({ teacherToUpdate, onReaload }) {
                       <input
                         type="email"
                         required
+                        readOnly
                         className="w-full h-[40px] border border-gray-300 rounded-md px-3"
                         value={teacherData.email}
                         onChange={(e) =>
@@ -363,7 +364,7 @@ function FormUpdateTeacher({ teacherToUpdate, onReaload }) {
                     type="submit"
                     className="w-[150px] h-[50px] bg-secondaryBlue text-white rounded-md font-bold"
                   >
-                    Lưu
+                    Cập nhật
                   </button>
                   <button
                     type="button"

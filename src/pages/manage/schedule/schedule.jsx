@@ -13,7 +13,6 @@ import FormAddAutoSchedule from "../../../components/management/Schedule/FormAdd
 
 function ManageSchedule() {
   //#region State & Error
-  const [loading, setLoading] = useState(true); // Trạng thái tải dữ liệu
   const [, setSelectedWeek] = useState(1); // Số thứ tự của tuần được chọn
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
@@ -62,6 +61,22 @@ function ManageSchedule() {
     setDataUpdate(data);
     setUpdateForm(!showUpdateForm);
   };
+
+  
+  // Fetch lại danh sách sau khi xóa mà không cần reload
+  const handleDeleteSuccess = (id) => {
+    setScheduleData((prev) =>
+      prev.filter((item) => item.scheduleId !== id)
+    );
+    setShowDeletePopup(false);
+  };
+
+  // Khi bấm nút xóa, mở popup xác nhận
+  const handleDeleteSchedule = (id) => {
+    setDeleteId(id);
+    setShowDeletePopup(true);
+  };
+
   //#endregion
 
   //#region Fetch Data từ API
@@ -77,7 +92,6 @@ function ManageSchedule() {
       filterData.endDay
     ) {
       // Đặt loading về true và reset error mỗi khi fetch dữ liệu mới
-      setLoading(true);
       const fetchScheduleData = async () => {
         try {
           const scheduleRes = await getScheduleForStaff(
@@ -101,8 +115,6 @@ function ManageSchedule() {
         } catch (err) {
           console.error("Error fetching schedules:", err);
           setScheduleData([]);
-        } finally {
-          setLoading(false);
         }
       };
       fetchScheduleData();
@@ -187,20 +199,6 @@ function ManageSchedule() {
     fetchClassIds();
   }, [filterData.majorId]);
 
-  // Fetch lại danh sách sau khi xóa mà không cần reload
-  const handleDeleteSuccess = (id) => {
-    setScheduleData((prev) =>
-      prev.filter((item) => item.scheduleId !== id)
-    );
-    setShowDeletePopup(false);
-  };
-
-  // Khi bấm nút xóa, mở popup xác nhận
-  const handleDeleteSchedule = (id) => {
-    setDeleteId(id);
-    setShowDeletePopup(true);
-  };
-
   //#endregion
 
   //#region Xử lý Filter Input
@@ -210,7 +208,6 @@ function ManageSchedule() {
     // Nếu thay đổi majorId (hoặc có thể các trường quan trọng khác), reset dữ liệu lịch và lỗi
     if (name === "majorId") {
       setScheduleData([]);
-      setLoading(true);
     }
     setFilterData({
       ...filterData,
@@ -491,27 +488,6 @@ function ManageSchedule() {
 
   // Render các dòng (dựa theo slot, giả sử có 5 slot)
   const renderTableRows = () => {
-    if (loading) {
-      return (
-        <tr>
-          <td colSpan="8" className="text-center">
-            Đang tải dữ liệu...
-          </td>
-        </tr>
-      );
-    }
-
-    // Nếu không có lịch (data rỗng)
-    if (!scheduleData || scheduleData.length === 0) {
-      return (
-        <tr>
-          <td colSpan="8" className="text-center">
-            Không có dữ liệu lịch
-          </td>
-        </tr>
-      );
-    }
-
     const slots = [1, 2, 3, 4, 5];
     return slots.map((slotId) => {
       let extraClass = slotId === 5 ? " rounded-b-xl" : "";

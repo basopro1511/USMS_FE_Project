@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
-import { getClassesIdByClassId } from "../../../services/classService";
+import { getClassesIdByClassId, getClassesIdByMajorId } from "../../../services/classService";
 import { GetAvailableRoom } from "../../../services/roomService";
 import {
   AddSchedule,
   getAvailableTeachersForAddSchedule,
 } from "../../../services/scheduleService";
+import { getMajors } from "../../../services/majorService";
 
 // eslint-disable-next-line react/prop-types
-function FormAddSchedule({ selectedClassId, selectedMajorId, onAdded }) {
+function FormAddSchedule({ onAdded }) {
   //#region State & Error
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
@@ -15,6 +16,7 @@ function FormAddSchedule({ selectedClassId, selectedMajorId, onAdded }) {
   const [isFormVisible, setIsFormVisible] = useState(true); // State to control form visibility
 
   // Dữ liệu cho form
+  const [classSubjectIds, setClassSubjectIds] = useState([]); // dropdown Lớp-Môn
   const [classSubjects, setClassSubjects] = useState([]); // dropdown Lớp-Môn
   const [rooms, setRooms] = useState([]); // dropdown phòng (nếu fetch)
   const [teachers, setTeachers] = useState([]);
@@ -27,6 +29,8 @@ function FormAddSchedule({ selectedClassId, selectedMajorId, onAdded }) {
     slotNoInSubject: 0,
     teacherId: "",
   });
+  const [majorIdSelected, setSelectedMajorId] = useState("");
+  const [classSubjectIdSelected, setClassSubjectIdSelected] = useState("");
 
   //#endregion
 
@@ -34,6 +38,39 @@ function FormAddSchedule({ selectedClassId, selectedMajorId, onAdded }) {
   const handleCancel = () => {
     setIsFormVisible(false); // Hide form when cancel is clicked
   };
+  // Fetch Data Major - Start
+  const [majorData, setMajorData] = useState([]);
+  useEffect(() => {
+    const fetchMajorData = async () => {
+      const majorData = await getMajors(); //Lấy ra list room rtong database
+      setMajorData(majorData.result);
+    };
+    fetchMajorData();
+  }, []);
+  //Fetch Data Major - End
+
+  //#region  lấy danh sách lớp học bởi chuyên ngành
+  useEffect(() => {
+    if (majorIdSelected) {
+      const fetchClassSubjectIds = async () => {
+        const classSubjects = await getClassesIdByMajorId(majorIdSelected);
+        setClassSubjectIds(classSubjects.result);
+      };
+      fetchClassSubjectIds();
+    }
+  }, [majorIdSelected]);
+  //#endregion
+
+  //#region  lấy danh sách lớp
+  useEffect(() => {
+    if (classSubjectIdSelected) {
+    const fetchClassSubject = async () => {
+      const classSubjects = await getClassesIdByClassId(classSubjectIdSelected); //Lấy ra list  trong database
+      setClassSubjects(classSubjects.result);
+    };
+    fetchClassSubject();}
+  }, [classSubjectIdSelected]);
+  //#endregion
 
   //#region  lấy danh sách giáo viên
   useEffect(() => {
@@ -41,7 +78,7 @@ function FormAddSchedule({ selectedClassId, selectedMajorId, onAdded }) {
       const fetchAvailableTeachers = async () => {
         try {
           const teachers = await getAvailableTeachersForAddSchedule(
-            selectedMajorId,
+            majorIdSelected,
             newSchedule.date,
             newSchedule.slotId
           );
@@ -55,16 +92,6 @@ function FormAddSchedule({ selectedClassId, selectedMajorId, onAdded }) {
   }, [newSchedule.date, newSchedule.slotId]);
   //#endregion
 
-  //#region  lấy danh sách lớp
-  useEffect(() => {
-    const fetchClassSubject = async () => {
-      const classSubjects = await getClassesIdByClassId(selectedClassId); //Lấy ra list  trong database
-      setClassSubjects(classSubjects.result);
-    };
-    fetchClassSubject();
-  }, []);
-  //#endregion
-
   //#region lấy danh sách phòng khả dụng
   useEffect(() => {
     if (newSchedule.date && newSchedule.slotId) {
@@ -73,9 +100,8 @@ function FormAddSchedule({ selectedClassId, selectedMajorId, onAdded }) {
           const rooms = await GetAvailableRoom(
             newSchedule.date,
             newSchedule.slotId
-          ); const available = rooms.result.filter(
-            (item) => item.status === 1
           );
+          const available = rooms.result.filter((item) => item.status === 1);
           setRooms(available);
         } catch (error) {
           console.error("Error fetching subjects:", error);
@@ -189,6 +215,38 @@ function FormAddSchedule({ selectedClassId, selectedMajorId, onAdded }) {
                     Mã lớp - Môn học:
                   </p>
                   <select
+                    name="majorId"
+                    onChange={(e) => setSelectedMajorId(e.target.value)}
+                    required
+                    className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl px-4"
+                  >
+                    <option value="" disabled selected>
+                      Chọn chuyên ngành
+                    </option>
+                    {majorData.map((major) => (
+                      <option key={major.majorId} value={major.majorId}>
+                        {major.majorName}
+                      </option>
+                    ))}
+                  </select>
+
+                  <p className="text-left ml-[100px] text-xl mt-5">Mã lớp :</p>
+                  <select
+                    placeholder="Mã kỳ học"
+                    className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl mb-3 px-4"
+                    name=""
+                    onChange={(e) => setClassSubjectIdSelected(e.target.value)}
+                  >
+                    <option value="">-- Chọn Lớp  --</option>
+                    {classSubjectIds.map((cs) => (
+                      <option key={cs} value={cs}>
+                        {cs}
+                      </option>
+                    ))}
+                  </select>
+
+                  <p className="text-left ml-[100px] text-xl ">Môn học :</p>
+                  <select
                     type="text"
                     required
                     placeholder="Mã kỳ học"
@@ -200,7 +258,7 @@ function FormAddSchedule({ selectedClassId, selectedMajorId, onAdded }) {
                     <option value="">-- Chọn Lớp-Môn --</option>
                     {classSubjects.map((cs) => (
                       <option key={cs.classSubjectId} value={cs.classSubjectId}>
-                        {cs.classId} - {cs.subjectId}
+                        {cs.classId}_{cs.subjectId}_{cs.semesterId}
                       </option>
                     ))}
                   </select>

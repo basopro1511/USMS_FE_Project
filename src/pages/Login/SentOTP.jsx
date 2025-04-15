@@ -135,10 +135,11 @@ function SentOTP() {
           </form>
           {/* Resend Email */}
           <div className="text-center">
+          
             <p className="text-gray-600 text-sm md:text-base">
               Bạn vẫn chưa nhận được email?{" "}
               <a
-                href="#"
+                href="/forgotPassword"
                 className="text-blue-600 font-semibold hover:underline"
               >
                 Gửi lại email
