@@ -2,7 +2,6 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Login from "../pages/Login/Login";
 import ManageLayout from '../layouts/LayoutManagement';
 import LayoutDefault from '../layouts/LayoutDefault';
-import ManageSchedule from '../pages/manage/schedule/schedule';
 import ManageClass from '../pages/manage/class/class';
 import LayoutUser from '../layouts/LayoutUser';
 import StudentSchedule from '../pages/user/Student/StudentSchedule';
@@ -38,7 +37,7 @@ import RoleProtectedRoute from '../pages/Login/RoleProtectedRoute';
 import NotAuthorized from '../pages/Login/UnAuthorize';
 import TeacherActivityDetail from '../pages/user/Teacher/TeacherActivityDetail';
 import TeacherRequestNotifications from '../pages/user/Teacher/TeacherViewRequest';
-import ScheduleManagement from '../pages/manage/schedule/schedule2';
+import ScheduleManagement from '../pages/manage/schedule/scheduleManage';
 
 
 // Danh sách các đường dẫn công khai
