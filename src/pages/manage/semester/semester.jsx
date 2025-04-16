@@ -350,7 +350,7 @@ function ManageSemester() {
               onClick={() => document.getElementById("fileInput").click()}
             >
               <i className="fa fa-upload mr-2" aria-hidden="true"></i>
-              Chọn file Excel thêm môn học
+              Chọn file Excel thêm học kỳ
             </button>
           </div>
           {/* Button Import Zone */}

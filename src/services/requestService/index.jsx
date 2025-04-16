@@ -26,3 +26,14 @@ export const UpdateRequest = async (data) => {
         console.log(error);
     }
 }
+// Change the status of a Request for Teacher
+export const changeRequestStatus = async (id, status) => {
+    try {
+        // Construct the URL with id and status
+        const response = await request.get(`/Request/ChangeStatus/${id}/${status}`);
+        console.log(response.data);
+        return response.data;
+    } catch (error) {
+        console.log(error);
+    }
+}

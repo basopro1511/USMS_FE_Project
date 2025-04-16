@@ -2,7 +2,7 @@ import { useState } from "react";
 import { DeleteSchedule } from "../../../services/scheduleService";
 
 // eslint-disable-next-line react/prop-types
-function PopUpDeleteSchedule({ scheduleId, onDeleted }) {
+function PopUpDeleteSchedule({ scheduleId, onDeleted, onCancel}) {
   //#region State & Error
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
@@ -14,6 +14,7 @@ function PopUpDeleteSchedule({ scheduleId, onDeleted }) {
   //  Xử lý khi nhấn "Hủy"
   const handleCancel = () => {
     setIsFormVisible(false);
+    onCancel();
   };
 
   //  Xử lý khi nhấn "Xóa"

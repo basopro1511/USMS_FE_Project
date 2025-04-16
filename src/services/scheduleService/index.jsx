@@ -72,6 +72,18 @@ export const getScheduleForStaff = async (majorId, classId, term, startDay, endD
 };
 //#endregion
 
+//#region Get Schedule for Staff
+// Get all Semesters in Database
+export const getScheduleForStaffByDay = async (majorId, classId, term, day) => {
+    try {
+        const response = await request.get(`/Schedule/${majorId}/${classId}/${term}/${day}`);
+        return response.data;
+    } catch (error) {
+        console.log(error);
+    }
+};
+//#endregion
+
 //#region Get Schedule for Student
 // Get all Schedule for student in Database
 export const getScheduleForStudent = async (studentId, startDay, endDay) => {

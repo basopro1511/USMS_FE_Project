@@ -32,8 +32,8 @@ function TeacherRequestNotifications() {
     const minutes = String(date.getMinutes()).padStart(2, "0");
     return `${day}/${month}/${year} ${hours}:${minutes}`;
   };
-//#endregion
-//#region fetch api
+  //#endregion
+  //#region fetch api
   // Lấy dữ liệu request từ API
   useEffect(() => {
     const fetchRequests = async () => {
@@ -52,8 +52,13 @@ function TeacherRequestNotifications() {
     };
     fetchRequests();
   }, [teacherId]);
-//#endregion
-//#region fitler data
+
+  const handleReload = async () => {
+    const data = await getRequests();
+    setRequestData(data.result);
+  };
+  //#endregion
+  //#region fitler data
   // Lọc theo trạng thái nếu có bộ lọc
   useEffect(() => {
     let data = [...requestData];
@@ -94,9 +99,9 @@ function TeacherRequestNotifications() {
       sortConfig.key === key && sortConfig.direction === "asc" ? "desc" : "asc";
     setSortConfig({ key, direction });
   };
-//#endregion
+  //#endregion
 
-    //#region Hide & Show Form
+  //#region Hide & Show Form
   // State requestDetail để lưu request được chọn để xem chi tiết
   const [selectedRequest, setSelectedRequest] = useState(null);
   // State hiển thị form chi tiết
@@ -115,7 +120,6 @@ function TeacherRequestNotifications() {
   return (
     <div className="p-8 bg-white rounded-xl mx-auto max-w-[1600px] ">
       <h1 className="text-3xl font-bold text-center mb-6">Yêu cầu của tôi</h1>
-
       {/* Bộ lọc */}
       <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-4">
         <div>
@@ -128,10 +132,10 @@ function TeacherRequestNotifications() {
             <option value="">Tất cả</option>
             <option value="0">Chưa xử lý</option>
             <option value="1">Đã xử lý</option>
+            <option value="2">Đã hủy</option>
           </select>
         </div>
       </div>
-
       {/* Bảng dữ liệu */}
       <div className="overflow-x-auto">
         <table className="min-w-full border-collapse">
@@ -163,33 +167,34 @@ function TeacherRequestNotifications() {
             {currentData.length > 0 ? (
               currentData.map((item, index) => {
                 const stt = indexOfFirstItem + (index + 1);
-return(
-                <tr key={index} className="hover:bg-gray-50">
-                  <td className="py-2 px-4 border text-center">
-                    {stt}
-                  </td>
-                  <td className="py-2 px-4 border text-center">
-                    {item.requestType === 2
-                      ? "Đổi thời gian dạy"
-                      : item.requestType === 1
-                      ? "Đổi người dạy thay thế"
-                      : ""}
-                  </td>
-                  <td className="py-2 px-4 border text-center">
-                    {" "}
-                    {formatDateTime(item.requestDate)}
-                  </td>
-                  <td className="py-2 px-4 border text-center">
-                    {item.status === 0 ? "Chưa xử lý" : "Đã xử lý"}
-                  </td>
-                  <td className="py-2 px-4 border text-center">
-                    <button className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 mr-2 hover:scale-95 transition-all duration-300"
-                     onClick={() => handleDetailClick(item)}>
-                      Xem chi tiết
-                    </button>
-                  </td>
-                </tr>
-              )})
+                return (
+                  <tr key={index} className="hover:bg-gray-50">
+                    <td className="py-2 px-4 border text-center">{stt}</td>
+                    <td className="py-2 px-4 border text-center">
+                      {item.requestType === 2
+                        ? "Đổi thời gian dạy"
+                        : item.requestType === 1
+                        ? "Đổi người dạy thay thế"
+                        : ""}
+                    </td>
+                    <td className="py-2 px-4 border text-center">
+                      {" "}
+                      {formatDateTime(item.requestDate)}
+                    </td>
+                    <td className="py-2 px-4 border text-center">
+                      {item.status === 0 ? "Chưa xử lý" : item.status === 1 ? "Đã xử lý" : "Đã hủy" }
+                    </td>
+                    <td className="py-2 px-4 border text-center">
+                      <button
+                        className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 mr-2 hover:scale-95 transition-all duration-300"
+                        onClick={() => handleDetailClick(item)}
+                      >
+                        Xem chi tiết
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })
             ) : (
               <tr>
                 <td colSpan="5" className="py-4 text-center">
@@ -231,10 +236,10 @@ return(
         <TeacherViewRequestDetail
           requestDetail={selectedRequest}
           onClose={toggleShowDetailForm}
+          onReload={handleReload}
         />
       )}{" "}
     </div>
-    
   );
 }
 

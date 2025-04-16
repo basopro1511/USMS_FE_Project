@@ -15,6 +15,7 @@ import FormAddSchedule from "../../../components/management/Schedule/FormAddSche
 import FormUpdateSchedule from "../../../components/management/Schedule/FormUpdateSchedule";
 import PopUpDeleteSchedule from "../../../components/management/Schedule/PopUpRemoveSchedule";
 import FormAddAutoSchedule from "../../../components/management/Schedule/FormAddAutoSchedule";
+import FormAddScheduleFillByWeek from "../../../components/management/Schedule/FormAddScheduleFillByWeek";
 
 function ManageScheduleByWeek() {
   //#region State & Error
@@ -66,6 +67,13 @@ function ManageScheduleByWeek() {
   const handleDeleteSchedule = (id) => {
     setDeleteId(id);
     setShowDeletePopup(true);
+  };
+
+  const [showAddFormFill, setAddFormFill] = useState(false);
+  const [preFillData, setPreFillData] = useState(null);
+  const openAddScheduleFormByWeekWithPrefill = (date, roomId) => {
+    setPreFillData({ date, roomId });
+    setAddFormFill((prev) => !prev);
   };
   //#endregion
 
@@ -643,9 +651,22 @@ function ManageScheduleByWeek() {
                               );
                             })
                           ) : (
-                            <span className="text-green-500 font-bold">
-                              Trống
-                            </span>
+                            <div className="relative group">
+                              <span className="text-green-500 font-bold group-hover:hidden">
+                                Trống
+                              </span>
+                              <button
+                                className="hidden group-hover:block absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[60px] h-[40px] bg-blue-500 hover:bg-blue-600 text-white text-xs rounded flex items-center justify-center"
+                                onClick={() =>
+                                  openAddScheduleFormByWeekWithPrefill(
+                                    cellDate,
+                                    room.roomId,
+                                  )
+                                }
+                              >
+                                Thêm lịch
+                              </button>
+                            </div>
                           )}
                         </td>
                       );
@@ -659,6 +680,9 @@ function ManageScheduleByWeek() {
       {/* end Bảng thời khóa biểu */}
 
       {/* Ẩn & Hiện form */}
+      {showAddFormFill && (
+        <FormAddScheduleFillByWeek onAdded={handleReload} initialData={preFillData} />
+      )}
       {showAddForm && (
         <FormAddSchedule
           selectedClassId={selectedClassId}

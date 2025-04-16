@@ -1,7 +1,11 @@
 import { useState, useEffect } from "react";
 import { getMajors } from "../../../services/majorService";
 import { getSlots } from "../../../services/slotService";
-import { getSchedule } from "../../../services/scheduleService";
+import {
+  getSchedule,
+  getScheduleForStaff,
+  getScheduleForStaffByDay,
+} from "../../../services/scheduleService";
 import {
   getClassesIdByMajorId,
   GetClassSubjectById,
@@ -17,6 +21,9 @@ function ManageScheduleByDay() {
   //#region State & Error
   // Sử dụng filter theo ngày
   const [filterData, setFilterData] = useState({
+    majorId: "",
+    classId: "",
+    term: 0,
     date: new Date().toISOString().split("T")[0], // "yyyy-mm-dd"
   });
 
@@ -55,28 +62,67 @@ function ManageScheduleByDay() {
     setUpdateForm((prev) => !prev);
   };
 
- 
   //#endregion
 
   //#region Fetch Data từ API
-  // Lấy dữ liệu lịch học
   useEffect(() => {
     const fetchScheduleData = async () => {
       try {
-        const majorRes = await getSchedule();
-        setScheduleData(majorRes.result || []);
+        let scheduleRes;
+        if (
+          filterData.majorId &&
+          filterData.classId &&
+          filterData.term &&
+          filterData.date
+        ) {
+          // Khi đã có đủ filter, gọi API lấy lịch theo bộ lọc
+          scheduleRes = await getScheduleForStaffByDay(
+            filterData.majorId,
+            filterData.classId,
+            filterData.term,
+            filterData.date
+          );
+        } else {
+          // Nếu thiếu filter, gọi API lấy tất cả lịch
+          scheduleRes = await getSchedule();
+        }
+        setScheduleData(scheduleRes.result || []);
+        console.log("Lịch được fetch:", scheduleRes.result);
       } catch (err) {
-        console.error("Error fetching majors:", err);
+        console.error("Error fetching schedules:", err);
         setScheduleData([]);
       }
     };
     fetchScheduleData();
-  }, []);
-
+  }, [
+    filterData.majorId,
+    filterData.classId,
+    filterData.term,
+    filterData.date,
+  ]);
   // Hàm reload lại lịch học sau khi thêm/sửa/xóa
   const handleReload = async () => {
-    const data = await getSchedule();
-    setScheduleData(data.result || []);
+    try {
+      let scheduleRes;
+      if (
+        filterData.majorId &&
+        filterData.classId &&
+        filterData.term &&
+        filterData.date
+      ) {
+        scheduleRes = await getScheduleForStaff(
+          filterData.majorId,
+          filterData.classId,
+          filterData.term,
+          filterData.date
+        );
+      } else {
+        scheduleRes = await getSchedule();
+      }
+      setScheduleData(scheduleRes.result || []);
+    } catch (err) {
+      console.error("Error reloading schedule data:", err);
+    }
   };
 
   // Lấy dữ liệu chuyên ngành
@@ -234,16 +280,14 @@ function ManageScheduleByDay() {
   };
 
   // Khi chọn lớp từ dropdown
-  // const handleClassChange = (e) => {
-  //   setSelectedClassId(e.target.value);
-  //   setFilterData((prev) => ({ ...prev, classId: e.target.value }));
-  // };
+  const handleClassChange = (e) => {
+    setFilterData((prev) => ({ ...prev, classId: e.target.value }));
+  };
 
-  // // Khi chọn chuyên ngành từ dropdown
-  // const handleMajorChange = (e) => {
-  //   setSelectedMajorId(e.target.value);
-  //   setFilterData((prev) => ({ ...prev, majorId: e.target.value }));
-  // };
+  // Khi chọn chuyên ngành từ dropdown
+  const handleMajorChange = (e) => {
+    setFilterData((prev) => ({ ...prev, majorId: e.target.value }));
+  };
 
   // Điều hướng đến "Ngày trước"
   const handlePreviousDay = () => {
@@ -426,10 +470,12 @@ function ManageScheduleByDay() {
   //#region Render Giao Diện (UI)
   return (
     <>
-     
       {/* Main Container */}
       {/* --- Filter --- */}
-      <p className="ml-2">Sắp lịch học theo ngày:</p>
+      <div className="flex">
+        <p className="ml-3  ">Sắp lịch học theo tuần:</p>
+        <p className="ml-24">Filter:</p>
+      </div>{" "}
       <div className="flex w-auto h-12 ">
         <div className="flex">
           {/* Input chọn ngày */}
@@ -441,27 +487,65 @@ function ManageScheduleByDay() {
             className="max-w-sm mx-auto ml-3 h-12 w-[230px] border border-black rounded-xl"
             required
           />
-          {/* --- Điều hướng theo ngày --- */}
-          <div className="flex mt-1 ml-4">
-            <button
-              onClick={handlePreviousDay}
-              type="button"
-              className="rounded-2xl transition-all duration-300 hover:bg-quaternarty hover:scale-95 border border-white w-[130px] h-[40px] bg-[#3c6470] text-white font-semibold ml-auto mr-4 flex items-center justify-center"
-            >
-              Ngày trước
-            </button>
-            <div className="border-2 border-black rounded-xl w-[220px] h-[40px] bg-primaryGray flex items-center justify-center">
-              {formatDateTime(filterData.date)}
-            </div>
-            <button
-              onClick={handleNextDay}
-              type="button"
-              className="rounded-2xl transition-all duration-300 hover:bg-quaternarty hover:scale-95 border border-white w-[130px] h-[40px] bg-[#3c6470] text-white font-semibold ml-4 mr-auto flex items-center justify-center"
-            >
-              Ngày sau 
-            </button>
-          </div>
-          {/* --- End Điều hướng --- */}
+
+          {/* Select chuyên ngành */}
+          <select
+            className="max-w-sm mx-auto ml-6 h-12 w-[230px] border border-black rounded-xl"
+            name="majorId"
+            value={filterData.majorId}
+            onChange={(e) => {
+              handleInputChange(e);
+              handleMajorChange(e);
+            }}
+          >
+            <option value="">Chọn chuyên ngành</option>
+            {majorData.map((major) => (
+              <option key={major.majorId} value={major.majorId}>
+                {major.majorName}
+              </option>
+            ))}
+          </select>
+
+          {/* Select lớp */}
+          <select
+            className="max-w-sm mx-auto ml-3 h-12 w-[168px] border border-black rounded-xl"
+            name="classId"
+            value={filterData.classId}
+            onChange={(e) => {
+              handleInputChange(e);
+              handleClassChange(e);
+            }}
+          >
+            <option value="" selected>
+              Lớp
+            </option>
+            {classIdsData.map((classId) => (
+              <option key={classId} value={classId}>
+                {classId}
+              </option>
+            ))}
+          </select>
+
+          {/* Select kì học */}
+          <select
+            className="max-w-sm mx-auto ml-3 h-12 w-[168px] border border-black rounded-xl"
+            name="term"
+            value={filterData.term}
+            onChange={handleInputChange}
+          >
+            <option value="" selected>
+              Kì học
+            </option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+            <option value="8">8</option>
+            <option value="9">9</option>
+          </select>
         </div>
         <div className="flex rounded-full transition-all duration-300 hover:scale-95 ml-auto mr-2">
           <button
@@ -485,15 +569,37 @@ function ManageScheduleByDay() {
         </div>
       </div>
       {/* --- End Filter --- */}
-
       {/* --- Bảng thời khóa biểu - Manager View --- */}
       <div className="ml-3 mr-3 mt-5 h-auto">
-        <h2 className="text-2xl font-bold mb-4">
-          Lịch học theo ngày{" "}
-          <span className="text-red-600 text-3xl">
-            {formatDateTime(filterData.date)}{" "}
-          </span>
-        </h2>
+        <div className="flex">
+          <h2 className="text-2xl font-bold mb-4">
+            Lịch học trong ngày{" "}
+            {/* <span className="text-red-600 text-3xl">
+              {formatDateTime(filterData.date)}{" "}
+            </span> */}
+          </h2>{" "}
+          {/* --- Điều hướng theo ngày --- */}
+          <div className="flex ml-4">
+            <button
+              onClick={handlePreviousDay}
+              type="button"
+              className="rounded-2xl transition-all duration-300 hover:bg-quaternarty hover:scale-95 border border-white w-[130px] h-[40px] bg-[#3c6470] text-white font-semibold ml-auto mr-4 flex items-center justify-center"
+            >
+              Ngày trước
+            </button>
+            <div className="border-2 border-black rounded-xl w-[220px] h-[40px] bg-primaryGray flex items-center justify-center">
+              {formatDateTime(filterData.date)}
+            </div>
+            <button
+              onClick={handleNextDay}
+              type="button"
+              className="rounded-2xl transition-all duration-300 hover:bg-quaternarty hover:scale-95 border border-white w-[130px] h-[40px] bg-[#3c6470] text-white font-semibold ml-4 mr-auto flex items-center justify-center"
+            >
+              Ngày sau
+            </button>
+          </div>
+          {/* --- End Điều hướng --- */}{" "}
+        </div>
         {renderManagerTable()}
       </div>
       {/* --- End Bảng thời khóa biểu - Manager View --- */}
@@ -501,17 +607,8 @@ function ManageScheduleByDay() {
       {showAddFormFill && (
         <FormAddScheduleFill onAdded={handleReload} initialData={preFillData} />
       )}
-
-      {showAddForm && (
-        <FormAddSchedule
-          onAdded={handleReload}
-        />
-      )}
-      {showAddAutoForm && (
-        <FormAddAutoSchedule
-          onAdded={handleReload}
-        />
-      )}
+      {showAddForm && <FormAddSchedule onAdded={handleReload} />}
+      {showAddAutoForm && <FormAddAutoSchedule onAdded={handleReload} />}
       {showUpdateForm && (
         <FormUpdateSchedule
           dataToUpdate={dataToUpdate}

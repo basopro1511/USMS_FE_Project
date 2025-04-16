@@ -1,7 +1,11 @@
 /* eslint-disable react/prop-types */
 import { useState, useEffect } from "react";
+import { changeRequestStatus } from "../../../services/requestService";
 
-function TeacherViewRequestDetail({ requestDetail, onClose }) {
+function TeacherViewRequestDetail({ requestDetail, onClose , onReload}) {
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+  const [showAlert, setShowAlert] = useState(false); // Alert for success or failure notification
   const [requestData, setRequestData] = useState({
     requestId: 0,
     userId: "",
@@ -73,10 +77,66 @@ function TeacherViewRequestDetail({ requestDetail, onClose }) {
     return "";
   };
 
+  const handleChangeSelectedStatus = async (requestId, status) => {
+    try {
+      const response = await changeRequestStatus(requestId, status);
+      if (response.isSuccess) {
+        setShowAlert("success");
+        setSuccessMessage(response.message);
+        setTimeout(() => setShowAlert(false), 3000);
+        onReload();
+      } else {
+        setShowAlert("error");
+        setErrorMessage(response.message);
+        setTimeout(() => setShowAlert(false), 3000);
+      }
+    } catch (error) {
+      console.error("Lỗi khi thay đổi trạng thái các sinh viên:", error);
+      setShowAlert("error");
+      setErrorMessage(error.message);
+      setTimeout(() => setShowAlert(false), 3000);
+    }
+  };
+
   // Hàm chuyển đổi trạng thái thành text
   const formatStatus = (status) => (status === 0 ? "Chưa xử lý" : "Đã xử lý");
   return (
     <>
+     {/* Notification Start */}
+     {showAlert && (
+        <div
+          className={`fixed top-5 right-0 z-50 ${
+            showAlert === "error"
+              ? "animate-slide-in text-red-800 bg-red-50 border-red-300 mr-4"
+              : "animate-slide-in text-green-800 bg-green-50 border-green-300 mr-4"
+          } border rounded-lg p-4`}
+        >
+          <div className="flex items-center">
+            <svg
+              className="flex-shrink-0 inline w-4 h-4 me-3"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 1 1 1 1v4h1a1 1 0 0 1 0 2Z" />
+            </svg>
+            <span className="sr-only">Info</span>
+            <div>
+              {showAlert === "error" ? (
+                <span>
+                  <strong>Thất bại:</strong> {errorMessage}
+                </span>
+              ) : (
+                <span>
+                  <strong>Thành công:</strong> {successMessage}
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Notification End */}
       {requestDetail && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 ">
           <div className="bg-white border w-full max-w-[900px] rounded-2xl items-center text-center shadow-xl p-8  scale-90">
@@ -216,13 +276,21 @@ function TeacherViewRequestDetail({ requestDetail, onClose }) {
               </div>
             </div>
             <div className="flex justify-center gap-8 mt-8 mb-8">
+            <button
+                type="button"
+                className="w-full max-w-[150px] h-[50px] sm:h-[40px]border rounded-2xl bg-red-500 text-white font-bold text-lg sm:text-l transition-all hover:scale-105 hover:bg-red-600 mt-auto mb-auto"
+                onClick={() => handleChangeSelectedStatus(requestData.requestId, 2)}
+              >
+                Hủy đơn yêu cầu
+              </button>
               <button
                 type="button"
-                className="w-[150px] h-[50px] bg-green-700 text-white rounded-md font-bold"
+                className="w-full max-w-[150px] h-[50px] sm:h-[40px]border rounded-2xl bg-green-700 text-white  font-bold text-lg sm:text-l transition-all hover:scale-105 hover:bg-green-700 mt-auto mb-auto"
                 onClick={handleClose}
               >
                 Quay lại
               </button>
+              
             </div>
           </div>
         </div>

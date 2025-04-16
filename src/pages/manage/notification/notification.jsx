@@ -12,6 +12,13 @@ function Notifications() {
     key: "requestId",
     direction: "asc",
   });
+  
+  // Các state để lọc dữ liệu
+  const [filterCreator, setFilterCreator] = useState("");  // Tìm kiếm theo người tạo
+  const [filterType, setFilterType] = useState("");          // Lọc theo loại yêu cầu
+  const [filterStatus, setFilterStatus] = useState("");      // Lọc theo trạng thái
+  
+  const [filteredData, setFilteredData] = useState([]);
 
   //#region Fetch Data
   useEffect(() => {
@@ -23,13 +30,35 @@ function Notifications() {
   }, []); // Chạy chỉ 1 lần khi component mount
   //#endregion
 
-  //#region Sort
+  //#region Filter & Sort
+  // Xử lý lọc (Search và filter theo các tiêu chí) mỗi khi requestData hoặc bộ filter thay đổi
+  useEffect(() => {
+    let data = [...requestData];
+    // Lọc theo người tạo (ví dụ theo userId; bạn có thể thay đổi nếu có thuộc tính creatorName)
+    if (filterCreator !== "") {
+      data = data.filter(item =>
+        item.userId.toLowerCase().includes(filterCreator.toLowerCase())
+      );
+    }
+    // Lọc theo loại yêu cầu (giả sử requestType được lưu là số, chuyển về string để so sánh)
+    if (filterType !== "") {
+      data = data.filter(item => String(item.requestType) === filterType);
+    }
+    // Lọc theo trạng thái
+    if (filterStatus !== "") {
+      data = data.filter(item => String(item.status) === filterStatus);
+    }
+    setFilteredData(data);
+    setCurrentPage(1); // Reset trang khi thay đổi filter
+  }, [requestData, filterCreator, filterType, filterStatus]);
+
   const handleSort = (key) => {
     const direction =
       sortConfig.key === key && sortConfig.direction === "asc" ? "desc" : "asc";
     setSortConfig({ key, direction });
   };
-  const sortedData = [...requestData].sort((a, b) => {
+  
+  const sortedData = [...filteredData].sort((a, b) => {
     if (a[sortConfig.key] < b[sortConfig.key]) {
       return sortConfig.direction === "asc" ? -1 : 1;
     }
@@ -69,11 +98,13 @@ function Notifications() {
     setShowDetailForm(false);
     setSelectedRequest(null);
   };
+  
   const [showUpdateForm, setShowUpdateForm] = useState(false);
   const toggleUpdateForm = () => {
     setShowUpdateForm(false);
     setSelectedRequest(null);
   };
+
   //#region Update Detail Modal
   const handleUpdateClick = (item) => {
     setSelectedRequest(item);
@@ -91,7 +122,6 @@ function Notifications() {
     toggleUpdateForm();
   };
   //#endregion
-
   //#endregion
 
   //#region Format Date
@@ -99,7 +129,6 @@ function Notifications() {
   const formatDateTime = (dateString) => {
     if (!dateString) return "";
     const date = new Date(dateString);
-    // Nếu đối tượng Date không hợp lệ, trả về chuỗi rỗng
     if (isNaN(date.getTime())) return "";
     const day = String(date.getDate()).padStart(2, "0");
     const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -108,74 +137,63 @@ function Notifications() {
     const minutes = String(date.getMinutes()).padStart(2, "0");
     return `${day}/${month}/${year} ${hours}:${minutes}`;
   };
-
   //#endregion
- 
+
   return (
     <div className="border mt-4 h-auto pb-7 w-[1600px] bg-white rounded-2xl">
       <div className="flex justify-center">
         <p className="mt-8 text-3xl font-bold">Quản lý thông báo</p>
       </div>
+      
       {/* Bộ lọc */}
       <div className="ml-4 mt-5">
         <p>Tìm kiếm:</p>
         <div className="flex gap-4">
+          {/* Search theo người tạo */}
           <input
             name="creator"
-            placeholder="Người tạo"
+            placeholder="Mã giáo viên"
             className="h-12 w-[200px] border border-black rounded-xl px-2"
+            value={filterCreator}
+            onChange={(e) => setFilterCreator(e.target.value)}
           />
+          {/* Lọc theo loại yêu cầu */}
           <select
-            name="status"
+            name="type"
             className="h-12 w-[200px] border border-black rounded-xl px-2"
+            value={filterType}
+            onChange={(e) => setFilterType(e.target.value)}
           >
             <option value="">Loại yêu cầu</option>
             <option value="1">Đổi giáo viên dạy</option>
             <option value="2">Đổi lịch dạy</option>
           </select>
+          {/* Lọc theo trạng thái */}
           <select
             name="status"
             className="h-12 w-[200px] border border-black rounded-xl px-2"
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value)}
           >
             <option value="">Tất cả trạng thái</option>
             <option value="0">Chưa xử lý</option>
             <option value="1">Đã xử lý</option>
+            <option value="2">Đã hủy</option>
           </select>
-          <div className="flex ml-auto space-x-4 mt-2 md:mt-0 mr-4">
-            <button
-              type="button"
-              className="border border-white rounded-xl w-full md:w-[150px] bg-secondaryGreen hover:bg-primaryGreen text-white font-semibold"
-              onClick={() => {
-                /* toggleShowForm code */
-              }}
-            >
-              <i className="fa fa-arrows-rotate mr-2" aria-hidden="true"></i>
-              Chờ xử lí
-            </button>
-            <button
-              type="button"
-              className="border border-white rounded-xl w-full md:w-[150px] bg-secondaryGreen hover:bg-primaryGreen text-white font-semibold"
-              onClick={() => {
-                /* toggleShowForm code */
-              }}
-            >
-              <i className="fa fa-check mr-2" aria-hidden="true"></i>
-              Đã xử lí
-            </button>
-          </div>
         </div>
       </div>
+      
       {/* Bảng dữ liệu */}
       <div className="w-[1570px] ml-3 relative flex flex-col mt-4 bg-white shadow-md rounded-2xl border border-gray overflow-hidden">
         <table className="w-full text-left table-auto bg-white">
           <thead className="bg-gray-100">
             <tr>
               <th
-                className="p-4 text-center align-middle bg-secondaryBlue text-white font-semibold cursor-pointer"
+                className="p-4 text-center align-middle bg-secondaryBlue text-white font-semibold cursor-pointer max-w-[80px]"
                 onClick={() => handleSort("requestId")}
               >
                 <div className="flex items-center justify-between">
-                  <p className="m-auto transition-all hover:scale-105">STT</p>
+                  <p className="m-auto transition-all hover:scale-105">Mã yêu cầu</p>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
@@ -198,9 +216,7 @@ function Notifications() {
                 onClick={() => handleSort("userId")}
               >
                 <div className="flex items-center justify-between">
-                  <p className="m-auto transition-all hover:scale-105">
-                    Người tạo
-                  </p>
+                  <p className="m-auto transition-all hover:scale-105">Mã giáo viên</p>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
@@ -223,9 +239,7 @@ function Notifications() {
                 onClick={() => handleSort("requestType")}
               >
                 <div className="flex items-center justify-between">
-                  <p className="m-auto transition-all hover:scale-105">
-                    Loại yêu cầu
-                  </p>
+                  <p className="m-auto transition-all hover:scale-105">Loại yêu cầu</p>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
@@ -248,9 +262,7 @@ function Notifications() {
                 onClick={() => handleSort("requestDate")}
               >
                 <div className="flex items-center justify-between">
-                  <p className="m-auto transition-all hover:scale-105">
-                    Ngày tạo yêu cầu
-                  </p>
+                  <p className="m-auto transition-all hover:scale-105">Ngày tạo yêu cầu</p>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
@@ -273,9 +285,7 @@ function Notifications() {
                 onClick={() => handleSort("status")}
               >
                 <div className="flex items-center justify-between">
-                  <p className="m-auto transition-all hover:scale-105">
-                    Trạng thái
-                  </p>
+                  <p className="m-auto transition-all hover:scale-105">Trạng thái</p>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
@@ -293,26 +303,20 @@ function Notifications() {
                   </svg>
                 </div>
               </th>
-              <th className="p-4 text-center align-middle bg-secondaryBlue text-white font-semibold">
-                Thao tác
-              </th>
+              <th className="p-4 text-center align-middle bg-secondaryBlue text-white font-semibold">Thao tác</th>
             </tr>
           </thead>
           <tbody>
             {currentData.map((item, index) => (
               <tr key={index} className="hover:bg-gray-50 even:bg-gray-50">
-                <td className="p-4 text-center align-middle">
-                  {item.requestId}
-                </td>
+                <td className="p-4 text-center align-middle">{item.requestId}</td>
                 <td className="p-4 text-center align-middle">{item.userId}</td>
                 <td className="p-4 text-center align-middle">
                   {item.requestType === 1 ? "Đổi giáo viên" : "Đổi lịch dạy"}
                 </td>
+                <td className="p-4 text-center align-middle">{formatDateTime(item.requestDate)}</td>
                 <td className="p-4 text-center align-middle">
-                  {formatDateTime(item.requestDate)}
-                </td>
-                <td className="p-4 text-center align-middle">
-                  {item.status === 0 ? "Chưa xử lý" : "Đã xử lý"}
+                  {item.status === 0 ? "Chưa xử lý" : item.status === 1 ? "Đã xử lý" : "Đã hủy"}
                 </td>
                 <td className="p-4 text-center align-middle">
                   <button
@@ -345,7 +349,7 @@ function Notifications() {
           requestDetail={selectedRequest}
           onClose={toggleShowDetailForm}
         />
-      )}{" "}
+      )}
       {showUpdateForm && selectedRequest && (
         <FormUpdateRequest
           requestDetail={selectedRequest}

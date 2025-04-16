@@ -1,6 +1,9 @@
 /* eslint-disable react/prop-types */
 import { useEffect, useState } from "react";
-import { getClassesIdByClassId, getClassesIdByMajorId } from "../../../services/classService";
+import {
+  getClassesIdByClassId,
+  getClassesIdByMajorId,
+} from "../../../services/classService";
 import { GetAvailableRoom } from "../../../services/roomService";
 import {
   AddSchedule,
@@ -9,7 +12,7 @@ import {
 import { getMajors } from "../../../services/majorService";
 
 // eslint-disable-next-line react/prop-types
-function FormAddScheduleFill({ onAdded ,initialData }) {
+function FormAddScheduleFillByWeek({ onAdded, initialData }) {
   //#region State & Error
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
@@ -53,7 +56,7 @@ function FormAddScheduleFill({ onAdded ,initialData }) {
       }));
     }
   }, [initialData]);
-  
+
   //#endregion
 
   //#region Fetch API
@@ -87,11 +90,14 @@ function FormAddScheduleFill({ onAdded ,initialData }) {
   //#region  lấy danh sách lớp
   useEffect(() => {
     if (classSubjectIdSelected) {
-    const fetchClassSubject = async () => {
-      const classSubjects = await getClassesIdByClassId(classSubjectIdSelected); //Lấy ra list  trong database
-      setClassSubjects(classSubjects.result);
-    };
-    fetchClassSubject();}
+      const fetchClassSubject = async () => {
+        const classSubjects = await getClassesIdByClassId(
+          classSubjectIdSelected
+        ); //Lấy ra list  trong database
+        setClassSubjects(classSubjects.result);
+      };
+      fetchClassSubject();
+    }
   }, [classSubjectIdSelected]);
   //#endregion
 
@@ -113,7 +119,7 @@ function FormAddScheduleFill({ onAdded ,initialData }) {
       fetchAvailableTeachers();
     }
   }, [majorIdSelected, newSchedule.date, newSchedule.slotId]);
-  
+
   //#endregion
 
   //#region lấy danh sách phòng khả dụng
@@ -184,7 +190,6 @@ function FormAddScheduleFill({ onAdded ,initialData }) {
   };
   //#endregion
 
-
   return (
     <>
       {/* Notification Start */}
@@ -253,7 +258,6 @@ function FormAddScheduleFill({ onAdded ,initialData }) {
                       </option>
                     ))}
                   </select>
-
                   <p className="text-left ml-[100px] text-xl mt-5">Mã lớp :</p>
                   <select
                     placeholder="Mã kỳ học"
@@ -261,14 +265,13 @@ function FormAddScheduleFill({ onAdded ,initialData }) {
                     name=""
                     onChange={(e) => setClassSubjectIdSelected(e.target.value)}
                   >
-                    <option value="">-- Chọn Lớp  --</option>
+                    <option value="">-- Chọn Lớp --</option>
                     {classSubjectIds.map((cs) => (
                       <option key={cs} value={cs}>
                         {cs}
                       </option>
                     ))}
                   </select>
-
                   <p className="text-left ml-[100px] text-xl ">Môn học :</p>
                   <select
                     type="text"
@@ -286,29 +289,6 @@ function FormAddScheduleFill({ onAdded ,initialData }) {
                       </option>
                     ))}
                   </select>
-                  <p className="text-left ml-[100px] text-xl ">Giáo viên:</p>
-                  <select
-                    required
-                    name="teacherId"
-                    className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl mb-3 px-4"
-                    onChange={handleInputChange}
-                  >
-                    <option value="">-- Chọn Giáo viên --</option>
-                    {teachers.map((r) => (
-                      <option key={r.userId} value={r.userId}>
-                        {r.fullUserName} - {r.majorId}
-                      </option>
-                    ))}
-                  </select>
-                  <p className="text-left ml-[100px] text-xl ">Ngày:</p>
-                  <input
-                    type="date"
-                    required
-                    className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl mb-3 px-4"
-                    name="date"
-                    value={newSchedule.date}
-                    onChange={handleInputChange}
-                  />
                   <p className="text-left ml-[100px] text-xl ">Slot:</p>
                   <select
                     required
@@ -324,7 +304,29 @@ function FormAddScheduleFill({ onAdded ,initialData }) {
                     <option value="4">4</option>
                     <option value="5">5</option>
                   </select>
-
+                  <p className="text-left ml-[100px] text-xl ">Giáo viên:</p>
+                  <select
+                    required
+                    name="teacherId"
+                    className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl mb-3 px-4"
+                    onChange={handleInputChange}
+                  >
+                    <option value="">-- Chọn Giáo viên --</option>
+                    {teachers.map((r) => (
+                      <option key={r.userId} value={r.userId}>
+                        {r.fullUserName} - {r.majorId}
+                      </option>
+                    ))}
+                  </select>{" "}
+                  <p className="text-left ml-[100px] text-xl ">Ngày:</p>
+                  <input
+                    type="date"
+                    required
+                    className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl mb-3 px-4"
+                    name="date"
+                    value={newSchedule.date}
+                    onChange={handleInputChange}
+                  />
                   <p className="text-left ml-[100px] text-xl ">Phòng:</p>
                   <input
                     required
@@ -332,8 +334,7 @@ function FormAddScheduleFill({ onAdded ,initialData }) {
                     className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl mb-3 px-4"
                     onChange={handleInputChange}
                     value={newSchedule.roomId}
-                  >
-                  </input>
+                  ></input>
                   <div className="flex flex-wrap justify-center gap-4">
                     <button
                       type="submit"
@@ -359,4 +360,4 @@ function FormAddScheduleFill({ onAdded ,initialData }) {
   );
 }
 
-export default FormAddScheduleFill;
+export default FormAddScheduleFillByWeek;

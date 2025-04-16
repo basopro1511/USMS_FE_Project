@@ -65,7 +65,7 @@ function FormUpdateRequest({ requestDetail, onClose, onUpdate }) {
         setSuccessMessage(response.message);
         setTimeout(() => setShowAlert(false), 2000);
         setIsFormVisible(false);
-        onUpdate(response.data)
+        onUpdate(response.data);
       } else {
         setShowAlert("error");
         setErrorMessage(response.message);
@@ -225,19 +225,37 @@ function FormUpdateRequest({ requestDetail, onClose, onUpdate }) {
                     />
                   </div>
                 )}
-
-                <div>
-                  <p className="font-medium">Trạng thái:</p>
-                  <select
-                    name="status"
-                    value={requestData.status}
-                    onChange={handleChange}
-                    className="w-full h-[40px] border border-gray-300 rounded-md px-3"
-                  >
-                    <option value={0}>Chưa xử lý</option>
-                    <option value={1}>Đã xử lý</option>
-                  </select>
-                </div>
+                {requestData.status === 2 ? (
+                  <div>
+                    <p className="font-medium">Trạng thái:</p>
+                    <select
+                      name="status"
+                      value={requestData.status}
+                      onChange={handleChange}
+                      className="w-full h-[40px] border border-gray-300 rounded-md px-3"
+                      readOnly
+                      disabled
+                    >
+                      <option value={0}>Chưa xử lý</option>
+                      <option value={1}>Đã xử lý</option>
+                      <option value={2}>Đã hủy</option>
+                    </select>
+                  </div>
+                ) : (
+                  <div>
+                    <p className="font-medium">Trạng thái:</p>
+                    <select
+                      name="status"
+                      value={requestData.status}
+                      onChange={handleChange}
+                      className="w-full h-[40px] border border-gray-300 rounded-md px-3"
+                    >
+                      <option value={0}>Chưa xử lý</option>
+                      <option value={1}>Đã xử lý</option>
+                      <option value={2}>Hủy yêu cầu</option>
+                    </select>
+                  </div>
+                )}
 
                 <div className="sm:col-span-2">
                   <p className="font-medium">Lý do:</p>
@@ -262,16 +280,20 @@ function FormUpdateRequest({ requestDetail, onClose, onUpdate }) {
               </div>
 
               <div className="flex justify-center gap-6 mt-3">
-                <button
-                  type="submit"
-                  className="w-full max-w-[152px] h-[50px] sm:h-[64px] border rounded-3xl bg-secondaryBlue text-white font-bold text-lg sm:text-2xl transition-all hover:scale-105 hover:bg-primaryBlue"
+                {requestData.status === 2 ? (
+                 <div></div>
+                ) : (
+                  <button
+                    type="submit"
+                    className="w-full max-w-[152px] h-[50px] sm:h-[64px] border rounded-3xl bg-secondaryBlue text-white font-bold text-lg sm:text-2xl transition-all hover:scale-105 hover:bg-primaryBlue"
                   >
-                  Cập nhật
-                </button>
+                    Cập nhật
+                  </button>
+                )}
                 <button
                   onClick={handleClose}
                   className="w-full max-w-[150px] h-[50px] sm:h-[64px] border rounded-3xl bg-red-500 text-white font-bold text-lg sm:text-2xl transition-all hover:scale-105 hover:bg-red-700 "
-                  >
+                >
                   Hủy
                 </button>
               </div>

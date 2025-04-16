@@ -74,7 +74,7 @@ function FormDetailRequest({ requestDetail, onClose }) {
   };
 
   // Hàm chuyển đổi trạng thái thành text
-  const formatStatus = (status) => (status === 0 ? "Chưa xử lý" : "Đã xử lý");
+  const formatStatus = (status) => (status === 0 ? "Chưa xử lý" : status=== 1 ? "Đã xử lý" : "Đã hủy");
   return (
     <>
       {requestDetail && (

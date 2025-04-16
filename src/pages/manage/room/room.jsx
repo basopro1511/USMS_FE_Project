@@ -338,7 +338,7 @@ function ManageRoom() {
               onClick={() => document.getElementById("fileInput").click()}
             >
               <i className="fa fa-upload mr-2" aria-hidden="true"></i>
-              Chọn file Excel thêm môn học
+              Chọn file Excel thêm phòng học
             </button>
           </div>
           {/* Button Import Zone */}
