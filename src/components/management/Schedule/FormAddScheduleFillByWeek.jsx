@@ -28,7 +28,7 @@ function FormAddScheduleFillByWeek({ onAdded, initialData }) {
   const [newSchedule, setNewSchedule] = useState({
     classSubjectId: 0,
     date: initialData?.date || "",
-    slotId: 0,
+    slotId: initialData?.slotId || 0,
     roomId: initialData?.roomId || "",
     slotNoInSubject: 0,
     teacherId: "",
@@ -47,15 +47,6 @@ function FormAddScheduleFillByWeek({ onAdded, initialData }) {
   }, [initialData]);
   const [majorIdSelected, setSelectedMajorId] = useState("");
   const [classSubjectIdSelected, setClassSubjectIdSelected] = useState("");
-  useEffect(() => {
-    if (initialData) {
-      setNewSchedule((prev) => ({
-        ...prev,
-        date: initialData.date,
-        roomId: initialData.roomId,
-      }));
-    }
-  }, [initialData]);
 
   //#endregion
 
@@ -190,6 +181,7 @@ function FormAddScheduleFillByWeek({ onAdded, initialData }) {
   };
   //#endregion
 
+  
   return (
     <>
       {/* Notification Start */}
@@ -289,6 +281,20 @@ function FormAddScheduleFillByWeek({ onAdded, initialData }) {
                       </option>
                     ))}
                   </select>
+                  <p className="text-left ml-[100px] text-xl ">Giáo viên:</p>
+                  <select
+                    required
+                    name="teacherId"
+                    className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl mb-3 px-4"
+                    onChange={handleInputChange}
+                  >
+                    <option value="">-- Chọn Giáo viên --</option>
+                    {teachers.map((r) => (
+                      <option key={r.userId} value={r.userId}>
+                        {r.fullUserName} - {r.majorId}
+                      </option>
+                    ))}
+                  </select>{" "}
                   <p className="text-left ml-[100px] text-xl ">Slot:</p>
                   <select
                     required
@@ -304,20 +310,7 @@ function FormAddScheduleFillByWeek({ onAdded, initialData }) {
                     <option value="4">4</option>
                     <option value="5">5</option>
                   </select>
-                  <p className="text-left ml-[100px] text-xl ">Giáo viên:</p>
-                  <select
-                    required
-                    name="teacherId"
-                    className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl mb-3 px-4"
-                    onChange={handleInputChange}
-                  >
-                    <option value="">-- Chọn Giáo viên --</option>
-                    {teachers.map((r) => (
-                      <option key={r.userId} value={r.userId}>
-                        {r.fullUserName} - {r.majorId}
-                      </option>
-                    ))}
-                  </select>{" "}
+           
                   <p className="text-left ml-[100px] text-xl ">Ngày:</p>
                   <input
                     type="date"

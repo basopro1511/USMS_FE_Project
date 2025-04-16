@@ -25,7 +25,7 @@ function FormUpdateSchedule({dataToUpdate,onAdded,}) {
     dataToUpdate || {
       scheduleId: 0,
       classSubjectId: 0,
-      slotId: 0,
+      slotId: 1,
       roomId: "",
       teacherId: "",
       date: "",

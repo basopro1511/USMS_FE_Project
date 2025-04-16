@@ -5,6 +5,7 @@ import {
   getSchedule,
   getScheduleForStaff,
   getScheduleForStaffByDay,
+  UpdateSchedule,
 } from "../../../services/scheduleService";
 import {
   getClassesIdByMajorId,
@@ -19,6 +20,9 @@ import FormAddScheduleFill from "../../../components/management/Schedule/FormAdd
 
 function ManageScheduleByDay() {
   //#region State & Error
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+  const [showAlert, setShowAlert] = useState(false); // Alert for success or failure notification
   // Sử dụng filter theo ngày
   const [filterData, setFilterData] = useState({
     majorId: "",
@@ -321,6 +325,50 @@ function ManageScheduleByDay() {
     );
   };
 
+
+  //#region Drag & Drop Handlers
+  const handleDragStart = (e, schedule) => {
+    const payload = JSON.stringify({ scheduleId: schedule.scheduleId });
+    e.dataTransfer.setData("application/json", payload);
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+  };
+
+  const handleDrop = async (e, toRoomId, toSlotId) => {
+    e.preventDefault();
+    try {
+      const { scheduleId } = JSON.parse(e.dataTransfer.getData("application/json"));
+      const original = scheduleData.find((s) => s.scheduleId === scheduleId);
+      if (!original) return;
+      const updated = {
+        ...original,
+        roomId: toRoomId,
+        slotId: toSlotId,
+      };
+      // Call UpdateSchedule API with full object
+      const response = await UpdateSchedule(updated);
+      if (response && response.isSuccess) {
+        setSuccessMessage(response.message);
+        setShowAlert("success");
+        setTimeout(() => {
+          setShowAlert(false); 
+        }, 3000);
+        handleReload();
+      } else {
+        setErrorMessage(response.message);
+        setShowAlert("error");
+        setTimeout(() => {
+          setShowAlert(false); // Ẩn thông báo sau 3 giây
+        }, 2000);
+      }
+    } catch (err) {
+      console.error("DragDrop update failed", err);
+    }
+  };
+  //#endregion
+
   // Render bảng thời khóa biểu dạng Manager View (trục dọc: phòng, trục ngang: slot)
   const renderManagerTable = () => {
     return (
@@ -377,9 +425,14 @@ function ManageScheduleByDay() {
                       <td
                         key={`${room.roomId}-${slot.slotId}`}
                         className={`border border-black text-center p-1 ${extraClass}`}
+                        onDragOver={handleDragOver}
+                        onDrop={(e) => handleDrop(e, room.roomId, slot.slotId)}
                       >
                         {schedule ? (
-                          <div className="p-1 border border-black w-[190px] h-auto m-auto rounded-2xl bg-whiteBlue scale-90">
+                          <div 
+                          draggable
+                          onDragStart={(e) => handleDragStart(e, schedule)}
+                          className="p-1 border border-black w-[190px] h-auto m-auto rounded-2xl bg-whiteBlue scale-90">
                             <div>
                               <span className="ml-1 font-bold text-boldBlue">
                                 {classSubjectData[schedule.classSubjectId]
@@ -470,6 +523,40 @@ function ManageScheduleByDay() {
   //#region Render Giao Diện (UI)
   return (
     <>
+      {showAlert && (
+          <div
+            className={`fixed top-5 right-0 z-50 ${
+              showAlert === "error"
+                ? "animate-slide-in text-red-800 bg-red-50 border-red-300 mr-4"
+                : "animate-slide-in text-green-800 bg-green-50 border-green-300 mr-4"
+            } border rounded-lg p-4`}
+          >
+            <div className="flex items-center">
+              <svg
+                className="flex-shrink-0 inline w-4 h-4 me-3"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 1 1 1 1v4h1a1 1 0 0 1 0 2Z" />
+              </svg>
+              <span className="sr-only">Info</span>
+              <div>
+                {showAlert === "error" ? (
+                  <span>
+                    <strong>Thất bại:</strong> {errorMessage}
+                  </span>
+                ) : (
+                  <span>
+                    <strong>Thành công:</strong> {successMessage}
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+      {/* Notification End */}
       {/* Main Container */}
       {/* --- Filter --- */}
       <div className="flex">

@@ -5,6 +5,7 @@ import {
   ChangeScheduleStatus,
   getSchedule,
   getScheduleForStaff,
+  UpdateSchedule,
 } from "../../../services/scheduleService";
 import {
   getClassesIdByMajorId,
@@ -19,6 +20,9 @@ import FormAddScheduleFillByWeek from "../../../components/management/Schedule/F
 
 function ManageScheduleByWeek() {
   //#region State & Error
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+  const [showAlert, setShowAlert] = useState(false);
   const [filterData, setFilterData] = useState({
     majorId: "",
     classId: "",
@@ -29,7 +33,7 @@ function ManageScheduleByWeek() {
   // Các state lưu dữ liệu từ API
   const [scheduleData, setScheduleData] = useState([]);
   const [majorData, setMajorData] = useState([]);
-  const [, setSlotData] = useState([]);
+  const [slotData, setSlotData] = useState([]);
   const [classIdsData, setClassIdsData] = useState([]);
   const [roomData, setRoomData] = useState([]);
   const [classSubjectData, setClassSubjectData] = useState([]);
@@ -71,8 +75,8 @@ function ManageScheduleByWeek() {
 
   const [showAddFormFill, setAddFormFill] = useState(false);
   const [preFillData, setPreFillData] = useState(null);
-  const openAddScheduleFormByWeekWithPrefill = (date, roomId) => {
-    setPreFillData({ date, roomId });
+  const openAddScheduleFormByWeekWithPrefill = (date, roomId, slotId) => {
+    setPreFillData({ date, roomId, slotId });
     setAddFormFill((prev) => !prev);
   };
   //#endregion
@@ -261,6 +265,15 @@ function ManageScheduleByWeek() {
 
   //#region Time Calculator & Xử lý Thời gian
 
+// Thay thế formatDateISO
+const formatDateISO = (dateObj) => {
+  const d = new Date(dateObj);
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
   // Lấy ngày đầu tuần của 1 ngày (giả sử tuần bắt đầu từ thứ 2)
   const getStartOfWeek = (date) => {
     const currentDate = new Date(date);
@@ -400,9 +413,94 @@ function ManageScheduleByWeek() {
   };
   //#endregion
 
+  //#region Drag & Drop Handlers
+  const handleDragStart = (e, schedule) => {
+    e.dataTransfer.setData(
+      "application/json",
+      JSON.stringify({
+        scheduleId: schedule.scheduleId,
+        originalDate: schedule.date,
+      })
+    );
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+  };
+
+  const handleDrop = async (e, toRoomId, toSlotId, toDate) => {
+    e.preventDefault();
+    try {
+      const { scheduleId } = JSON.parse(
+        e.dataTransfer.getData("application/json")
+      );
+      const original = scheduleData.find((s) => s.scheduleId === scheduleId);
+      if (!original) return;
+      const updated = {
+        ...original,
+        roomId: toRoomId !== null ? toRoomId : original.roomId,
+        slotId: toSlotId !== null ? toSlotId : original.slotId,
+        date: toDate || filterData.date,
+      };
+      const response = await UpdateSchedule(updated);
+      if (response && response.isSuccess) {
+        setSuccessMessage(response.message);
+        setShowAlert("success");
+        setTimeout(() => {
+          setShowAlert(false);
+        }, 3000);
+        handleReload();
+      } else {
+        setErrorMessage(response.message);
+        setShowAlert("error");
+        setTimeout(() => {
+          setShowAlert(false); // Ẩn thông báo sau 3 giây
+        }, 2000);
+      }
+    } catch (err) {
+      console.error("DragDrop update failed", err);
+    }
+  };
+  //#endregion
+
   //#region Render Giao diện (UI)
   return (
     <>
+      {" "}
+      {showAlert && (
+        <div
+          className={`fixed top-5 right-0 z-50 ${
+            showAlert === "error"
+              ? "animate-slide-in text-red-800 bg-red-50 border-red-300 mr-4"
+              : "animate-slide-in text-green-800 bg-green-50 border-green-300 mr-4"
+          } border rounded-lg p-4`}
+        >
+          <div className="flex items-center">
+            <svg
+              className="flex-shrink-0 inline w-4 h-4 me-3"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 1 1 1 1v4h1a1 1 0 0 1 0 2Z" />
+            </svg>
+            <span className="sr-only">Info</span>
+            <div>
+              {showAlert === "error" ? (
+                <span>
+                  <strong>Thất bại:</strong> {errorMessage}
+                </span>
+              ) : (
+                <span>
+                  <strong>Thành công:</strong> {successMessage}
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Notification End */}
       {/* --- Filter --- */}
       <div className="flex">
         <p className="ml-3  ">Sắp lịch học theo tuần:</p>
@@ -512,7 +610,6 @@ function ManageScheduleByWeek() {
         </div>
       </div>
       {/* --- End Filter --- */}
-
       {/* --- Bảng thời khóa biểu - Manager View theo tuần --- */}
       <div className="ml-3 mr-3 mt-5 h-auto">
         <div className="flex">
@@ -570,118 +667,89 @@ function ManageScheduleByWeek() {
             </tr>
           </thead>
           <tbody>
-            {roomData &&
-              roomData.map((room, roomIndex) => {
-                const isLastRow = roomIndex === roomData.length - 1;
-                return (
-                  <tr key={room.roomId}>
-                    <td
-                      className={`border border-black p-2 font-bold ${
-                        isLastRow ? "rounded-bl-xl" : ""
-                      }`}
-                    >
-                      {" "}
-                      {room.roomId}
-                    </td>
-                    {weekDates.map((date, idx) => {
-                      const getLocalDateString = (date) => {
-                        const day = date.getDate().toString().padStart(2, "0");
-                        const month = (date.getMonth() + 1)
-                          .toString()
-                          .padStart(2, "0");
-                        const year = date.getFullYear();
-                        return `${year}-${month}-${day}`;
-                      };
-                      const cellDate = getLocalDateString(date);
-                      // Lọc lịch của phòng đó tại ngày được chọn trong ô tương ứng
-                      const schedulesForCell = scheduleData.filter(
-                        (s) => s.roomId === room.roomId && s.date === cellDate
-                      );
-                      const isLastCell = idx === weekDates.length - 1;
-                      const extraClass =
-                        isLastRow && isLastCell ? "rounded-br-xl" : "";
-                      return (
-                        <td
-                          key={`${room.roomId}-${idx}`}
-                          className={`border border-black text-center w-[360px] ${extraClass}`}
-                        >
-                          {schedulesForCell.length > 0 ? (
-                            schedulesForCell.map((schedule, i) => {
-                              return (
-                                <div
-                                  key={i}
-                                  className="border border-black rounded mt-1 mb-1 ml-auto mr-auto bg-gray-100 text-sm flex max-w-[270px]"
+            {roomData.map((room, roomIndex) => {
+              const isLastRow = roomIndex === roomData.length - 1;
+              return (
+                <tr key={room.roomId}>
+                  <td className={`border border-black p-2 font-bold ${isLastRow ? 'rounded-bl-xl' : ''}`}>{room.roomId}</td>
+                  {weekDates.map((date, idx) => {
+                    const cellDate = formatDateISO(date);
+                    const isLastCell = idx === weekDates.length - 1;
+                    const extraClass = isLastRow && isLastCell ? 'rounded-br-xl' : '';
+                    return (
+                      <td
+                        key={cellDate}
+                        className={`border border-black text-center w-[360px] ${extraClass}`}
+                        onDragOver={handleDragOver}
+                      >
+                        {slotData.map((slot) => {
+                          // filter schedules for this room, date and slot
+                          const schedulesForSlot = scheduleData.filter(
+                            (s) => s.roomId === room.roomId && s.date === cellDate && s.slotId === slot.slotId
+                          );
+                          return schedulesForSlot.length > 0 ? (
+                            schedulesForSlot.map((schedule, i) => (
+                              <div
+                                key={`${slot.slotId}-${i}`}
+                                className="border border-black rounded mt-1 mb-1 ml-auto mr-auto bg-gray-100 text-sm flex max-w-[270px]"
+                                draggable
+                                onDragStart={(e) => handleDragStart(e, schedule)}
+                                onDrop={(e) => handleDrop(e, room.roomId, slot.slotId, cellDate)}
+                              >
+                                <strong>[Slot {slot.slotId}]</strong> {schedule.teacherId}_
+                                {classSubjectData[schedule.classSubjectId] || schedule.classSubjectId}
+                                <button
+                                  type="button"
+                                  className="ml-1 border border-white w-[24px] h-[24px] bg-btnBlue text-white font-bold rounded-xl transition-all duration-300 hover:scale-95"
+                                  onClick={() => toggleShowUpdateForm(schedule)}
                                 >
-                                  <strong>[Slot {schedule.slotId}]</strong>{" "}
-                                  {schedule.teacherId}_
-                                  {classSubjectData[schedule.classSubjectId]
-                                    ? classSubjectData[schedule.classSubjectId]
-                                    : schedule.classSubjectId}
-                                  <div>
-                                    <button
-                                      type="button"
-                                      className="ml-1 border border-white w-[24px] h-[24px] bg-btnBlue text-white font-bold rounded-xl transition-all duration-300 hover:scale-95"
-                                      onClick={() =>
-                                        toggleShowUpdateForm(schedule)
-                                      }
-                                    >
-                                      <i
-                                        className="fa fa-pencil-square w-13 h-21 text-black m-auto"
-                                        aria-hidden="true"
-                                      ></i>
-                                    </button>
-                                  </div>
-                                  <div>
-                                    <button
-                                      type="button"
-                                      className="border w-[25px] h-[25px] bg-red-600 text-white font-bold rounded-xl transition-all duration-300 hover:scale-95"
-                                      onClick={() =>
-                                        handleDeleteSchedule(
-                                          schedule.scheduleId
-                                        )
-                                      }
-                                    >
-                                      <i
-                                        className="fa fa-trash text-black m-auto"
-                                        aria-hidden="true"
-                                      ></i>
-                                    </button>
-                                  </div>
-                                </div>
-                              );
-                            })
+                                  <i className="fa fa-pencil-square text-black"></i>
+                                </button>
+                                <button
+                                  type="button"
+                                  className="border w-[25px] h-[25px] bg-red-600 text-white font-bold rounded-xl transition-all duration-300 hover:scale-95"
+                                  onClick={() => handleDeleteSchedule(schedule.scheduleId)}
+                                >
+                                  <i className="fa fa-trash text-black"></i>
+                                </button>
+                              </div>
+                            ))
                           ) : (
-                            <div className="relative group">
-                              <span className="text-green-500 font-bold group-hover:hidden">
-                                Trống
+                            <div
+                              key={slot.slotId}
+                              className="relative group"
+                              onDragOver={handleDragOver}
+                              onDrop={(e) => handleDrop(e, room.roomId, slot.slotId, cellDate)}
+                            >
+                               <span className="font-bold text-sm mr-auto">[Slot {slot.slotId}]</span>
+                               <span className="text-green-500 font-bold group-hover:hidden">
+                                Trống 
                               </span>
                               <button
-                                className="hidden group-hover:block absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[60px] h-[40px] bg-blue-500 hover:bg-blue-600 text-white text-xs rounded flex items-center justify-center"
-                                onClick={() =>
-                                  openAddScheduleFormByWeekWithPrefill(
-                                    cellDate,
-                                    room.roomId,
-                                  )
-                                }
+                                className="hidden group-hover:block absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[60px] h-[30px] bg-blue-500 hover:bg-blue-600 text-white text-xs rounded flex items-center justify-center"
+                                onClick={() => openAddScheduleFormByWeekWithPrefill(cellDate, room.roomId, slot.slotId)}
                               >
                                 Thêm lịch
                               </button>
                             </div>
-                          )}
-                        </td>
-                      );
-                    })}
-                  </tr>
-                );
-              })}
+                          );
+                        })}
+                      </td>
+                    );
+                  })}
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
       {/* end Bảng thời khóa biểu */}
-
       {/* Ẩn & Hiện form */}
       {showAddFormFill && (
-        <FormAddScheduleFillByWeek onAdded={handleReload} initialData={preFillData} />
+        <FormAddScheduleFillByWeek
+          onAdded={handleReload}
+          initialData={preFillData}
+        />
       )}
       {showAddForm && (
         <FormAddSchedule
