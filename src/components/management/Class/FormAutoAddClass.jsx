@@ -149,8 +149,8 @@ function FormAutoAddClass({ onClassesCreated }) {
         parseInt(formData.term)
       );
       if (response.isSuccess) {         
-       setShowAlert("true");
-        setTimeout(() => setShowAlert(true), 3000);
+        setShowAlert("true");
+        setTimeout(() => setShowAlert(false), 3000);
         setSuccessMessage(response.message);
         onClassesCreated(response.result); 
         setIsFormVisible(false);

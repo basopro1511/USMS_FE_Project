@@ -176,7 +176,7 @@ function ManageSemester() {
       setShowAlert("error");
       setErrorMessage("Import thất bại. Vui lòng thử lại!");
       setTimeout(() => setShowAlert(false), 3000);
-      console.error("Lỗi khi thêm giáo viên:", error);
+      console.error("Lỗi khi thêm học kỳ:", error);
     }
   };
   //#endregion
@@ -214,7 +214,7 @@ function ManageSemester() {
         setTimeout(() => setShowAlert(false), 3000);
       }
     } catch (error) {
-      console.error("Lỗi khi thay đổi trạng thái các sinh viên:", error);
+      console.error("Lỗi khi thay đổi trạng thái các học kỳ:", error);
       setShowAlert("error");
       setErrorMessage(error.message);
       setTimeout(() => setShowAlert(false), 3000);

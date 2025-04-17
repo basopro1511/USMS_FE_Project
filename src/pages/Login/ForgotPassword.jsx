@@ -1,6 +1,6 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ForgotPasswordOTP } from '../../services/userService';
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { ForgotPasswordOTP } from "../../services/userService";
 import CryptoJS from "crypto-js";
 
 function ForgotPassword() {
@@ -8,25 +8,37 @@ function ForgotPassword() {
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [showAlert, setShowAlert] = useState(false); // Cho alert chung
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const navigate = useNavigate();
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // Gọi API gửi OTP
-    const response = await ForgotPasswordOTP(email);
-    if (response.isSuccess) {
-      setShowAlert("success");
-      localStorage.setItem("email",email);
-      const secretKey = "KeysuperBiMat"; // Một key bí mật để mã hóa
-      const encryptedOTP = CryptoJS.AES.encrypt( response.result, secretKey).toString();
-      localStorage.setItem("OTP6Digit", encryptedOTP);
-      setSuccessMessage("Mã OTP đã được gửi đến Email cá nhân của bạn.");
-      setTimeout(() => {setShowAlert(false);
-      navigate("/sentOTP");
-      }, 1000);
-    } else {
+    if (isSubmitting) return;       
+    setIsSubmitting(true);   
+    try {
+      const response = await ForgotPasswordOTP(email);
+      if (response.isSuccess) {
+        navigate("/sentOTP");
+        setShowAlert("success");
+        localStorage.setItem("email", email);
+        const secretKey = "KeysuperBiMat"; // Một key bí mật để mã hóa
+        const encryptedOTP = CryptoJS.AES.encrypt(
+          response.result,
+          secretKey
+        ).toString();
+        localStorage.setItem("OTP6Digit", encryptedOTP);
+        setSuccessMessage("Mã OTP đã được gửi đến Email cá nhân của bạn.");
+      } else {
+        setShowAlert("error");
+        setErrorMessage(response.message);
+        setTimeout(() => setShowAlert(false), 1000);
+      }
+    } catch (error) {
       setShowAlert("error");
-      setErrorMessage(response.message);
+      setErrorMessage("Lỗi khi gửi OTP.");
       setTimeout(() => setShowAlert(false), 1000);
+    } finally {
+      setIsSubmitting(false); 
     }
   };
   return (
@@ -35,7 +47,9 @@ function ForgotPassword() {
       {showAlert && (
         <div
           className={`fixed top-5 right-0 z-50 ${
-            showAlert === "error" ? "animate-slide-in text-red-800 bg-red-50 border-red-300 mr-4" : "animate-slide-in text-green-800 bg-green-50 border-green-300 mr-4"
+            showAlert === "error"
+              ? "animate-slide-in text-red-800 bg-red-50 border-red-300 mr-4"
+              : "animate-slide-in text-green-800 bg-green-50 border-green-300 mr-4"
           } border rounded-lg p-4`}
         >
           <div className="flex items-center">
@@ -62,8 +76,8 @@ function ForgotPassword() {
             </div>
           </div>
         </div>
-      )}     
-       {/* Thông báo  End*/}
+      )}
+      {/* Thông báo  End*/}
 
       <div className="w-full mt-[100px] mx-auto max-w-screen-lg">
         {/* Logo */}
@@ -83,7 +97,6 @@ function ForgotPassword() {
             <p className="text-lg font-semibold md:text-2xl text-gray-700">
               Xin mời nhập email để khôi phục lại mật khẩu.
             </p>
-       
           </div>
 
           {/* Form */}
@@ -106,9 +119,21 @@ function ForgotPassword() {
             {/* Submit Button */}
             <button
               type="submit"
-              className="block w-full max-w-[460px] bg-green-500 text-white font-bold text-lg rounded-md py-4 transition-transform transform hover:bg-green-700 hover:scale-105 mb-6 mx-auto"
+              disabled={isSubmitting}
+              className={`
+    block w-full max-w-[460px]
+    bg-green-500 text-white font-bold text-lg
+    rounded-md py-4
+    transition-transform transform
+    mb-6 mx-auto
+    hover:bg-green-700 hover:scale-105
+    disabled:opacity-50
+    disabled:cursor-not-allowed
+    disabled:hover:bg-green-500
+    disabled:hover:scale-100
+  `}
             >
-              Gửi OTP
+              {isSubmitting ? "Đang gửi..." : "Gửi OTP"}
             </button>
           </form>
         </div>

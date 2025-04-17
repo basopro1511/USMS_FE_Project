@@ -205,34 +205,32 @@ const TeacherSchedule = () => {
           <td key={schedule.scheduleId} className="pt-1 pb-1  flex ">
             <div className="p-2 border border-black w-[190px] h-auto m-auto rounded-2xl bg-whiteBlue">
               <div className="text-left">
-              <div className="text-[14px] sm:text-[16px] md:text-[16px]">
-                Môn:{" "}
-                <Link                       
-                 to={`/teacherActivityDetail/${schedule.scheduleId}`}
-                  className="text-blue-600 font-bold hover:text-blue-900 cursor-pointer hover:underline"
-                >
-                  {schedule.subjectId}_{schedule.classId}
+                <div className="text-[14px] sm:text-[16px] md:text-[16px]">
+                  Môn:{" "}
+                  <Link
+                    to={`/teacherActivityDetail/${schedule.scheduleId}`}
+                    className="text-blue-600 font-bold hover:text-blue-900 cursor-pointer hover:underline"
+                  >
+                    {schedule.subjectId}_{schedule.classId}
                   </Link>
-              </div>
-    
-              <div>
-                Thời gian:
-                <span className="ml-1 font-bold text-quaternartyGreen">
-                  {startTime} - {endTime}
-                </span>
-              </div>
-              <div>
-                Phòng học:
-                <span className="ml-1 ">
-                  {schedule.roomId ? schedule.roomId : "Trống"}
-                </span>
-              </div>
-              <div>
-                Slot học: 
-                <span className="ml-1 ">
-                  {schedule.slotNoInSubject}
-                </span>
-              </div>
+                </div>
+
+                <div>
+                  Thời gian:
+                  <span className="ml-1 font-bold text-quaternartyGreen">
+                    {startTime} - {endTime}
+                  </span>
+                </div>
+                <div>
+                  Phòng học:
+                  <span className="ml-1 ">
+                    {schedule.roomId ? schedule.roomId : "Trống"}
+                  </span>
+                </div>
+                <div>
+                  Slot học:
+                  <span className="ml-1 ">{schedule.slotNoInSubject}</span>
+                </div>
               </div>
             </div>
           </td>
@@ -242,51 +240,23 @@ const TeacherSchedule = () => {
     return null;
   };
 
-  // Render các dòng (dựa theo slot, giả sử có 5 slot)
   const renderTableRows = () => {
-    if (loading) {
+    return slotData.map((slot) => {
       return (
-        <tr>
-          <td colSpan="8" className="text-center">
-            Đang tải dữ liệu...
-          </td>
-        </tr>
-      );
-    }
-
-    // Nếu không có lịch (data rỗng)
-    if (!scheduleData || scheduleData.length === 0) {
-      return (
-        <tr>
-          <td colSpan="8" className="text-center">
-            Không có dữ liệu lịch
-          </td>
-        </tr>
-      );
-    }
-
-    const slots = [1, 2, 3, 4, 5];
-    return slots.map((slotId) => {
-      let extraClass = slotId === 5 ? " rounded-b-xl" : "";
-      return (
-        <tr key={slotId}>
-          <td
-            className={`border-t border-l border-black font-bold text-center${extraClass}`}
-          >
-            Buổi {slotId}
+        <tr key={slot.slotId}>
+          <td className={`border border-black font-bold text-center`}>
+            Buổi {slot.slotId}
           </td>
           {[1, 2, 3, 4, 5, 6, 0].map((day) => (
-            <td
-              key={`${slotId}-${day}`}
-              className="border-t border-l border-black"
-            >
-              {renderCellForDay(day, slotId)}
+            <td key={`${slot.slotId}-${day}`} className="border border-black">
+              {renderCellForDay(day, slot.slotId)}
             </td>
           ))}
         </tr>
       );
     });
   };
+
   //#endregion
   return (
     <div className="w-full max-w-[1920px] mb-5 p-4">

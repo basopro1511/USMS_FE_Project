@@ -84,8 +84,11 @@ function FormAddScheduleFillByWeek({ onAdded, initialData }) {
       const fetchClassSubject = async () => {
         const classSubjects = await getClassesIdByClassId(
           classSubjectIdSelected
-        ); //Lấy ra list  trong database
-        setClassSubjects(classSubjects.result);
+        );
+        const activeData = classSubjects.result.filter(
+          (item) => item.status !== 2
+        );
+        setClassSubjects(activeData);
       };
       fetchClassSubject();
     }
@@ -181,7 +184,6 @@ function FormAddScheduleFillByWeek({ onAdded, initialData }) {
   };
   //#endregion
 
-  
   return (
     <>
       {/* Notification Start */}
@@ -257,7 +259,7 @@ function FormAddScheduleFillByWeek({ onAdded, initialData }) {
                     name=""
                     onChange={(e) => setClassSubjectIdSelected(e.target.value)}
                   >
-                    <option value="">-- Chọn Lớp --</option>
+                    <option value=""> Chọn Lớp </option>
                     {classSubjectIds.map((cs) => (
                       <option key={cs} value={cs}>
                         {cs}
@@ -274,7 +276,7 @@ function FormAddScheduleFillByWeek({ onAdded, initialData }) {
                     value={newSchedule.classSubjectId}
                     onChange={handleInputChange}
                   >
-                    <option value="">-- Chọn Lớp-Môn --</option>
+                    <option value=""> Chọn Lớp - Môn </option>
                     {classSubjects.map((cs) => (
                       <option key={cs.classSubjectId} value={cs.classSubjectId}>
                         {cs.classId}_{cs.subjectId}_{cs.semesterId}
@@ -288,7 +290,7 @@ function FormAddScheduleFillByWeek({ onAdded, initialData }) {
                     className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl mb-3 px-4"
                     onChange={handleInputChange}
                   >
-                    <option value="">-- Chọn Giáo viên --</option>
+                    <option value="">Chọn Giáo viên </option>
                     {teachers.map((r) => (
                       <option key={r.userId} value={r.userId}>
                         {r.fullUserName} - {r.majorId}
@@ -303,14 +305,13 @@ function FormAddScheduleFillByWeek({ onAdded, initialData }) {
                     onChange={handleInputChange}
                     className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl mb-3 px-4"
                   >
-                    <option value="">-- Chọn Slot --</option>
+                    <option value="">Chọn Slot </option>
                     <option value="1">1</option>
                     <option value="2">2</option>
                     <option value="3">3</option>
                     <option value="4">4</option>
                     <option value="5">5</option>
                   </select>
-           
                   <p className="text-left ml-[100px] text-xl ">Ngày:</p>
                   <input
                     type="date"
@@ -323,6 +324,7 @@ function FormAddScheduleFillByWeek({ onAdded, initialData }) {
                   <p className="text-left ml-[100px] text-xl ">Phòng:</p>
                   <input
                     required
+                    readOnly
                     name="roomId"
                     className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl mb-3 px-4"
                     onChange={handleInputChange}

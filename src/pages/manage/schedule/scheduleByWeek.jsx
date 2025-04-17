@@ -546,7 +546,6 @@ const formatDateISO = (dateObj) => {
               </option>
             ))}
           </select>
-
           {/* Select lớp */}
           <select
             className="max-w-sm mx-auto ml-3 h-12 w-[168px] border border-black rounded-xl"
@@ -638,7 +637,8 @@ const formatDateISO = (dateObj) => {
           </div>
           {/* --- End Phân trang --- */}
         </div>
-        <table className="w-full  border-separate border-spacing-0 mb-4">
+        <div className="w-full overflow-x-auto">
+        <table className="w-full border-separate border-spacing-0 mb-4 ">
           <thead>
             <tr>
               <th className="border-t border-l border-black rounded-tl-xl  p-2 bg-secondaryBlue text-white">
@@ -742,6 +742,8 @@ const formatDateISO = (dateObj) => {
             })}
           </tbody>
         </table>
+        </div>
+
       </div>
       {/* end Bảng thời khóa biểu */}
       {/* Ẩn & Hiện form */}

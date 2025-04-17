@@ -66,7 +66,10 @@ function FormAddSchedule({ onAdded }) {
     if (classSubjectIdSelected) {
     const fetchClassSubject = async () => {
       const classSubjects = await getClassesIdByClassId(classSubjectIdSelected); //Lấy ra list  trong database
-      setClassSubjects(classSubjects.result);
+      const activeData = classSubjects.result.filter(
+        (item) => item.status !== 2
+      );
+      setClassSubjects(activeData);
     };
     fetchClassSubject();}
   }, [classSubjectIdSelected]);
@@ -116,7 +119,6 @@ function FormAddSchedule({ onAdded }) {
   //#region handle input change
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-
     setNewSchedule((prev) => ({
       ...prev,
       [name]:

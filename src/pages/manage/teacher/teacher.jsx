@@ -32,8 +32,8 @@ function ManageTeacher() {
 
   //Update bảng mà không cần reload
   const handleReload = async () => {
-    const data = await getTeachers(); // Gọi API để lấy lại tất cả các phòng
-    setTeacherData(data.result); // Cập nhật lại dữ liệu phòng
+    const data = await getTeachers(); 
+    setTeacherData(data.result); 
   };
 
   // Lấy danh sách Major

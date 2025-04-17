@@ -89,7 +89,10 @@ function FormAddScheduleFill({ onAdded ,initialData }) {
     if (classSubjectIdSelected) {
     const fetchClassSubject = async () => {
       const classSubjects = await getClassesIdByClassId(classSubjectIdSelected); //Lấy ra list  trong database
-      setClassSubjects(classSubjects.result);
+      const activeData = classSubjects.result.filter(
+        (item) => item.status !== 2
+      );
+      setClassSubjects(activeData);
     };
     fetchClassSubject();}
   }, [classSubjectIdSelected]);
@@ -261,7 +264,7 @@ function FormAddScheduleFill({ onAdded ,initialData }) {
                     name=""
                     onChange={(e) => setClassSubjectIdSelected(e.target.value)}
                   >
-                    <option value="">-- Chọn Lớp  --</option>
+                    <option value="">Chọn Lớp  </option>
                     {classSubjectIds.map((cs) => (
                       <option key={cs} value={cs}>
                         {cs}
@@ -279,7 +282,7 @@ function FormAddScheduleFill({ onAdded ,initialData }) {
                     value={newSchedule.classSubjectId}
                     onChange={handleInputChange}
                   >
-                    <option value="">-- Chọn Lớp-Môn --</option>
+                    <option value="">Chọn Lớp - Môn</option>
                     {classSubjects.map((cs) => (
                       <option key={cs.classSubjectId} value={cs.classSubjectId}>
                         {cs.classId}_{cs.subjectId}_{cs.semesterId}
@@ -293,7 +296,7 @@ function FormAddScheduleFill({ onAdded ,initialData }) {
                     className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl mb-3 px-4"
                     onChange={handleInputChange}
                   >
-                    <option value="">-- Chọn Giáo viên --</option>
+                    <option value="">Chọn Giáo viên </option>
                     {teachers.map((r) => (
                       <option key={r.userId} value={r.userId}>
                         {r.fullUserName} - {r.majorId}
@@ -317,7 +320,7 @@ function FormAddScheduleFill({ onAdded ,initialData }) {
                     onChange={handleInputChange}
                     className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl mb-3 px-4"
                   >
-                    <option value="">-- Chọn Slot --</option>
+                    <option value="">Chọn Slot </option>
                     <option value="1">1</option>
                     <option value="2">2</option>
                     <option value="3">3</option>
@@ -328,6 +331,7 @@ function FormAddScheduleFill({ onAdded ,initialData }) {
                   <p className="text-left ml-[100px] text-xl ">Phòng:</p>
                   <input
                     required
+                    readOnly
                     name="roomId"
                     className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl mb-3 px-4"
                     onChange={handleInputChange}

@@ -9,6 +9,14 @@ export const GetUserByID = async (id) => {
         console.log(error);
     }
 }
+export const GetUserByEmail = async (email) => {
+    try {
+        const response = await request.get(`/User/Email/${email}`)
+        return response.data
+    } catch (error) {
+        console.log(error);
+    }
+}
 
 export const ResetPassword = async (passwordData) => {
     try {

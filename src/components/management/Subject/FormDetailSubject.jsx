@@ -142,23 +142,23 @@ function FormDetailSubject({ subjectDetail, onSubjectDetailUpdated }) {
                                 <button
                                     type="button"
                                     className="w-full max-w-[150px] h-[50px] sm:h-[45px] border rounded-2xl bg-gray-500 text-white font-bold text-lg sm:text-xl transition-all hover:scale-105 hover:bg-primaryBlue mt-auto mb-auto"
-                                    onClick={() => handleChangeSubjectStatus(subjectData.subjectId, 2)}
+                                    onClick={() => handleChangeSubjectStatus(subjectData.subjectId, 0 )}
                                 >
-                                    Đã kết thúc
+                                    Vô hiệu hóa 
                                 </button>
                                 <button
                                     type="button"
                                     className="w-full max-w-[150px] h-[50px] sm:h-[45px] border rounded-2xl bg-yellow-500 text-white font-bold text-lg sm:text-xl transition-all hover:scale-105 hover:bg-yellow-600 mt-auto mb-auto"
-                                    onClick={() => handleChangeSubjectStatus(subjectData.subjectId, 0)}
+                                    onClick={() => handleChangeSubjectStatus(subjectData.subjectId, 1)}
                                 >
-                                    Chưa bắt đầu
+                                   Đang diễn ra
                                 </button>
                                 <button
                                     type="button"
                                     className="w-full max-w-[150px] h-[50px] sm:h-[45px] border rounded-2xl bg-red-500 text-white font-bold text-lg sm:text-xl transition-all hover:scale-105 hover:bg-red-600 mt-auto mb-auto"
-                                    onClick={() => handleChangeSubjectStatus(subjectData.subjectId, 1)}
+                                    onClick={() => handleChangeSubjectStatus(subjectData.subjectId, 2)}
                                 >
-                                    Đang diễn ra
+                                    Đang tạm hoãn
                                 </button>
                             </div>
                             <p className="text-left ml-[100px] text-xl">Mô tả:</p>

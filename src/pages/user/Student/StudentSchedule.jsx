@@ -242,51 +242,28 @@ const StudentSchedule = () => {
     return null;
   };
 
-  // Render các dòng (dựa theo slot, giả sử có 5 slot)
   const renderTableRows = () => {
-    if (loading) {
+    return slotData.map((slot) => {
       return (
-        <tr>
-          <td colSpan="8" className="text-center">
-            Đang tải dữ liệu...
-          </td>
-        </tr>
-      );
-    }
-
-    // Nếu không có lịch (data rỗng)
-    if (!scheduleData || scheduleData.length === 0) {
-      return (
-        <tr>
-          <td colSpan="8" className="text-center">
-            Không có dữ liệu lịch
-          </td>
-        </tr>
-      );
-    }
-
-    const slots = [1, 2, 3, 4, 5];
-    return slots.map((slotId) => {
-      let extraClass = slotId === 5 ? " rounded-b-xl" : "";
-      return (
-        <tr key={slotId}>
+        <tr key={slot.slotId}>
           <td
-            className={`border-t border-l border-black font-bold text-center${extraClass}`}
+            className={`border border-black font-bold text-center`}
           >
-            Buổi {slotId}
+            Buổi {slot.slotId}
           </td>
           {[1, 2, 3, 4, 5, 6, 0].map((day) => (
             <td
-              key={`${slotId}-${day}`}
-              className="border-t border-l border-black"
+              key={`${slot.slotId}-${day}`}
+              className="border border-black"
             >
-              {renderCellForDay(day, slotId)}
+              {renderCellForDay(day, slot.slotId)}
             </td>
           ))}
         </tr>
       );
     });
   };
+  
   //#endregion
   return (
     <div className="w-full max-w-[1920px] mb-5 p-4">

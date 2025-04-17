@@ -379,10 +379,8 @@ function ManageScheduleByDay() {
               Phòng học
             </th>
             {slotData.map((slot, index) => {
-              let slotLabel;
               let extraClass = "";
-              if (index + 1 > 4) {
-                slotLabel === 5;
+              if (index + 1 > slotData.length - 1 ) {
                 extraClass = "border-r rounded-tr-xl";
               }
               return (

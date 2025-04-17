@@ -141,7 +141,7 @@ function ManageStaff() {
       return;
     }
     try {
-      const response = await await importStaff(selectedFile);
+      const response = await importStaff(selectedFile);
       if (response.isSuccess) {
         setShowAlert("success");
         setSuccessMessage(response.message);
@@ -156,7 +156,7 @@ function ManageStaff() {
       setShowAlert("error");
       setErrorMessage("Import thất bại. Vui lòng thử lại!");
       setTimeout(() => setShowAlert(false), 3000);
-      console.error("Lỗi khi thêm giáo viên:", error);
+      console.error("Lỗi khi thêm nhân viên:", error);
     }
   };
   //#endregion

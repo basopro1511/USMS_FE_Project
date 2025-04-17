@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import CryptoJS from "crypto-js";
+import { ForgotPasswordOTP, GetUserByEmail } from "../../services/userService";
 function SentOTP() {
   const navigate = useNavigate();
   // Lấy OTP đã lưu từ localStorage (đã lưu từ lúc gửi OTP)
@@ -24,13 +25,13 @@ function SentOTP() {
       }
     }
   };
-
+  const email = localStorage.getItem("email");
   const storedOTP = localStorage.getItem("OTP6Digit");
   const secretKey = "KeysuperBiMat"; // Một key bí mật để mã hóa
   const bytes = CryptoJS.AES.decrypt(storedOTP, secretKey);
   const decryptedOTP = bytes.toString(CryptoJS.enc.Utf8);
 
-  // Xử lý submit form OTP
+  //#region Handle Submid OTP
   const handleSubmit = (e) => {
     e.preventDefault();
     const inputOTP = otpDigits.join("");
@@ -48,6 +49,61 @@ function SentOTP() {
       setTimeout(() => setShowAlert(false), 2000);
     }
   };
+  //#endregion
+
+  //#region fetch Email API
+  const [emailData, setEmailData] = useState([]);
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const data = await GetUserByEmail(email); //Lấy ra data của user  trong database
+      setEmailData(data.result);
+    };
+    fetchUserData();
+  }, []);
+  //#endregion
+
+  //#region Hide Email
+  function maskEmail(email) {
+    if (!email) return "";
+    const [local, domain] = email.split("@");
+    if (local.length <= 4) {
+      return local[0] + "***@" + domain;
+    }
+    const start = local.slice(0, 2);
+    const end = local.slice(-2);
+    return `${start}${"*".repeat(local.length - 4)}${end}@${domain}`;
+  }
+  //#endregion
+
+  //#region Handle Resend OTP
+  // trong SentOTP component:
+  const handleResend = async () => {
+    try {
+      const response = await ForgotPasswordOTP(email);
+      if (response.isSuccess) {
+        // mã hóa và lưu lại OTP mới
+        const secretKey = "KeysuperBiMat";
+        const encryptedOTP = CryptoJS.AES.encrypt(
+          response.result,
+          secretKey
+        ).toString();
+        localStorage.setItem("OTP6Digit", encryptedOTP);
+        setShowAlert("success");
+        setSuccessMessage("Mã OTP mới đã được gửi đến email của bạn.");
+        setTimeout(() => setShowAlert(false), 3000);
+      } else {
+        setShowAlert("error");
+        setErrorMessage(response.message);
+        setTimeout(() => setShowAlert(false), 3000);
+      }
+    } catch (err) {
+      setShowAlert("error");
+      setErrorMessage("Gửi lại OTP thất bại, vui lòng thử lại.");
+      console.log(err);
+      setTimeout(() => setShowAlert(false), 3000);
+    }
+  };
+  //#endregion
 
   return (
     <>
@@ -104,7 +160,10 @@ function SentOTP() {
             </h1>
             <p className="text-lg md:text-2xl text-gray-700">
               Chúng tôi đã gửi liên kết tới{" "}
-              <span className="font-bold">email@email.com</span>.
+              <span className="font-bold">
+                {maskEmail(emailData.personalEmail)}
+              </span>
+              .
             </p>
             <p className="text-lg md:text-2xl text-gray-700 mt-2">
               Nhập mã gồm 6 chữ số được đề cập trong email.
@@ -135,15 +194,15 @@ function SentOTP() {
           </form>
           {/* Resend Email */}
           <div className="text-center">
-          
             <p className="text-gray-600 text-sm md:text-base">
-              Bạn vẫn chưa nhận được email?{" "}
-              <a
-                href="/forgotPassword"
+              Bạn vẫn chưa nhận được OTP?{" "}
+              <button
+                type="button"
+                onClick={handleResend}
                 className="text-blue-600 font-semibold hover:underline"
               >
-                Gửi lại email
-              </a>
+                Gửi lại OTP
+              </button>
             </p>
           </div>
         </div>
