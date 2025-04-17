@@ -9,6 +9,8 @@ function SentOTP() {
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [showAlert, setShowAlert] = useState(false); // Cho alert chung
+  const [isResending, setIsResending] = useState(false);
+
   // Xử lý khi nhập một ô OTP
   const handleChange = (e, index) => {
     const value = e.target.value;
@@ -78,6 +80,8 @@ function SentOTP() {
   //#region Handle Resend OTP
   // trong SentOTP component:
   const handleResend = async () => {
+    if (isResending) return;
+    setIsResending(true);
     try {
       const response = await ForgotPasswordOTP(email);
       if (response.isSuccess) {
@@ -102,6 +106,7 @@ function SentOTP() {
       console.log(err);
       setTimeout(() => setShowAlert(false), 3000);
     }
+    setIsResending(false);
   };
   //#endregion
 
@@ -199,9 +204,18 @@ function SentOTP() {
               <button
                 type="button"
                 onClick={handleResend}
-                className="text-blue-600 font-semibold hover:underline"
+                disabled={isResending}
+                className={`
+                  font-semibold
+                  hover:underline
+                  ${
+                    isResending
+                      ? "opacity-50 cursor-not-allowed hover:no-underline"
+                      : "text-blue-600"
+                  }
+                `}
               >
-                Gửi lại OTP
+                {isResending ? "Đang gửi lại..." : "Gửi lại OTP"}
               </button>
             </p>
           </div>
