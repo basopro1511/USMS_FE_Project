@@ -241,16 +241,7 @@ function UserHome() {
                 </Link>
               </div>
 
-              {/* View exam schedule */}
-              <div className="w-full sm:w-[320px] h-[390px] border border-black mt-6 bg-white rounded-2xl text-center">
-                <i className="fa fa-calendar-day text-[150px] mt-10"></i>
-                <p className="font-bold text-[24px] mt-2 mb-2">Xem lịch thi</p>
-                <Link to="/studentViewExam">
-                  <button className="border rounded-xl bg-tritenaryGreen w-[200px] h-[70px] p-2 hover:scale-90 hover:bg-primaryGreen hover:text-white text-[20px] font-semibold">
-                    Xem ngay
-                  </button>
-                </Link>
-              </div>
+        
 
               {/* View personal information */}
               <div className="w-full sm:w-[320px] h-[390px] border border-black mt-6 bg-white rounded-2xl text-center">
