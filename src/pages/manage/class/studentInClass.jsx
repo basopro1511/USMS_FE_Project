@@ -1,14 +1,15 @@
 import { useState, useEffect } from "react";
 import FormAddStudentInClass from "../../../components/management/StudentInClass/FormAddStudentInClass";
 import PopUpRemoveStudentInClass from "../../../components/management/StudentInClass/PopUpRemoveStudentInClass";
-import { GetStudentDataByClassId } from "../../../services/studentInClassService";
+import { GetStudentDataByClassId, handleExportStudentInClass } from "../../../services/studentInClassService";
 import { useParams } from "react-router-dom";
 import { getMajors } from "../../../services/majorService";
+import Pagination from "../../../components/management/HeaderFooter/Pagination";
 
 function StudentInClass() {
   //#region State & error
   const [studentData, setStudentData] = useState([]);
-  const { classSubjectId, classId } = useParams(); // Lấy classId, classSubjectId từ URL
+  const { classSubjectId, classId, subjectId } = useParams(); // Lấy classId, classSubjectId từ URL
   // State để lưu ID của lịch cần xóa
   const [deleteId, setDeleteId] = useState(null);
   const [showDeletePopup, setShowDeletePopup] = useState(false);
@@ -58,19 +59,18 @@ function StudentInClass() {
     setShowDeletePopup(true);
   };
 
-  
-      const [majorData, setMajorData] = useState([]);
-      useEffect(() => {
-        const fetchMajorData = async () => {
-          try {
-            const majorData = await getMajors();
-            setMajorData(majorData.result || []);
-          } catch (error) {
-            console.error("Lỗi khi lấy danh sách chuyên ngành:", error);
-          }
-        };
-        fetchMajorData();
-      }, []);
+  const [majorData, setMajorData] = useState([]);
+  useEffect(() => {
+    const fetchMajorData = async () => {
+      try {
+        const majorData = await getMajors();
+        setMajorData(majorData.result || []);
+      } catch (error) {
+        console.error("Lỗi khi lấy danh sách chuyên ngành:", error);
+      }
+    };
+    fetchMajorData();
+  }, []);
   //#endregion
 
   //#region Filter, Sort, Paging
@@ -127,15 +127,19 @@ function StudentInClass() {
     return 0;
   });
 
+  //#region Paging
+  const totalItems = sortedData.length;
+  const totalPages = Math.ceil(totalItems / pageSize);
   const indexOfLastItem = currentPage * pageSize;
   const indexOfFirstItem = indexOfLastItem - pageSize;
   const currentData = sortedData.slice(indexOfFirstItem, indexOfLastItem);
 
   const handlePageChange = (newPage) => {
-    if (newPage >= 1 && newPage <= Math.ceil(sortedData.length / pageSize)) {
+    if (newPage >= 1 && newPage <= totalPages) {
       setCurrentPage(newPage);
     }
   };
+  //#endregion
   //#endregion
 
   //#region Render UI
@@ -144,6 +148,7 @@ function StudentInClass() {
       <div className="flex justify-center">
         <p className="mt-8 text-3xl font-bold">
           Sinh viên trong lớp <span className="text-red-600">{classId}</span>
+          <span className="text-red-600">- {subjectId}</span>
         </p>
       </div>
       <p className="ml-4 mt-5">Tìm kiếm: </p>
@@ -169,8 +174,16 @@ function StudentInClass() {
             placeholder="Tìm theo Tên sinh viên"
           />
         </div>
+        <button
+          type="button"
+          className="ml-auto mr-2 border border-white rounded-xl w-full md:w-[150px] bg-blue-600 hover:bg-blue-700 text-white font-semibold hover:scale-95 transition-all duration-300"
+          onClick={() => handleExportStudentInClass(classSubjectId,classId,subjectId)} // Sử dụng callback hàm
+        >
+          <i className="fa fa-download mr-2" aria-hidden="true"></i>
+          Export Dữ liệu sinh viên trong lớp học
+        </button>
         {/* Button Container */}
-        <div className="flex ml-auto space-x-4 mt-2 md:mt-0 mr-4">
+        <div className="flex  space-x-4 mt-2 md:mt-0 mr-4">
           {/* Add Student Button */}
           <button
             type="button"
@@ -331,50 +344,24 @@ function StudentInClass() {
                   </svg>
                 </div>
               </th>
-              <th
-                className="p-4 font-semibold cursor-pointer transition-all hover:bg-primaryBlue text-white text-center align-middle bg-secondaryBlue "
-                onClick={() => handleSort("term")}
-              >
-                <div className="flex items-center justify-between">
-                  <p className="m-auto transition-all hover:scale-105">
-                    Kỳ học
-                  </p>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth="2"
-                    stroke="currentColor"
-                    aria-hidden="true"
-                    className="w-4 h-4"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9"
-                    />
-                  </svg>
-                </div>
-              </th>
               <th className="p-4 font-semibold text-white text-center align-middle bg-secondaryBlue">
                 <span>Thao tác</span>
               </th>
             </tr>
           </thead>
           <tbody>
-          {currentData.map((student, index) => {
-                // tăng số thứ tự
-             const stt = indexOfFirstItem + (index + 1);
-                // Tìm majorName tương ứng
-                const foundMajor = majorData.find(
-                  (m) => m.majorId === student.majorId
-                );
-                const majorName = foundMajor
-                  ? foundMajor.majorName
-                  : student.majorId;
-                return (
-                  
-                  <tr
+            {currentData.map((student, index) => {
+              // tăng số thứ tự
+              const stt = indexOfFirstItem + (index + 1);
+              // Tìm majorName tương ứng
+              const foundMajor = majorData.find(
+                (m) => m.majorId === student.majorId
+              );
+              const majorName = foundMajor
+                ? foundMajor.majorName
+                : student.majorId;
+              return (
+                <tr
                   key={student.studentId}
                   className="hover:bg-gray-50 even:bg-gray-50"
                 >
@@ -391,13 +378,12 @@ function StudentInClass() {
                   <td className="p-4 border-b text-center">
                     {student.phoneNumber}
                   </td>
-                  <td className="p-4 border-b text-center">
-                    {majorName}
-                  </td>
-                  <td className="p-4 border-b text-center">{student.term}</td>
+                  <td className="p-4 border-b text-center">{majorName}</td>
                   <td className="p-4 border-b text-center">
                     <button
-                      onClick={() => handleDeleteStudent(student.studentClassId)}
+                      onClick={() =>
+                        handleDeleteStudent(student.studentClassId)
+                      }
                       type="button"
                       className="border border-white w-[45px] h-[35px] bg-red-600 text-white font-bold rounded-[10px] transition-all duration-300  hover:scale-95"
                     >
@@ -408,38 +394,20 @@ function StudentInClass() {
                     </button>
                   </td>
                 </tr>
-                );
-              })}
-              </tbody>
+              );
+            })}
+          </tbody>
         </table>
       </div>
-      {/* Phân trang - start */}
-      <div className="flex mt-5">
-        {/* Button: Previous */}
-        <button
-          type="button"
-          className="rounded-2xl transition-all duration-300 hover:bg-quaternarty hover:scale-95 border border-white w-[130px] h-[40px] bg-[#3c6470] text-white font-semibold ml-auto mr-4 flex items-center justify-center"
-          onClick={() => handlePageChange(currentPage - 1)}
-        >
-          <span className="font-bold text-xl">&lt;</span> Trang Trước
-        </button>
-
-        {/* Date Range */}
-        <div className="border-2 border-black rounded-xl w-[220px] h-[40px] bg-primaryGray flex items-center justify-center">
-          <p>{`Trang ${currentPage}`}</p>
-        </div>
-
-        {/* Button: Next */}
-        <button
-          type="button"
-          className="rounded-2xl transition-all duration-300 hover:bg-quaternarty hover:scale-95 border border-white w-[130px] h-[40px] bg-[#3c6470] text-white font-semibold ml-4 mr-auto flex items-center justify-center"
-          onClick={() => handlePageChange(currentPage + 1)}
-        >
-          Trang Sau <span className="font-bold text-xl">&gt;</span>
-        </button>
-      </div>
-      {/* Phân trang - end */}
-
+      {/* Phân trang - Start */}
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        pageSize={pageSize}
+        totalItems={totalItems}
+        onPageChange={handlePageChange}
+      />
+      {/* Phân trang - End */}
       {/* Add Student Form */}
       {showAddForm && (
         <FormAddStudentInClass

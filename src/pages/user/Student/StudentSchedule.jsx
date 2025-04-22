@@ -9,10 +9,15 @@ const StudentSchedule = () => {
   const [loading, setLoading] = useState(true); // Trạng thái tải dữ liệu
   const [, setSelectedWeek] = useState(1); // Số thứ tự của tuần được chọn
   const [slotData, setSlotData] = useState([]);
-  const studentId = "SE250001";
+
+  //#region  Login Data
+  const userId = localStorage.getItem("userId");
+  // Dung de check Role la Student hay la Teacher de hien thi nut bam tuong ung voi ROLE
+  //#endregion
+
   // State cho dữ liệu filter (majorId, classId, term, startDay, endDay)
   const [filterData, setFilterData] = useState({
-    studentId: studentId,
+    studentId: userId,
     startDay: "",
     endDay: "",
   });
@@ -43,7 +48,11 @@ const StudentSchedule = () => {
             scheduleRes.result &&
             scheduleRes.result.length > 0
           ) {
-            setScheduleData(scheduleRes.result);
+            const available = scheduleRes.result.filter(
+              (item) => item.status === 1
+            );
+            setScheduleData(available);
+            console.log(available);
           } else {
             setScheduleData([]);
           }
@@ -198,13 +207,13 @@ const StudentSchedule = () => {
         const endTime = slotInfo ? formatTime(slotInfo.endTime) : "N/A";
 
         return (
-          <td key={schedule.classScheduleId} className="pt-1 pb-1  flex ">
+          <td key={schedule.scheduleId} className="pt-1 pb-1  flex ">
             <div className="p-2 border border-black w-[190px] h-auto m-auto rounded-2xl bg-whiteBlue">
               <div className="text-left">
               <div className="text-[14px] sm:text-[16px] md:text-[18px]">
                 Môn:{" "}
-                <Link
-                  to="/studentActivityDetail"
+                <Link                       
+                 to={`/studentActivityDetail/${schedule.scheduleId}`}
                   className="text-blue-600 font-bold hover:text-blue-900 cursor-pointer hover:underline"
                 >
                   {schedule.subjectId}
@@ -233,51 +242,28 @@ const StudentSchedule = () => {
     return null;
   };
 
-  // Render các dòng (dựa theo slot, giả sử có 5 slot)
   const renderTableRows = () => {
-    if (loading) {
+    return slotData.map((slot) => {
       return (
-        <tr>
-          <td colSpan="8" className="text-center">
-            Đang tải dữ liệu...
-          </td>
-        </tr>
-      );
-    }
-
-    // Nếu không có lịch (data rỗng)
-    if (!scheduleData || scheduleData.length === 0) {
-      return (
-        <tr>
-          <td colSpan="8" className="text-center">
-            Không có dữ liệu lịch
-          </td>
-        </tr>
-      );
-    }
-
-    const slots = [1, 2, 3, 4, 5];
-    return slots.map((slotId) => {
-      let extraClass = slotId === 5 ? " rounded-b-xl" : "";
-      return (
-        <tr key={slotId}>
+        <tr key={slot.slotId}>
           <td
-            className={`border-t border-l border-black font-bold text-center${extraClass}`}
+            className={`border border-black font-bold text-center`}
           >
-            Buổi {slotId}
+            Buổi {slot.slotId}
           </td>
           {[1, 2, 3, 4, 5, 6, 0].map((day) => (
             <td
-              key={`${slotId}-${day}`}
-              className="border-t border-l border-black"
+              key={`${slot.slotId}-${day}`}
+              className="border border-black"
             >
-              {renderCellForDay(day, slotId)}
+              {renderCellForDay(day, slot.slotId)}
             </td>
           ))}
         </tr>
       );
     });
   };
+  
   //#endregion
   return (
     <div className="w-full max-w-[1920px] mb-5 p-4">

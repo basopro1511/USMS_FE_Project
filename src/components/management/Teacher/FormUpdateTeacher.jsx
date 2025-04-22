@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from "react";
 import { getMajors } from "../../../services/majorService";
 import { UpdateTeacher } from "../../../services/TeacherService";
+import { bool } from "prop-types";
 
 function FormUpdateTeacher({ teacherToUpdate, onReaload }) {
   const [errorMessage, setErrorMessage] = useState("");
@@ -15,7 +16,7 @@ function FormUpdateTeacher({ teacherToUpdate, onReaload }) {
     firstName: "",
     middleName: "",
     lastName: "",
-    gender: true,
+    gender: bool,
     passwordHash: "",
     email: "",
     personalEmail: "",
@@ -202,7 +203,7 @@ function FormUpdateTeacher({ teacherToUpdate, onReaload }) {
                           onChange={(e) =>
                             setTeacherData({
                               ...teacherData,
-                              gender: e.target.value === "true",
+                              gender: JSON.parse(e.target.value),
                             })
                           }
                         >
@@ -214,6 +215,7 @@ function FormUpdateTeacher({ teacherToUpdate, onReaload }) {
                         </select>
                       </div>
                     </div>
+                    
                     <div className="flex gap-4">
                       <div>
                         <p className="text-left">Họ:</p>
@@ -265,6 +267,7 @@ function FormUpdateTeacher({ teacherToUpdate, onReaload }) {
                       <input
                         type="email"
                         required
+                        readOnly
                         className="w-full h-[40px] border border-gray-300 rounded-md px-3"
                         value={teacherData.email}
                         onChange={(e) =>
@@ -361,7 +364,7 @@ function FormUpdateTeacher({ teacherToUpdate, onReaload }) {
                     type="submit"
                     className="w-[150px] h-[50px] bg-secondaryBlue text-white rounded-md font-bold"
                   >
-                    Lưu
+                    Cập nhật
                   </button>
                   <button
                     type="button"

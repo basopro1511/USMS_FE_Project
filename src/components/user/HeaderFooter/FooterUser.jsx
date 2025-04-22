@@ -11,6 +11,5 @@ function FooterUser() {
       </div>
     );
   }
-
   export default FooterUser;
   

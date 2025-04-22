@@ -1,3 +1,4 @@
+import { saveAs } from "file-saver";
 import request from "../../utils/baseURL";
 
 //Get all Students in Database 
@@ -45,3 +46,51 @@ export const importTeachers = async (file) => {
     }
 };
 //#endregion
+export const changeSelectedTeacherStatus = async (userIds, status) => {
+    try {
+        // Construct the URL with id and status
+        const response = await request.put(`/Teacher/ChangeStatus?status=${status}`, 
+      userIds,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+        return response.data;
+    } catch (error) {
+        console.log(error);
+    }
+}
+export const handleExportEmptyFormTeacher = async () => {
+    try {
+      const response = await request.get(`/Teacher/exportEmpty`, {
+        responseType: "blob", // Cực kỳ quan trọng
+      });
+      const blob = new Blob([response.data], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+      saveAs(blob, "MauThemGiaoVien.xlsx");
+      return response.data;
+    } catch (error) {
+      console.error("Lỗi export:", error);
+    }
+  };
+
+  export const handleExportTeacher = async (filters) => {
+    try {
+      const params = new URLSearchParams();
+      if (filters.majorId) params.append("majorId", filters.majorId);
+      if (filters.status !== undefined) params.append("status", filters.status.toString());
+      const response = await request.get(`/Teacher/export?${params.toString()}`, {
+        responseType: "blob", // Cực kỳ quan trọng
+      });
+      const blob = new Blob([response.data], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+      saveAs(blob, "DanhSachGiaoVien"+filters.majorId+ ".xlsx");
+      return response.data;
+    } catch (error) {
+      console.error("Lỗi export:", error);
+    }
+  };

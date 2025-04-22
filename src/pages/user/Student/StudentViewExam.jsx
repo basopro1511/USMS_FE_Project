@@ -3,18 +3,39 @@ import { getExamScheduleForStudent } from "../../../services/examScheduleService
 
 function StudentViewExam() {
   const [studentData, setStudentData] = useState([]);
+  const [loading, setLoading] = useState(true);
+   //#region  Login Data
+   const userId = localStorage.getItem("userId");
+   //#endregion
+ 
   //#region Fetch Data
-
-  useEffect(() => {
-    const fetchUserData = async () => {
-      const data = await getExamScheduleForStudent("SE0001");
-      setStudentData(data.result);
-    };
-    fetchUserData();
-  }, []);
+    //#region  Lấy dữ liệu user từ API
+    useEffect(() => {
+      const fetchUserData = async () => {
+        try {
+          const data = await getExamScheduleForStudent(userId); // Lấy ra data của user trong database
+          const available = data.result.filter(
+            (item) => item.status === 1
+          );
+          setStudentData(available);
+        } catch (error) {
+          console.error("Error fetching user data:", error);
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchUserData();
+    }, [userId]);
+    //#endregion
 
   //#endregion
-
+  // Nếu đang loading hoặc không có dữ liệu user, hiển thị UI loading (hoặc thông báo lỗi)
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+  if (!studentData) {
+    return <div>Không tìm thấy thông tin người dùng.</div>;
+  }
   return (
     <div>
       {/* Tiêu đề */}

@@ -1,3 +1,4 @@
+import { saveAs } from "file-saver";
 import request from "../../utils/baseURL";
 
 //Get all Students in Database 
@@ -45,3 +46,52 @@ export const importStaff = async (file) => {
     }
 };
 //#endregion
+export const changeSelectedStaffStatus = async (userIds, status) => {
+    try {
+        // Construct the URL with id and status
+        const response = await request.put(`/Staff/ChangeStatus?status=${status}`, 
+      userIds,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+        return response.data;
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+export const handleExportStaff = async (filters) => {
+    try {
+      const params = new URLSearchParams();
+      if (filters.majorId) params.append("majorId", filters.majorId);
+      if (filters.status !== undefined) params.append("status", filters.status.toString());
+      const response = await request.get(`/Staff/export?${params.toString()}`, {
+        responseType: "blob", // Cực kỳ quan trọng
+      });
+      const blob = new Blob([response.data], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+      saveAs(blob, "DanhSachNhanVien.xlsx");
+      return response.data;
+    } catch (error) {
+      console.error("Lỗi export:", error);
+    }
+  };
+  
+  export const handleExportEmptyFormStaff = async () => {
+      try {
+        const response = await request.get(`/Staff/exportEmpty`, {
+          responseType: "blob", // Cực kỳ quan trọng
+        });
+        const blob = new Blob([response.data], {
+          type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        });
+        saveAs(blob, "MauThemNhanVien.xlsx");
+        return response.data;
+      } catch (error) {
+        console.error("Lỗi export:", error);
+      }
+    };

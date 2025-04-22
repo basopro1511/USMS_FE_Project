@@ -133,10 +133,10 @@ function FormUpdateSlot({ dataToUpdate, onUpdated}) {
                     type="submit"
                     className="w-full max-w-[200px] h-[50px] sm:h-[64px] border rounded-3xl bg-secondaryBlue text-white font-bold text-lg sm:text-2xl transition-all hover:scale-105 hover:bg-primaryBlue"
                   >
-                    Thêm
+                    Cập nhật
                   </button>
                   <button
-                    type="button" // Sử dụng type="button" để ngừng việc submit form
+                    type="button" 
                     className="w-full max-w-[200px] h-[50px] sm:h-[64px] border rounded-3xl bg-red-500 text-white font-bold text-lg sm:text-2xl transition-all hover:scale-105 hover:bg-red-700 mb-8"
                     onClick={handleCancel} // Ẩn form khi nhấn nút hủy
                   >

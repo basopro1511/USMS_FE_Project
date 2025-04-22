@@ -67,16 +67,16 @@ function FormAddStudent({ onReaload }) {
       const updatedTeacher = { ...newTeacher, userAvartar };
       const response = await AddTeacher(updatedTeacher);
       if (response.isSuccess) {
+        onReaload(response.data);
+        setIsFormVisible(false); 
         setShowAlert("success");
         setSuccessMessage(response.message);
         setTimeout(() => setShowAlert(false), 3000); 
-        setIsFormVisible(false); 
-        onReaload(response.data);
       } else {
+        setIsFormVisible(true); 
         setShowAlert("error");
         setErrorMessage(response.message);
         setTimeout(() => setShowAlert(false), 3000);
-        setIsFormVisible(true); 
       }
     } catch (error) {
       console.error("Lỗi khi thêm giáo viên:", error);

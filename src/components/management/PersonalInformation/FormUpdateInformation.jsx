@@ -1,6 +1,7 @@
 /* eslint-disable react/prop-types */
 import { useState, useEffect, useRef } from "react";
 import { UpdateStaff } from "../../../services/staffService";
+import { bool } from "prop-types";
 
 function FormUpdateInformation({ infoToUpdate, onReaload }) {
   const [errorMessage, setErrorMessage] = useState("");
@@ -14,7 +15,7 @@ function FormUpdateInformation({ infoToUpdate, onReaload }) {
     firstName: "",
     middleName: "",
     lastName: "",
-    gender: true,
+    gender: bool,
     passwordHash: "",
     email: "",
     personalEmail: "",
@@ -54,6 +55,7 @@ function FormUpdateInformation({ infoToUpdate, onReaload }) {
     e.preventDefault();
     try {
       const updatedStaff = { ...teacherData, userAvartar };
+      updatedStaff.majorId=" "
       const response = await UpdateStaff(updatedStaff); // Giả sử đây là API gọi để cập nhật thông tin giáo viên
       if (response.isSuccess) {
         setShowAlert("success");
@@ -157,7 +159,7 @@ function FormUpdateInformation({ infoToUpdate, onReaload }) {
                           onChange={(e) =>
                             setTeacherData({
                               ...teacherData,
-                              gender: e.target.value, // ép kiểu boolean luôn
+                              gender:JSON.parse(e.target.value), 
                             })
                           }
                         >

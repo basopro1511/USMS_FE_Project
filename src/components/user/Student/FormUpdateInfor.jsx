@@ -8,7 +8,6 @@ function FormUpdateStudentPersonalInformation({ infoToUpdate, onReaload }) {
   const [showAlert, setShowAlert] = useState(false);
   const [isFormVisible, setIsFormVisible] = useState(true);
   const fileInputRef = useRef(null); // Sử dụng useRef để tham chiếu đến input file
-
   const [studentData, setstudentData] = useState({
     userId: "",
     firstName: "",
@@ -151,7 +150,8 @@ function FormUpdateStudentPersonalInformation({ infoToUpdate, onReaload }) {
                         {/* Major Selection */}
                         <p className="text-left">Giới tính:</p>
                         <select
-                          required
+                          readOnly
+                          disabled
                           className="border rounded-md px-3 py-2 h-[40px]"
                           value={studentData.gender}
                           onChange={(e) =>
@@ -172,6 +172,7 @@ function FormUpdateStudentPersonalInformation({ infoToUpdate, onReaload }) {
                         <p className="text-left">Họ:</p>
                         <input
                           type="text"
+                          readOnly
                           required
                           className="w-full h-[40px] border border-gray-300 rounded-md px-3"
                           value={studentData.lastName}
@@ -186,6 +187,7 @@ function FormUpdateStudentPersonalInformation({ infoToUpdate, onReaload }) {
                       <div>
                         <p className="text-left">Tên đệm:</p>
                         <input
+                          readOnly
                           type="text"
                           className="w-full h-[40px] border border-gray-300 rounded-md px-3"
                           value={studentData.middleName}
@@ -200,6 +202,7 @@ function FormUpdateStudentPersonalInformation({ infoToUpdate, onReaload }) {
                       <div>
                         <p className="text-left">Tên:</p>
                         <input
+                        readOnly
                           type="text"
                           required
                           className="w-full h-[40px] border border-gray-300 rounded-md px-3"
@@ -213,7 +216,7 @@ function FormUpdateStudentPersonalInformation({ infoToUpdate, onReaload }) {
                         />
                       </div>
                     </div>
-              
+
                     {/* Lưu ẩn mật khẩu */}
                     <input
                       type="passwordHash"

@@ -32,12 +32,12 @@ function PopUpRemoveStudentInClass({ studentClassId, onDeleted }) {
       } else {
         setErrorMessage(response.message);
         setShowAlert("error");
-        setTimeout(() => setShowAlert(false), 3000);
+        setTimeout(() => setShowAlert(false), 1000);
       }
     } catch (error) {
       setErrorMessage(error);
       setShowAlert("error");
-      setTimeout(() => setShowAlert(false), 3000);
+      setTimeout(() => setShowAlert(false), 1000);
     }
   };
 

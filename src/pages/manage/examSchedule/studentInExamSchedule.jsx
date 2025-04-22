@@ -93,7 +93,7 @@ function StudentInExamSchedule() {
   };
 
   useEffect(() => {
-    const filteredData = studentData.filter(
+    const filteredData = studentData?.filter(
       (item) =>
         // Kiểm tra theo studentId nếu có
         (!filters.userId || item.userId.includes(filters.userId)) &&

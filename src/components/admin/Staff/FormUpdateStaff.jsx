@@ -1,6 +1,7 @@
 /* eslint-disable react/prop-types */
 import { useState, useEffect, useRef } from "react";
 import { UpdateStaff } from "../../../services/staffService";
+import { bool } from "prop-types";
 
 function FormUpdateStaff({ teacherToUpdate, onReaload }) {
   const [errorMessage, setErrorMessage] = useState("");
@@ -8,13 +9,12 @@ function FormUpdateStaff({ teacherToUpdate, onReaload }) {
   const [showAlert, setShowAlert] = useState(false);
   const [isFormVisible, setIsFormVisible] = useState(true);
   const fileInputRef = useRef(null); // Sử dụng useRef để tham chiếu đến input file
-
-  const [teacherData, setTeacherData] = useState({
+  const [staffData, setstaffData] = useState({
     userId: "",
     firstName: "",
     middleName: "",
     lastName: "",
-    gender: true,
+    gender: bool,
     passwordHash: "",
     email: "",
     personalEmail: "",
@@ -22,14 +22,14 @@ function FormUpdateStaff({ teacherToUpdate, onReaload }) {
     userAvartar: null,
     dateOfBirth: "",
     roleId: 2,
-    majorId: "",
+    majorId: "SE",
     status: 1,
     address: "",
   });
 
   useEffect(() => {
     if (teacherToUpdate) {
-      setTeacherData(teacherToUpdate);
+      setstaffData(teacherToUpdate);
     }
   }, [teacherToUpdate]);
 
@@ -53,8 +53,8 @@ function FormUpdateStaff({ teacherToUpdate, onReaload }) {
   const handleUpdate = async (e) => {
     e.preventDefault();
     try {    
-        const updatedTeacher = { ...teacherData, userAvartar };
-        updatedTeacher.majorId= "";
+        const updatedTeacher = { ...staffData, userAvartar };
+        updatedTeacher.majorId= "SE";
       const response = await UpdateStaff(updatedTeacher); // Giả sử đây là API gọi để cập nhật thông tin giáo viên
       if (response.isSuccess) {
         setShowAlert("success");
@@ -120,7 +120,7 @@ function FormUpdateStaff({ teacherToUpdate, onReaload }) {
                 <div className="flex gap-8">
                   <div>
                     <div className="mb-4">
-                     <img src={userAvartar ||teacherData.userAvartar} alt="Avatar" className="w-[180px] h-[220px] object-cover rounded-md" />
+                     <img src={userAvartar ||staffData.userAvartar} alt="Avatar" className="w-[180px] h-[220px] object-cover rounded-md" />
                      
                       <input
                         type="file"
@@ -148,10 +148,10 @@ function FormUpdateStaff({ teacherToUpdate, onReaload }) {
                           required
                           readOnly
                           className="w-full h-[40px] border border-gray-300 rounded-md px-3"
-                          value={teacherData.userId}
+                          value={staffData.userId}
                           onChange={(e) =>
-                            setTeacherData({
-                              ...teacherData,
+                            setstaffData({
+                              ...staffData,
                               teacherId: e.target.value,
                             })
                           }
@@ -163,11 +163,11 @@ function FormUpdateStaff({ teacherToUpdate, onReaload }) {
                         <select
                           required
                           className="border rounded-md px-3 py-2 h-[40px]"
-                          value={teacherData.gender}
+                          value={staffData.gender}
                           onChange={(e) =>
-                            setTeacherData({
-                              ...teacherData,
-                              gender: e.target.value === 'true' // ép kiểu boolean
+                            setstaffData({
+                              ...staffData,
+                              gender:JSON.parse(e.target.value) // ép kiểu boolean
                             })
                           }
                         >
@@ -184,10 +184,10 @@ function FormUpdateStaff({ teacherToUpdate, onReaload }) {
                           type="text"
                           required
                           className="w-full h-[40px] border border-gray-300 rounded-md px-3"
-                          value={teacherData.lastName}
+                          value={staffData.lastName}
                           onChange={(e) =>
-                            setTeacherData({
-                              ...teacherData,
+                            setstaffData({
+                              ...staffData,
                               lastName: e.target.value,
                             })
                           }
@@ -198,10 +198,10 @@ function FormUpdateStaff({ teacherToUpdate, onReaload }) {
                         <input
                           type="text"
                           className="w-full h-[40px] border border-gray-300 rounded-md px-3"
-                          value={teacherData.middleName}
+                          value={staffData.middleName}
                           onChange={(e) =>
-                            setTeacherData({
-                              ...teacherData,
+                            setstaffData({
+                              ...staffData,
                               middleName: e.target.value,
                             })
                           }
@@ -213,10 +213,10 @@ function FormUpdateStaff({ teacherToUpdate, onReaload }) {
                           type="text"
                           required
                           className="w-full h-[40px] border border-gray-300 rounded-md px-3"
-                          value={teacherData.firstName}
+                          value={staffData.firstName}
                           onChange={(e) =>
-                            setTeacherData({
-                              ...teacherData,
+                            setstaffData({
+                              ...staffData,
                               firstName: e.target.value,
                             })
                           }
@@ -224,15 +224,16 @@ function FormUpdateStaff({ teacherToUpdate, onReaload }) {
                       </div>
                     </div>
                     <div>
-                      <p className="text-left">Email:</p>
+                      <p className="text-left">Email ( hệ thống ):</p>
                       <input
                         type="email"
                         required
+                        readOnly
                         className="w-full h-[40px] border border-gray-300 rounded-md px-3"
-                        value={teacherData.email}
+                        value={staffData.email}
                         onChange={(e) =>
-                          setTeacherData({
-                            ...teacherData,
+                          setstaffData({
+                            ...staffData,
                             email: e.target.value,
                           })
                         }
@@ -242,10 +243,10 @@ function FormUpdateStaff({ teacherToUpdate, onReaload }) {
                     <input
                       type="passwordHash"
                       hidden
-                      value={teacherData.passwordHash}
+                      value={staffData.passwordHash}
                       onChange={(e) =>
-                        setTeacherData({
-                          ...teacherData,
+                        setstaffData({
+                          ...staffData,
                           passwordHash: e.target.value,
                         })
                       }
@@ -258,10 +259,10 @@ function FormUpdateStaff({ teacherToUpdate, onReaload }) {
                         type="email"
                         required
                         className="w-full h-[40px] border border-gray-300 rounded-md px-3"
-                        value={teacherData.personalEmail}
+                        value={staffData.personalEmail}
                         onChange={(e) =>
-                          setTeacherData({
-                            ...teacherData,
+                          setstaffData({
+                            ...staffData,
                             personalEmail: e.target.value,
                           })
                         }
@@ -273,10 +274,10 @@ function FormUpdateStaff({ teacherToUpdate, onReaload }) {
                         type="text"
                         required
                         className="w-full h-[40px] border border-gray-300 rounded-md px-3"
-                        value={teacherData.phoneNumber}
+                        value={staffData.phoneNumber}
                         onChange={(e) =>
-                          setTeacherData({
-                            ...teacherData,
+                          setstaffData({
+                            ...staffData,
                             phoneNumber: e.target.value,
                           })
                         }
@@ -288,10 +289,10 @@ function FormUpdateStaff({ teacherToUpdate, onReaload }) {
                         type="date"
                         required
                         className="w-full h-[40px] border border-gray-300 rounded-md px-3"
-                        value={teacherData.dateOfBirth}
+                        value={staffData.dateOfBirth}
                         onChange={(e) =>
-                          setTeacherData({
-                            ...teacherData,
+                          setstaffData({
+                            ...staffData,
                             dateOfBirth: e.target.value,
                           })
                         }
@@ -300,11 +301,11 @@ function FormUpdateStaff({ teacherToUpdate, onReaload }) {
                     <div>
                       <p className="text-left">Trạng thái</p>
                       <select
-                        value={teacherData.status}
+                        value={staffData.status}
                         className="w-full border rounded-md px-3 py-2"
                         onChange={(e) =>
-                          setTeacherData({
-                              ...teacherData,
+                          setstaffData({
+                              ...staffData,
                               status: parseInt(e.target.value),
                             })
                           }

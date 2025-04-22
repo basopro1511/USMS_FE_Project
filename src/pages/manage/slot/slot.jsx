@@ -3,6 +3,7 @@ import FormAddSlot from "../../../components/management/Slot/FormAddSlot";
 import FormUpdateSlot from "../../../components/management/Slot/FormUpdateSlot";
 import FormDetailSlot from "../../../components/management/Slot/FormDetailSlot";
 import { getSlots } from "../../../services/slotService";
+import Pagination from "../../../components/management/HeaderFooter/Pagination";
 
 function ManageSlot() {
     // Fetch Data Slot - Start
@@ -102,16 +103,19 @@ function ManageSlot() {
         return 0;
     });
 
-    const indexOfLastItem = currentPage * pageSize;
-    const indexOfFirstItem = indexOfLastItem - pageSize;
-    const currentData = sortedData.slice(indexOfFirstItem, indexOfLastItem);
+      //#region Paging
+  const totalItems = sortedData.length;
+  const totalPages = Math.ceil(totalItems / pageSize);
+  const indexOfLastItem = currentPage * pageSize;
+  const indexOfFirstItem = indexOfLastItem - pageSize;
+  const currentData = sortedData.slice(indexOfFirstItem, indexOfLastItem);
 
-    const handlePageChange = (newPage) => {
-        if (newPage >= 1 && newPage <= Math.ceil(sortedData.length / pageSize)) {
-            setCurrentPage(newPage);
-        }
-    };
-
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setCurrentPage(newPage);
+    }
+  };
+  //#endregion
     return (
         <div className="border mt-4 h-auto pb-7 w-[1600px] bg-white rounded-2xl">
             <div className="flex justify-center">
@@ -222,32 +226,15 @@ function ManageSlot() {
                 </table>
             </div>
 
-            {/* Phân trang - start */}
-            <div className="flex mt-5">
-                {/* Button: Previous */}
-                <button
-                    type="button"
-                    className="rounded-2xl transition-all duration-300 hover:bg-quaternarty hover:scale-95 border border-white w-[130px] h-[40px] bg-[#3c6470] text-white font-semibold ml-auto mr-4 flex items-center justify-center"
-                    onClick={() => handlePageChange(currentPage - 1)}
-                >
-                    <span className="font-bold text-xl">&lt;</span> Trang Trước
-                </button>
-
-                {/* Date Range */}
-                <div className="border-2 border-black rounded-xl w-[220px] h-[40px] bg-primaryGray flex items-center justify-center">
-                    <p>{`Trang ${currentPage}`}</p>
-                </div>
-
-                {/* Button: Next */}
-                <button
-                    type="button"
-                    className="rounded-2xl transition-all duration-300 hover:bg-quaternarty hover:scale-95 border border-white w-[130px] h-[40px] bg-[#3c6470] text-white font-semibold ml-4 mr-auto flex items-center justify-center"
-                    onClick={() => handlePageChange(currentPage + 1)}
-                >
-                    Trang Sau <span className="font-bold text-xl">&gt;</span>
-                </button>
-            </div>
-            {/* Phân trang - end */}    
+            {/* Phân trang - Start */}
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          pageSize={pageSize}
+          totalItems={totalItems}
+          onPageChange={handlePageChange}
+        ></Pagination>
+        {/* Phân trang - End */}
             {/* Đường dẫn tới formAddSubject - Start */}
             {showAddForm && <FormAddSlot onSlotAdded={handleSlotReload} />}
             {/* Đường dẫn tới formAddSubject - End */}

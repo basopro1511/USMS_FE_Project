@@ -1,351 +1,446 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { AddRequest } from "../../../services/requestService";
+import { getSlots } from "../../../services/slotService";
+import {
+  getAvailableTeachersForAddSchedule,
+  getClassSubjectIdByTeacherSchedule,
+  GetScheduleDataByScheduleIdandSlotInSubject,
+  GetSlotNoInSubjectByClassSubjectId,
+} from "../../../services/scheduleService";
+import { GetClassSubjectById } from "../../../services/classService";
 
 function TeacherSendRequest() {
-    const [requestType, setRequestType] = useState("");
-    const [selectedSubject, setSelectedSubject] = useState("");
-    const [selectedTeacher, setSelectedTeacher] = useState("");
-    const [teachingDate, setTeachingDate] = useState("");
-    const [teachingTime, setTeachingTime] = useState("");
-    const [changeTime, setChangeTime] = useState("");
-    const [reason, setReason] = useState("");
-    const [errors, setErrors] = useState({});
-    const navigate = useNavigate();
+  const userId = localStorage.getItem("userId");
 
-    // Danh sách giáo viên theo môn học
-    const teacherOptions = {
-        KTPM: ["Thầy Đa", "Thầy Hiếu", "Thầy Phúc"],
-        XaHoi: ["Cô Lan", "Thầy Thanh"],
-        NgonNgu: ["Cô Trúc", "Cô Isekai"],
+  // Định nghĩa trạng thái ban đầu của form
+  const initialRequestState = {
+    requestId: 0,
+    userId: userId,
+    requestType: 1,
+    scheduleId: 1,
+    alternativeTeacher: null,
+    classSubjectId: 0,
+    slotNoInSubject: 0,
+    originalDate: null,
+    originalSlotId: 0,
+    originalRoomId: 0,
+    newDate: null,
+    newSlotId: null,
+    newRoomId: null,
+    reason: null,
+    replyResponse: null,
+    status: 0,
+    requestDate: new Date().toISOString(),
+  };
+
+  const [newRequest, setNewRequest] = useState(initialRequestState);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+  const [showAlert, setShowAlert] = useState(false); // Alert: "success" hoặc "error"
+
+  //#region Handle Add Request
+  const handleAddRequest = async (e) => {
+    e.preventDefault();
+    console.log("Form submitted with:", newRequest);
+    try {
+      const response = await AddRequest(newRequest);
+      if (response.isSuccess) {
+        setShowAlert("success");
+        setSuccessMessage(response.message);
+        // Sau khi gửi đơn thành công, reset form
+        clearForm();
+        setTimeout(() => setShowAlert(false), 3000);
+      } else {
+        setShowAlert("error");
+        setErrorMessage(response.message);
+        setTimeout(() => setShowAlert(false), 3000);
+      }
+    } catch (error) {
+      setShowAlert("error");
+      console.log(error);
+      setErrorMessage("Gửi đơn thất bại");
+      setTimeout(() => setShowAlert(false), 3000);    }
+  };
+
+  // Hàm clearForm để reset toàn bộ form về trạng thái ban đầu
+  const clearForm = () => {
+    setNewRequest(initialRequestState);
+  };
+  //#endregion
+
+  //#region Fetch Data
+  // Lấy dữ liệu các buổi dạy (slot)
+  const [slotData, setSlotData] = useState([]);
+  useEffect(() => {
+    const fetchSlotData = async () => {
+      const data = await getSlots();
+      setSlotData(data.result || []);
     };
+    fetchSlotData();
+  }, []);
 
-    // danh sách thời gian đổi
-    const timeSlots = [
-        "Slot 1 (7:00 AM - 9:00 AM)",
-        "Slot 2 (9:00 AM - 11:00 AM)",
-        "Slot 3 (1:00 PM - 3:00 PM)",
-        "Slot 4 (3:00 PM - 5:00 PM)",
-        "Slot 5 (5:00 PM - 7:00 PM)",
-    ];
-
-    // Hàm lọc thời gian muốn thay đổi theo buổi dạy
-    const getFilteredTimeSlots = () => {
-        if (teachingTime === "sang") {
-            return timeSlots.slice(0, 2); // Slot 1 và Slot 2
-        }
-        if (teachingTime === "chieu") {
-            return timeSlots.slice(2, 4); // Slot 3 và Slot 4
-        }
-        if (teachingTime === "toi") {
-            return timeSlots.slice(4); // Slot 5
-        }
-        return []; // Không hiển thị nếu chưa chọn buổi
+  // Lấy danh sách classSubjectId từ lịch của giáo viên
+  const [classSubjectId, setClassSubjectId] = useState([]);
+  useEffect(() => {
+    const fetchClassSubjectId = async () => {
+      const data = await getClassSubjectIdByTeacherSchedule(userId);
+      setClassSubjectId(data.result || []);
     };
+    fetchClassSubjectId();
+  }, [userId]);
 
-
-    // Hàm kiểm tra lỗi
-    const validateForm = () => {
-        const newErrors = {};
-
-        // Kiểm tra loại yêu cầu
-        if (!requestType || requestType === "0") {
-            newErrors.requestType = "Vui lòng chọn loại yêu cầu hợp lệ.";
-        }
-
-        // Kiểm tra môn học
-        if (!selectedSubject) {
-            newErrors.selectedSubject = "Vui lòng chọn môn học.";
-        }
-
-        // Kiểm tra giáo viên (nếu loại đơn là "2")
-        if (requestType === "2" && !selectedTeacher) {
-            newErrors.selectedTeacher = "Vui lòng chọn giáo viên muốn đổi.";
-        }
-
-        // Kiểm tra ngày dạy
-        if (!teachingDate) {
-            newErrors.teachingDate = "Vui lòng chọn ngày dạy.";
-        } else if (isNaN(new Date(teachingDate).getTime())) {
-            newErrors.teachingDate = "Ngày dạy không hợp lệ.";
-        }
-
-        // Kiểm tra buổi dạy
-        if (!teachingTime) {
-            newErrors.teachingTime = "Vui lòng chọn buổi dạy.";
-        }
-
-        // Kiểm tra thời gian thay đổi
-        if (!changeTime) {
-            newErrors.changeTime = "Vui lòng chọn thời gian muốn thay đổi.";
-        }
-        // Kiểm tra lý do
-        if (!reason) {
-            newErrors.reason = "Vui lòng nhập lý do.";
-        }
-
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0; // Form hợp lệ nếu không có lỗi
-    };
-
-    // Xử lí khi mà người dùng xuất hiện lỗi, người dùng ấn vào ô input thì lỗi tự động mất đi.
-    // Cái này mình sẽ sử dụng ở dưới các ô input có nút onchange => trỏ tới hàm này để sử dụng.
-    const handleInputChange = (field, value) => {
-        setErrors((prevErrors) => {
-            const newErrors = { ...prevErrors };
-            if (field === "requestType" && value !== "0") {
-                delete newErrors.requestType;
-            }
-            if (field === "selectedSubject" && value) {
-                delete newErrors.selectedSubject;
-            }
-            if (field === "selectedTeacher" && value) {
-                delete newErrors.selectedTeacher;
-            }
-            if (field === "teachingDate" && value && !isNaN(new Date(value).getTime())) {
-                delete newErrors.teachingDate;
-            }
-            if (field === "teachingTime" && value) {
-                delete newErrors.teachingTime;
-            }
-            if (field === "changeTime" && value) {
-                delete newErrors.changeTime;
-            }
-            if (field === "reason" && value.trim() !== "") {
-                delete newErrors.reason;
-            }
-            return newErrors;
-        });
-
-        switch (field) {
-            case "requestType":
-                setRequestType(value);
-                break;
-            case "selectedSubject":
-                setSelectedSubject(value);
-                break;
-            case "selectedTeacher":
-                setSelectedTeacher(value);
-                break;
-            case "teachingDate":
-                setTeachingDate(value);
-                break;
-            case "teachingTime":
-                setTeachingTime(value);
-                break;
-            case "changeTime":
-                setChangeTime(value);
-                break;
-            case "reason":
-                setReason(value);
-                break;
-            default:
-                break;
-        }
-    };
-    // Hàm xử lý gửi đơn
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-
-        // Kiểm tra form hợp lệ
-        if (!validateForm()) return;
-
+  // Lấy thông tin chi tiết của lớp học - môn
+  const [classSubjectData, setClassSubjectData] = useState([]);
+  useEffect(() => {
+    const fetchClassSubjectData = async () => {
+      if (classSubjectId && classSubjectId.length > 0) {
         try {
-            // Tạo dữ liệu gửi đi
-            const requestData = {
-                requestType,
-                selectedSubject,
-                selectedTeacher,
-                teachingDate,
-                teachingTime,
-                changeTime,
-                reason,
-            };
-
-            console.log("Dữ liệu gửi đi:", requestData);
-
-            // Giả lập API bằng setTimeout
-            setTimeout(() => {
-                // Giả lập thành công
-                alert("Gửi yêu cầu thành công!");
-                navigate("/home"); // Điều hướng về trang chủ
-            }, 1000); // Chờ 1 giây
+          const subjectPromises = classSubjectId.map(async (subjectId) => {
+            const res = await GetClassSubjectById(subjectId);
+            console.log("Fetched class subject:", res);
+            return res.result;
+          });
+          const subjects = await Promise.all(subjectPromises);
+          setClassSubjectData(subjects);
         } catch (error) {
-            console.error("Lỗi khi gửi yêu cầu:", error);
-            alert("Đã xảy ra lỗi khi gửi yêu cầu. Vui lòng thử lại.");
+          console.error("Error fetching class subject data:", error);
         }
+      }
     };
+    fetchClassSubjectData();
+  }, [classSubjectId]);
 
+  // Lấy danh sách slotNoInSubject dựa vào classSubject được chọn
+  const [slotNoInSubject, setSlotNoInSubject] = useState([]);
+  useEffect(() => {
+    if (newRequest.classSubjectId) {
+      const fetchSlotInSubject = async () => {
+        try {
+          const subjectResponse = await GetSlotNoInSubjectByClassSubjectId(
+            newRequest.classSubjectId
+          );
+          setSlotNoInSubject(subjectResponse.result);
+        } catch (error) {
+          console.error("Error fetching slotNoInSubject:", error);
+        }
+      };
+      fetchSlotInSubject();
+    }
+  }, [newRequest.classSubjectId]);
 
+  // Khi lớp học - môn và buổi học số được chọn thì lấy thông tin scheduleData
+  const [scheduleData, setScheduleData] = useState(null);
+  useEffect(() => {
+    if (newRequest.classSubjectId && newRequest.slotNoInSubject) {
+      const fetchScheduleData = async () => {
+        try {
+          const response = await GetScheduleDataByScheduleIdandSlotInSubject(
+            newRequest.classSubjectId,
+            newRequest.slotNoInSubject
+          );
+          const schedule = Array.isArray(response.result)
+            ? response.result[0]
+            : response.result;
+          setScheduleData(schedule);
+        } catch (error) {
+          console.error("Error fetching schedule data:", error);
+        }
+      };
+      fetchScheduleData();
+    }
+  }, [newRequest.classSubjectId, newRequest.slotNoInSubject]);
 
-    // // Reset giáo viên khi thay đổi môn học
-    // const handleSubjectChange = (event) => {
-    //     setSelectedSubject(event.target.value);
-    //     setSelectedTeacher(""); // Reset giáo viên khi thay đổi môn học
-    // };
+  // Khi scheduleData thay đổi, update thông tin originalDate, originalSlotId, originalRoomId
+  useEffect(() => {
+    if (scheduleData) {
+      setNewRequest((prev) => ({
+        ...prev,
+        originalDate: scheduleData.date || "",
+        originalSlotId: scheduleData.slotId || "",
+        originalRoomId: scheduleData.roomId || "",
+      }));
+    }
+  }, [scheduleData]);
 
-    return (
-        <div>
-            {/* Tiêu đề */}
-            <div className="flex justify-center">
-                <p className="mt-8 text-3xl font-bold">Yêu cầu thay đổi lịch dạy</p>
+  // Lấy danh sách giáo viên có thể thay thế dựa vào thông tin hiện tại
+  const [teacherData, setTeacherData] = useState(null);
+  useEffect(() => {
+    if (scheduleData?.date && scheduleData?.slotId && classSubjectData.length > 0) {
+      const selectedClassSubject = classSubjectData.find(
+        (item) => item.classSubjectId === newRequest.classSubjectId
+      );
+      if (selectedClassSubject && selectedClassSubject.majorId) {
+        const fetchTeacherData = async () => {
+          try {
+            const response = await getAvailableTeachersForAddSchedule(
+              selectedClassSubject.majorId,
+              scheduleData.date,
+              scheduleData.slotId
+            );
+            setTeacherData(response.result);
+          } catch (error) {
+            console.error("Error fetching teacher data:", error);
+          }
+        };
+        fetchTeacherData();
+      }
+    }
+  }, [classSubjectData, newRequest.classSubjectId, scheduleData]);
+  //#endregion
+
+  return (
+    <>
+      {/* Notification Start */}
+      {showAlert && (
+        <div
+          className={`fixed top-5 right-0 z-50 ${
+            showAlert === "error"
+              ? "animate-slide-in text-red-800 bg-red-50 border-red-300 mr-4"
+              : "animate-slide-in text-green-800 bg-green-50 border-green-300 mr-4"
+          } border rounded-lg p-4`}
+        >
+          <div className="flex items-center">
+            <svg
+              className="flex-shrink-0 inline w-4 h-4 mr-3"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 1 1 1 1v4h1a1 1 0 0 1 0 2Z" />
+            </svg>
+            <span className="sr-only">Info</span>
+            <div>
+              {showAlert === "error" ? (
+                <span>
+                  <strong>Thất bại:</strong> {errorMessage}
+                </span>
+              ) : (
+                <span>
+                  <strong>Thành công:</strong> {successMessage}
+                </span>
+              )}
             </div>
-
-            {/* Bảng hiển thị */}
-            <div className="mt-8 mb-8 mx-auto max-w-[700px] bg-gray-100 p-8 rounded shadow">
-                {/* Loại yêu cầu */}
-                <div className="mb-4">
-                    <label className="block text-gray-700 font-medium mb-2" htmlFor="loai-yeu-cau">
-                        Loại yêu cầu
-                    </label>
-                    <select
-                        id="loai-yeu-cau"
-                        value={requestType}
-                        onChange={(e) => handleInputChange("requestType", e.target.value)}
-                        className={`w-full border rounded px-3 py-2 focus:outline-none focus:ring ${errors.requestType ? "border-red-500 focus:ring-red-500" : "border-black focus:ring-blue-500"
-                            }`}
-                    >
-                        <option value="0">Chọn loại yêu cầu</option>
-                        <option value="1">Đổi thời gian dạy sang buổi/ giờ khác</option>
-                        <option value="2">Đổi người dạy thay thế</option>
-                    </select>
-                    {errors.requestType && <p className="text-red-500 text-sm">{errors.requestType}</p>}
-                </div>
-                {/* Môn học */}
-                <div className="mb-4">
-                    <label className="block text-gray-700 font-medium mb-2" htmlFor="mon-hoc">
-                        Môn học
-                    </label>
-                    <select
-                        id="mon-hoc"
-                        value={selectedSubject}
-                        onChange={(e) => handleInputChange("selectedSubject", e.target.value)}
-                        className={`w-full border rounded px-3 py-2 focus:outline-none focus:ring ${errors.selectedSubject ? "border-red-500 focus:ring-red-500" : "border-black focus:ring-blue-500"
-                            }`}
-                    >
-                        <option value="">Chọn môn học</option>
-                        <option value="KTPM">PRM123</option>
-                        <option value="XaHoi">EXE201</option>
-                        <option value="NgonNgu">JPD123</option>
-                    </select>
-                    {errors.selectedSubject && <p className="text-red-500 text-sm">{errors.selectedSubject}</p>}
-                </div>
-
-                {/* Giáo viên muốn đổi (Hiển thị nếu loại yêu cầu là "Đổi người dạy thay thế") */}
-                {requestType === "2" && (
-                    <div className="mb-4">
-                        <label className="block text-gray-700 font-medium mb-2" htmlFor="giao-vien-muon-doi">
-                            Giáo viên muốn đổi
-                        </label>
-                        <select
-                            id="giao-vien-muon-doi"
-                            value={selectedTeacher}
-                            onChange={(e) => handleInputChange("selectedTeacher", e.target.value)}
-                            className={`w-full border rounded px-3 py-2 focus:outline-none focus:ring ${errors.selectedTeacher ? "border-red-500 focus:ring-red-500" : "border-black focus:ring-blue-500"
-                                }`}
-                        >
-                            <option value="">Chọn giáo viên</option>
-                            {teacherOptions[selectedSubject]?.map((teacher, index) => (
-                                <option key={index} value={teacher}>
-                                    {teacher}
-                                </option>
-                            ))}
-                        </select>
-                        {errors.selectedTeacher && <p className="text-red-500 text-sm">{errors.selectedTeacher}</p>}
-                    </div>
-                )}
-
-                {/* Ngày dạy */}
-                <div className="mb-4">
-                    <label className="block text-gray-700 font-medium mb-2" htmlFor="ngay-day">
-                        Ngày dạy
-                    </label>
-                    <input
-                        type="date"
-                        id="ngay-day"
-                        value={teachingDate}
-                        onChange={(e) => handleInputChange("teachingDate", e.target.value)}
-                        className={`w-full border rounded px-3 py-2 focus:outline-none focus:ring ${errors.teachingDate ? "border-red-500 focus:ring-red-500" : "border-black focus:ring-blue-500"
-                            }`}
-                    />
-                    {errors.teachingDate && <p className="text-red-500 text-sm">{errors.teachingDate}</p>}
-                </div>
-
-
-                {/* Buổi dạy */}
-                <div className="mb-4">
-                    <label className="block text-gray-700 font-medium mb-2" htmlFor="buoi-day">
-                        Buổi dạy
-                    </label>
-                    <select
-                        id="buoi-day"
-                        value={teachingTime}
-                        onChange={(e) => handleInputChange("teachingTime", e.target.value)}
-                        className={`w-full border rounded px-3 py-2 focus:outline-none focus:ring ${errors.teachingTime ? "border-red-500 focus:ring-red-500" : "border-black focus:ring-blue-500"
-                            }`}
-                    >
-                        <option value="">Chọn buổi</option>
-                        <option value="sang">Sáng</option>
-                        <option value="chieu">Chiều</option>
-                        <option value="toi">Tối</option>
-                    </select>
-                    {errors.teachingTime && <p className="text-red-500 text-sm">{errors.teachingTime}</p>}
-                </div>
-
-                {/* Thời gian muốn thay đổi */}
-                <div className="mb-4">
-                    <label className="block text-gray-700 font-medium mb-2" htmlFor="thoi-gian-thay-doi">
-                        Thời gian muốn thay đổi
-                    </label>
-                    <select
-                        id="thoi-gian-thay-doi"
-                        value={changeTime}
-                        onChange={(e) => handleInputChange("changeTime", e.target.value)}
-                        className={`w-full border rounded px-3 py-2 focus:outline-none focus:ring ${errors.changeTime ? "border-red-500 focus:ring-red-500" : "border-black focus:ring-blue-500"
-                            }`}
-                    >
-                        <option value="">Chọn thời gian muốn thay đổi</option>
-                        {getFilteredTimeSlots().map((slot, index) => (
-                            <option key={index} value={slot}>
-                                {slot}
-                            </option>
-                        ))}
-                    </select>
-                    {errors.changeTime && <p className="text-red-500 text-sm">{errors.changeTime}</p>}
-                </div>
-                {/* Input lý do */}
-                <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-700 mb-2 ">
-                        Lý do
-                    </label>
-                    <textarea
-                        value={reason}
-                        onChange={(e) => handleInputChange("reason", e.target.value)}
-                        placeholder="Nhập lý do thay đổi thời gian dạy"
-                        className={`w-full border rounded px-3 py-2 focus:outline-none focus:ring ${errors.reason ? "border-red-500 focus:ring-red-500" : "border-black focus:ring-blue-500"
-                            }`}
-                    />
-                    {errors.reason && <p className="text-red-500 text-sm">{errors.reason}</p>}
-                </div>
-
-
-                {/* Nút hành động */}
-                <div className="flex justify-between">
-                    <button
-                        onClick={handleSubmit}
-                        className="w-[300px] h-[64px] bg-secondaryBlue text-white rounded-md font-bold hover:scale-105 "
-                    >
-                        Gửi Đơn
-                    </button>
-                    <button
-                        onClick={() => navigate("/home")}
-                        className="w-[300px] h-[64px] bg-red-500 text-white rounded-md font-bold hover:scale-105"
-                    >
-                        Hủy
-                    </button>
-                </div>
-            </div>
+          </div>
         </div>
-    );
+      )}
+      {/* Notification End */}
+      <div>
+        {/* Tiêu đề */}
+        <div className="flex justify-center">
+          <p className="mt-8 text-3xl font-bold">Yêu cầu thay đổi lịch dạy</p>
+        </div>
+        {/* Form */}
+        <form onSubmit={handleAddRequest}>
+          <div className="mt-8 mb-8 mx-auto max-w-[700px] bg-gray-100 p-8 rounded shadow">
+            {/* Loại yêu cầu */}
+            <div className="mb-4">
+              <label className="block text-gray-700 font-medium mb-2">
+                Loại yêu cầu
+              </label>
+              <select
+                required
+                className="w-full border rounded px-3 py-2 focus:outline-none focus:ring"
+                onChange={(e) =>
+                  setNewRequest({
+                    ...newRequest,
+                    requestType: parseInt(e.target.value),
+                  })
+                }
+              >
+                <option value="">Chọn loại yêu cầu</option>
+                <option value={2}>Đổi thời gian dạy sang buổi/ giờ khác</option>
+                <option value={1}>Đổi người dạy thay thế</option>
+              </select>
+            </div>
+            {/* Môn học - Môn */}
+            <div className="mb-4">
+              <label className="block text-gray-700 font-medium mb-2">
+                Lớp học - Môn học
+              </label>
+              <select
+                required
+                className="w-full border rounded px-3 py-2 focus:outline-none focus:ring"
+                onChange={(e) =>
+                  setNewRequest({
+                    ...newRequest,
+                    classSubjectId: parseInt(e.target.value),
+                  })
+                }
+              >
+                <option value="">Chọn lớp môn</option>
+                {classSubjectData.map((item, index) => (
+                  <option key={index} value={item.classSubjectId}>
+                    {item.classSubjectName}
+                  </option>
+                ))}
+              </select>
+            </div>
+            {/* Buổi học số */}
+            <div className="mb-4">
+              <label className="block text-gray-700 font-medium mb-2">
+                Buổi học số
+              </label>
+              <select
+                required
+                className="w-full border rounded px-3 py-2 focus:outline-none focus:ring"
+                onChange={(e) =>
+                  setNewRequest({
+                    ...newRequest,
+                    slotNoInSubject: parseInt(e.target.value),
+                  })
+                }
+              >
+                <option value="">Chọn buổi học số</option>
+                {slotNoInSubject.map((item, index) => (
+                  <option key={index} value={item}>
+                    {item}
+                  </option>
+                ))}
+              </select>
+            </div>
+            {/* Thông tin hiện tại từ scheduleData */}
+            <div className="mb-4">
+              <label className="block text-gray-700 font-medium mb-2">
+                Ngày dạy
+              </label>
+              <input
+                required
+                type="date"
+                value={newRequest.originalDate}
+                readOnly
+                className="w-full border rounded px-3 py-2 focus:outline-none focus:ring"
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-gray-700 font-medium mb-2">
+                Buổi dạy (slot)
+              </label>
+              <input
+                required
+                type="text"
+                value={newRequest.originalSlotId}
+                readOnly
+                className="w-full border rounded px-3 py-2 focus:outline-none focus:ring"
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-gray-700 font-medium mb-2">
+                Phòng dạy
+              </label>
+              <input
+                required
+                type="text"
+                value={newRequest.originalRoomId}
+                readOnly
+                className="w-full border rounded px-3 py-2 focus:outline-none focus:ring"
+              />
+            </div>
+            {/* Phần hiển thị dựa trên loại yêu cầu */}
+            {newRequest.requestType === 2 ? (
+              <>
+                <div className="mb-4">
+                  <label className="block text-gray-700 font-medium mb-2">
+                    Chọn ngày thay đổi
+                  </label>
+                  <input
+                    required
+                    type="date"
+                    className="w-full border rounded px-3 py-2 focus:outline-none focus:ring"
+                    onChange={(e) =>
+                      setNewRequest({
+                        ...newRequest,
+                        newDate: e.target.value,
+                      })
+                    }
+                  />
+                </div>
+                <div className="mb-4">
+                  <label className="block text-gray-700 font-medium mb-2">
+                    Chọn buổi dạy muốn thay đổi
+                  </label>
+                  <select
+                    required
+                    className="w-full border rounded px-3 py-2 focus:outline-none focus:ring"
+                    onChange={(e) =>
+                      setNewRequest({
+                        ...newRequest,
+                        newSlotId: parseInt(e.target.value),
+                      })
+                    }
+                  >
+                    <option value="">Chọn buổi dạy muốn thay đổi</option>
+                    {slotData.map((r) => (
+                      <option key={r.slotId} value={r.slotId}>
+                        Buổi {r.slotId} - ({r.startTime} - {r.endTime})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </>
+            ) : newRequest.requestType === 1 ? (
+              <div className="mb-4">
+                <label className="block text-gray-700 font-medium mb-2">
+                  Chọn giáo viên muốn thay thế
+                </label>
+                <select
+                  required
+                  className="w-full border rounded px-3 py-2 focus:outline-none focus:ring"
+                  onChange={(e) =>
+                    setNewRequest({
+                      ...newRequest,
+                      alternativeTeacher: e.target.value,
+                    })
+                  }
+                >
+                  <option value="">Chọn giáo viên</option>
+                  {teacherData &&
+                    teacherData.map((r) => (
+                      <option key={r.userId} value={r.userId}>
+                        {r.fullUserName} - {r.majorId}
+                      </option>
+                    ))}
+                </select>
+              </div>
+            ) : null}
+
+            {/* Lý do */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Lý do
+              </label>
+              <textarea
+                placeholder="Nhập lý do thay đổi thời gian dạy hoặc đổi người dạy"
+                className="w-full border rounded px-3 py-2 focus:outline-none focus:ring"
+                onChange={(e) =>
+                  setNewRequest({
+                    ...newRequest,
+                    reason: e.target.value,
+                  })
+                }
+              />
+            </div>
+            {/* Nút hành động */}
+            <div className="flex justify-between">
+              <button
+                type="submit"
+                className="w-[300px] h-[64px] bg-green-600 text-white rounded-md font-bold hover:scale-95"
+              >
+                Gửi Đơn
+              </button>
+              <button
+                type="button"
+                onClick={clearForm}
+                className="w-[300px] h-[64px] bg-red-500 text-white rounded-md font-bold hover:scale-95"
+              >
+                Hủy
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </>
+  );
 }
 
 export default TeacherSendRequest;

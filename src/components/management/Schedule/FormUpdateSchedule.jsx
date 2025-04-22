@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getClassesIdByClassId } from "../../../services/classService";
+import {  GetClassSubjectById } from "../../../services/classService";
 import { GetAvailableRoom } from "../../../services/roomService";
 import {
   getAvailableTeachersForAddSchedule,
@@ -8,8 +8,7 @@ import {
 import { getTeachers } from "../../../services/TeacherService";
 
 // eslint-disable-next-line react/prop-types
-function FormUpdateSchedule({dataToUpdate,selectedMajorId,selectedClassId,onAdded,
-}) {
+function FormUpdateSchedule({dataToUpdate,onAdded,}) {
   //#region State & Error
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
@@ -24,9 +23,9 @@ function FormUpdateSchedule({dataToUpdate,selectedMajorId,selectedClassId,onAdde
   // Dữ liệu schedule
   const [scheduleData, setNewSchedule] = useState(
     dataToUpdate || {
-      classScheduleId: 0,
+      scheduleId: 0,
       classSubjectId: 0,
-      slotId: 0,
+      slotId: 1,
       roomId: "",
       teacherId: "",
       date: "",
@@ -51,8 +50,9 @@ function FormUpdateSchedule({dataToUpdate,selectedMajorId,selectedClassId,onAdde
   //#region  lấy danh sách lớp
   useEffect(() => {
     const fetchClassSubject = async () => {
-      const classSubjects = await getClassesIdByClassId(selectedClassId); //Lấy ra list  trong database
+      const classSubjects = await GetClassSubjectById(scheduleData.classSubjectId); //Lấy ra list  trong database
       setClassSubjects(classSubjects.result);
+      console.log(classSubjects.result);
     };
     fetchClassSubject();
   }, []);
@@ -63,7 +63,7 @@ function FormUpdateSchedule({dataToUpdate,selectedMajorId,selectedClassId,onAdde
       const fetchAvailableTeachers = async () => {
         try {
           const teachers = await getAvailableTeachersForAddSchedule(
-            selectedMajorId,
+            classSubjects.majorId,
             scheduleData.date,
             scheduleData.slotId
           );
@@ -103,12 +103,14 @@ function FormUpdateSchedule({dataToUpdate,selectedMajorId,selectedClassId,onAdde
             scheduleData.date,
             scheduleData.slotId
           );
-
+          const available = rooms.result.filter(
+            (item) => item.status === 1
+          );
           //  Kiểm tra nếu phòng cũ vẫn tồn tại, giữ lại nó trong danh sách
           const currentRoom = scheduleData.roomId
             ? [{ roomId: scheduleData.roomId, location: "Phòng hiện tại" }]
             : [];
-          setRooms([...currentRoom, ...rooms.result]);
+          setRooms([...currentRoom, ...available]);
         } catch (error) {
           console.error("Error fetching rooms:", error);
         }
@@ -222,20 +224,15 @@ function FormUpdateSchedule({dataToUpdate,selectedMajorId,selectedClassId,onAdde
                     Mã lớp - Môn học:
                   </p>
                   <select
-                    required
                     className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl mb-3 px-4"
                     name="classSubjectId"
                     value={scheduleData.classSubjectId}
                     onChange={handleInputChange}
                   >
-                    <option value="">-- Chọn Lớp-Môn --</option>
-                    {classSubjects.map((cs) => (
-                      <option key={cs.classSubjectId} value={cs.classSubjectId}>
-                        {cs.classId} - {cs.subjectId}
+                      <option selected disabled key={classSubjects.classSubjectId} value={classSubjects.classSubjectId}>
+                        {classSubjects.classId} - {classSubjects.subjectId}
                       </option>
-                    ))}
                   </select>
-
                   <p className="text-left ml-[100px] text-xl ">Ngày:</p>
                   <input
                     type="date"
@@ -244,7 +241,15 @@ function FormUpdateSchedule({dataToUpdate,selectedMajorId,selectedClassId,onAdde
                     name="date"
                     value={scheduleData.date}
                     onChange={handleInputChange}
-                  />
+                  />   <p className="text-left ml-[100px] text-xl ">Buổi học số:</p>
+                  <input
+                    required
+                    name="slotId"
+                    value={scheduleData.slotNoInSubject}
+                    readOnly
+                    className="w-full max-w-[500px] h-[50px] text-black border border-black rounded-xl mb-3 px-4"
+                  >
+                  </input>
                   <p className="text-left ml-[100px] text-xl ">Slot:</p>
                   <select
                     required
@@ -310,7 +315,7 @@ function FormUpdateSchedule({dataToUpdate,selectedMajorId,selectedClassId,onAdde
                       type="submit"
                       className="w-full max-w-[200px] h-[50px] sm:h-[64px] border rounded-3xl bg-secondaryBlue text-white font-bold text-lg sm:text-2xl transition-all hover:scale-105 hover:bg-primaryBlue"
                     >
-                      Thêm
+                      Cập nhật
                     </button>
                     <button
                       type="button" // Use type="button" to prevent form submission

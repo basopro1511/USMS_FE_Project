@@ -3,11 +3,15 @@ import { getExamScheduleForTeacher } from "../../../services/examScheduleService
 function TeacherViewExam() {
   const [teacherData, setTeacherData] = useState([]);
   //#region Fetch Data
+  const userId = localStorage.getItem("userId");
 
   useEffect(() => {
     const fetchTeacherExamData = async () => {
-      const data = await getExamScheduleForTeacher("HieuNT");
-      setTeacherData(data.result);
+      const data = await getExamScheduleForTeacher(userId);
+      const available = data.result.filter(
+        (item) => item.status === 1
+      );
+      setTeacherData(available);
     };
     fetchTeacherExamData();
   }, []);

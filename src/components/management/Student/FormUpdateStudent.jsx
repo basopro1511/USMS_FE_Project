@@ -26,7 +26,7 @@ function FormUpdateStudent({ studentToUpdate, onStudentUpdated }) {
     majorId: "",
     status: 1,
     address: "",
-    term: 0,
+    term: 1,
   });
 
   useEffect(() => {
@@ -337,7 +337,7 @@ function FormUpdateStudent({ studentToUpdate, onStudentUpdated }) {
                       />
                     </div>
 
-                    {/* Term */}
+                    {/* Term
                     <div>
                       <label className="block text-sm font-medium mb-1">
                         Kì học:
@@ -359,7 +359,7 @@ function FormUpdateStudent({ studentToUpdate, onStudentUpdated }) {
                           </option>
                         ))}
                       </select>
-                    </div>
+                    </div> */}
                     {/* Address */}
                     <div>
                       <label className="block text-sm font-medium mb-1">

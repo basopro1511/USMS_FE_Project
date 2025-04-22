@@ -49,7 +49,8 @@ function FormAddStudentInClass({ onStudentAdded, classSubjectIdParam }) {
         setStudentData([]);
         return;
       }
-      setStudentData(data.result);
+      const activeStudent = data.result.filter((item) => item.status === 1);
+      setStudentData(activeStudent);
     } catch (error) {
       console.error("Lỗi khi fetch dữ liệu sinh viên:", error);
       setStudentData([]);
@@ -106,7 +107,13 @@ function FormAddStudentInClass({ onStudentAdded, classSubjectIdParam }) {
       }
       // Lọc theo tên sinh viên (ghép full name) - case-insensitive
       if (filter.studentName) {
-        const fullName = (item.firstName + " " + item.middleName + " " + item.lastName).toLowerCase();
+        const fullName = (
+          item.firstName +
+          " " +
+          item.middleName +
+          " " +
+          item.lastName
+        ).toLowerCase();
         const filterName = filter.studentName.toLowerCase();
         if (!fullName.includes(filterName)) {
           return false;
@@ -117,7 +124,7 @@ function FormAddStudentInClass({ onStudentAdded, classSubjectIdParam }) {
     });
     setFilteredStudents(filteredData);
   }, [filter, studentData]);
-  
+
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
     setFilters((prev) => ({ ...prev, [name]: value }));
@@ -205,7 +212,6 @@ function FormAddStudentInClass({ onStudentAdded, classSubjectIdParam }) {
   // Thêm nhiều SV
   const handleAddMultipleStudents = async (event) => {
     event.preventDefault();
-
     try {
       if (selectedStudents.length === 0) {
         setShowAlert("error");
@@ -219,9 +225,7 @@ function FormAddStudentInClass({ onStudentAdded, classSubjectIdParam }) {
         classSubjectId: classSubjectIdParam,
         studentId: userId,
       }));
-
       const response = await AddMultipleStudentToClass(studentsData);
-
       if (response.isSuccess) {
         setShowAlert("success");
         setSuccessMessage(response.message);
@@ -301,11 +305,11 @@ function FormAddStudentInClass({ onStudentAdded, classSubjectIdParam }) {
                     className="max-w-sm mx-auto ml-3 h-12 w-full md:w-[230px] border border-black rounded-xl"
                   >
                     <option value="">Chọn chuyên ngành</option>
-  {majorData.map((major) => (
-    <option key={major.majorId} value={major.majorId}>
-      {major.majorName}
-    </option>
-  ))}
+                    {majorData.map((major) => (
+                      <option key={major.majorId} value={major.majorId}>
+                        {major.majorName}
+                      </option>
+                    ))}
                   </select>
 
                   <select
@@ -515,31 +519,7 @@ function FormAddStudentInClass({ onStudentAdded, classSubjectIdParam }) {
                               </svg>
                             </div>
                           </th>
-                          <th
-                            className="p-4 font-semibold cursor-pointer transition-all hover:bg-primaryBlue text-white text-center align-middle bg-secondaryBlue "
-                            onClick={() => handleSort("major")}
-                          >
-                            <div className="flex items-center justify-between">
-                              <p className="m-auto transition-all hover:scale-105">
-                                Kỳ học
-                              </p>
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                strokeWidth="2"
-                                stroke="currentColor"
-                                aria-hidden="true"
-                                className="w-4 h-4"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9"
-                                />
-                              </svg>
-                            </div>
-                          </th>
+                   
                           <th className="p-4 font-semibold cursor-pointer transition-all hover:bg-primaryBlue text-white text-center align-middle bg-secondaryBlue">
                             Thao tác
                           </th>
@@ -591,9 +571,7 @@ function FormAddStudentInClass({ onStudentAdded, classSubjectIdParam }) {
                               <td className="p-4 border-b text-center">
                                 {majorName}
                               </td>
-                              <td className="p-4 border-b text-center">
-                                {student.term}
-                              </td>
+                     
                               <td className="p-4 border-b text-center">
                                 <button
                                   type="button"
