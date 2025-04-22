@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { changeRequestStatus } from "../../../services/requestService";
 
-function TeacherViewRequestDetail({ requestDetail, onClose , onReload}) {
+function TeacherViewRequestDetail({ requestDetail, onClose, onReload }) {
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [showAlert, setShowAlert] = useState(false); // Alert for success or failure notification
@@ -84,7 +84,7 @@ function TeacherViewRequestDetail({ requestDetail, onClose , onReload}) {
         setShowAlert("success");
         setSuccessMessage(response.message);
         setTimeout(() => setShowAlert(false), 3000);
-        onReload();
+        onReload(response.data);
       } else {
         setShowAlert("error");
         setErrorMessage(response.message);
@@ -102,8 +102,8 @@ function TeacherViewRequestDetail({ requestDetail, onClose , onReload}) {
   const formatStatus = (status) => (status === 0 ? "Chưa xử lý" : "Đã xử lý");
   return (
     <>
-     {/* Notification Start */}
-     {showAlert && (
+      {/* Notification Start */}
+      {showAlert && (
         <div
           className={`fixed top-5 right-0 z-50 ${
             showAlert === "error"
@@ -180,7 +180,7 @@ function TeacherViewRequestDetail({ requestDetail, onClose , onReload}) {
                   value={formatDateTime(requestData.requestDate)}
                 />
               </div>
-          
+
               <div>
                 <p className="font-medium">Ngày dạy ( Chính thức ):</p>
                 <input
@@ -191,7 +191,9 @@ function TeacherViewRequestDetail({ requestDetail, onClose , onReload}) {
                 />
               </div>
               <div>
-                <p className="font-medium">Buổi dạy - Thời gian ( Chính Thức )</p>
+                <p className="font-medium">
+                  Buổi dạy - Thời gian ( Chính Thức )
+                </p>
                 <input
                   type="text"
                   readOnly
@@ -207,7 +209,7 @@ function TeacherViewRequestDetail({ requestDetail, onClose , onReload}) {
                   className="w-full h-[40px] border border-gray-300 rounded-md px-3"
                   value={requestData.originalRoomId}
                 />
-              </div>    
+              </div>
               {requestData.requestType === 2 && (
                 <>
                   <div>
@@ -225,7 +227,11 @@ function TeacherViewRequestDetail({ requestDetail, onClose , onReload}) {
                       type="text"
                       readOnly
                       className="w-full h-[40px] border border-gray-300 rounded-md px-3"
-                      value={requestData.newSlotId !== null ? requestData.newSlotId : ""}
+                      value={
+                        requestData.newSlotId !== null
+                          ? requestData.newSlotId
+                          : ""
+                      }
                     />
                   </div>
                   <div>
@@ -234,7 +240,11 @@ function TeacherViewRequestDetail({ requestDetail, onClose , onReload}) {
                       type="text"
                       readOnly
                       className="w-full h-[40px] border border-gray-300 rounded-md px-3"
-                      value={requestData.newRoomId !== null ? requestData.newRoomId : "Chưa có phòng mới"}
+                      value={
+                        requestData.newRoomId !== null
+                          ? requestData.newRoomId
+                          : "Chưa có phòng mới"
+                      }
                     />
                   </div>
                 </>
@@ -249,15 +259,16 @@ function TeacherViewRequestDetail({ requestDetail, onClose , onReload}) {
                     value={requestData.alternativeTeacher}
                   />
                 </div>
-              )}<div>
-              <p className="font-medium">Trạng thái:</p>
-              <input
-                type="text"
-                readOnly
-                className="w-full h-[40px] border border-gray-300 rounded-md px-3"
-                value={formatStatus(requestData.status)}
-              />
-            </div>
+              )}
+              <div>
+                <p className="font-medium">Trạng thái:</p>
+                <input
+                  type="text"
+                  readOnly
+                  className="w-full h-[40px] border border-gray-300 rounded-md px-3"
+                  value={formatStatus(requestData.status)}
+                />
+              </div>
               <div className="sm:col-span-2">
                 <p className="font-medium">Lý do:</p>
                 <textarea
@@ -276,13 +287,18 @@ function TeacherViewRequestDetail({ requestDetail, onClose , onReload}) {
               </div>
             </div>
             <div className="flex justify-center gap-8 mt-8 mb-8">
-            <button
-                type="button"
-                className="w-full max-w-[150px] h-[50px] sm:h-[40px]border rounded-2xl bg-red-500 text-white font-bold text-lg sm:text-l transition-all hover:scale-105 hover:bg-red-600 mt-auto mb-auto"
-                onClick={() => handleChangeSelectedStatus(requestData.requestId, 2)}
-              >
-                Hủy đơn yêu cầu
-              </button>
+              {requestData.status === 0 && (
+                <button
+                  type="button"
+                  className="w-full max-w-[150px] h-[50px] sm:h-[40px]border rounded-2xl bg-red-500 text-white font-bold text-lg sm:text-l transition-all hover:scale-105 hover:bg-red-600 mt-auto mb-auto"
+                  onClick={() =>
+                    handleChangeSelectedStatus(requestData.requestId, 2)
+                  }
+                >
+                  Hủy đơn yêu cầu
+                </button>
+              )}
+
               <button
                 type="button"
                 className="w-full max-w-[150px] h-[50px] sm:h-[40px]border rounded-2xl bg-green-700 text-white  font-bold text-lg sm:text-l transition-all hover:scale-105 hover:bg-green-700 mt-auto mb-auto"
@@ -290,7 +306,6 @@ function TeacherViewRequestDetail({ requestDetail, onClose , onReload}) {
               >
                 Quay lại
               </button>
-              
             </div>
           </div>
         </div>

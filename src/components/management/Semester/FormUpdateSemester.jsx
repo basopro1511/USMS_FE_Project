@@ -134,10 +134,10 @@ function FormUpdateSemester({ semesterToUpdate, onSemesterUpdated }) {
           <div className="bg-white border w-full max-w-[700px] h-auto rounded-2xl items-center text-center shadow-xl">
             <div>
               <p className="font-bold text-3xl sm:text-4xl md:text-5xl mt-8 text-secondaryBlue">
-                Cập nhật kỳ học
+                Cập nhật học kỳ
               </p>
               <form onSubmit={handleUpdateSemester}>
-                <p className="text-left ml-[100px] text-xl mt-5">Mã kỳ học: </p>
+                <p className="text-left ml-[100px] text-xl mt-5">Mã học kỳ: </p>
                 <input
                   readOnly
                   type="text"
@@ -151,7 +151,7 @@ function FormUpdateSemester({ semesterToUpdate, onSemesterUpdated }) {
                     })
                   }
                 />
-                <p className="text-left ml-[100px] text-xl ">Tên kỳ học: </p>
+                <p className="text-left ml-[100px] text-xl ">Tên học kỳ: </p>
 
                 <input
                   type="text"

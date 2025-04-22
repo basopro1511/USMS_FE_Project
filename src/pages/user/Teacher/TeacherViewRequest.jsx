@@ -54,9 +54,15 @@ function TeacherRequestNotifications() {
   }, [teacherId]);
 
   const handleReload = async () => {
-    const data = await getRequests();
-    setRequestData(data.result);
-  };
+    const response = await getRequests();
+    if (response.isSuccess && response.result) {
+      // Lọc dữ liệu để chỉ lấy các request của giáo viên hiện tại
+      const myRequests = response.result.filter(
+        (item) => item.userId === teacherId
+      );
+      setRequestData(myRequests);
+    setRequestData(myRequests);
+  };}
   //#endregion
   //#region fitler data
   // Lọc theo trạng thái nếu có bộ lọc

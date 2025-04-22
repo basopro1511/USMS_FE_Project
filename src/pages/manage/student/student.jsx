@@ -308,7 +308,7 @@ function ManageStudent() {
               ))}
             </select>
 
-            {/* Select filter kỳ học */}
+            {/* Select filter kỳ học
             <select
               name="term"
               value={filter.term}
@@ -323,7 +323,7 @@ function ManageStudent() {
                   </option>
                 )
               )}
-            </select>
+            </select> */}
 
             {/* Select filter trạng thái */}
             <select

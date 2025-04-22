@@ -60,9 +60,6 @@ function UserHome() {
 
   //#region Log Out
   const handleLogout = () => {
-    setShowAlert(true);
-    setShowAlert("success");
-    setSuccessMessage("Đăng xuất thành công !");
     localStorage.removeItem("token");
     localStorage.removeItem("userId");
     localStorage.removeItem("roleId");

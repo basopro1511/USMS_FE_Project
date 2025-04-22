@@ -54,8 +54,6 @@ function HeaderManage() {
 
   //#region Log Out
   const handleLogout = () => {
-    setShowAlert("success");
-    setSuccessMessage("Đăng xuất thành công !");
     localStorage.removeItem("token");
     localStorage.removeItem("userId");
     localStorage.removeItem("roleId");
@@ -137,7 +135,12 @@ function HeaderManage() {
           {isActive("/manageSemester") && (
             <>
               <i className="fas fa-calendar-days w-4 h-4"></i>
-              <p className="text-lg italic">Quản lý kỳ học</p>
+              <p className="text-lg italic">Quản lý học kỳ</p>
+            </>
+          )}   {location.pathname.includes("/studentInClass") && (
+            <>
+              <i className="fas fa-user-graduate w-4 h-4"></i>
+              <p className="text-lg italic">Quản lý sinh viên trong lớp</p>
             </>
           )}
           {isActive("/manageStudent") && (

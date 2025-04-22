@@ -224,10 +224,11 @@ function FormUpdateStaff({ teacherToUpdate, onReaload }) {
                       </div>
                     </div>
                     <div>
-                      <p className="text-left">Email:</p>
+                      <p className="text-left">Email ( hệ thống ):</p>
                       <input
                         type="email"
                         required
+                        readOnly
                         className="w-full h-[40px] border border-gray-300 rounded-md px-3"
                         value={staffData.email}
                         onChange={(e) =>

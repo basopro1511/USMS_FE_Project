@@ -259,7 +259,7 @@ function ManageStaff() {
               value={filters.userId}
               onChange={handleFilterChange}
               className="max-w-sm mx-auto ml-3 h-12 px-3 w-full md:w-[230px] border border-black rounded-xl"
-              placeholder="Mã giáo viên"
+              placeholder="Mã nhân viên"
             />
 
             {/* Lọc theo Họ và tên */}
@@ -365,7 +365,7 @@ function ManageStaff() {
                 >
                   <div className="flex items-center justify-between">
                     <p className="m-auto transition-all hover:scale-105">
-                      Mã GV
+                      Mã NV
                     </p>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -571,7 +571,7 @@ function ManageStaff() {
               })}
             </tbody>
           </table>
-          <div className="">
+          <div className=" ml-2 mb-3">
             <h1 className="text-left">
               Thay đổi trạng thái sinh viên đã được chọn:{" "}
             </h1>

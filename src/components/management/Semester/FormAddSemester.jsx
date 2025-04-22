@@ -143,7 +143,7 @@ function FormAddSemester({ onSemesterAdded }) {
           <div className="bg-white border w-full max-w-[700px] h-auto rounded-2xl shadow-xl p-6">
             <div>
               <p className="font-bold text-3xl sm:text-4xl md:text-5xl mt-8  text-secondaryBlue text-center">
-                Thêm kỳ học
+                Thêm học kỳ
               </p>
               <form onSubmit={handleAddSemester} className="ml-16">
                 {/* Chọn mùa */}
@@ -170,7 +170,7 @@ function FormAddSemester({ onSemesterAdded }) {
                 />
 
                 {/* Hiển thị các field tự động (read-only) */}
-                <p className="text-left text-xl">Mã kỳ học:</p>
+                <p className="text-left text-xl">Mã học kỳ:</p>
                 <input
                   type="text"
                   readOnly
@@ -178,7 +178,7 @@ function FormAddSemester({ onSemesterAdded }) {
                   className="w-full max-w-[500px] h-[50px] border border-gray-300 rounded-xl mb-3 px-4 bg-gray-100"
                 />
 
-                <p className="text-left text-xl">Tên kỳ học:</p>
+                <p className="text-left text-xl">Tên học kỳ:</p>
                 <input
                   type="text"
                   readOnly

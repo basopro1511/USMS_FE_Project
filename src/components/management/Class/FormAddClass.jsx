@@ -39,7 +39,7 @@ function FormAddClass({ onClassAdded }) {
       const semesterData = await getSemesters(); // Lấy ra list semester từ database
       // Chỉ giữ lại các semester có status = 1
       const activeSemesters = semesterData.result.filter(
-        (item) => item.status === 1
+        (item) => item.status !== 2
       );
       setSemesterData(activeSemesters);
     };

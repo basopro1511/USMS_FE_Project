@@ -558,7 +558,7 @@ function ManageScheduleByDay() {
       {/* Main Container */}
       {/* --- Filter --- */}
       <div className="flex">
-        <p className="ml-3  ">Sắp lịch học theo tuần:</p>
+        <p className="ml-3  ">Sắp lịch học theo ngày:</p>
         <p className="ml-24">Filter:</p>
       </div>{" "}
       <div className="flex w-auto h-12 ">
